@@ -250,8 +250,8 @@ const Landing: React.FC = () => {
           <div className="text-center">
             <p className="text-white/60 text-sm">
               {language === 'pt' 
-                ? '© 2024 Calendado. Todos os direitos reservados.' 
-                : '© 2024 Calendado. All rights reserved.'
+                ? '© 2025 Calendado. Todos os direitos reservados.' 
+                : '© 2025 Calendado. All rights reserved.'
               }
             </p>
           </div>

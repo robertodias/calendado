@@ -1,0 +1,49 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Waitlist collection rules
+    match /waitlist/{document} {
+      // Allow anyone to write to waitlist (for public signup)
+      allow write: if true;
+      
+      // Only authenticated users can read waitlist data
+      allow read: if request.auth != null;
+    }
+    
+    // TODO: Add user profiles collection rules
+    // match /users/{userId} {
+    //   allow read, write: if request.auth != null && request.auth.uid == userId;
+    // }
+    
+    // TODO: Add bookings collection rules
+    // match /bookings/{bookingId} {
+    //   allow read, write: if request.auth != null;
+    //   allow create: if true; // Allow public booking creation
+    // }
+    
+    // TODO: Add calendar events collection rules
+    // match /events/{eventId} {
+    //   allow read, write: if request.auth != null;
+    // }
+    
+    // TODO: Add notifications collection rules
+    // match /notifications/{notificationId} {
+    //   allow read, write: if request.auth != null && 
+    //     request.auth.uid == resource.data.userId;
+    // }
+    
+    // TODO: Add admin-only collections
+    // match /admin/{document} {
+    //   allow read, write: if request.auth != null && 
+    //     exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+    //     get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    // }
+    
+    // Default deny rule for any unmatched paths
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
