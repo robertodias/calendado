@@ -3,13 +3,13 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { db } from '../firebase';
 import { hasJoinedWaitlist, markWaitlistJoined } from '../lib/cookieUtils';
+import { normalizeEmail, isValidEmailFormat, getEmailNormalizationMessage } from '../lib/emailUtils';
 import '../lib/testUtils'; // Import test utilities for development
 
 const Landing: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
-    whatsapp: ''
+    email: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -17,6 +17,8 @@ const Landing: React.FC = () => {
   const [hasJoined, setHasJoined] = useState(false);
   const [captchaValue, setCaptchaValue] = useState<string | null>(null);
   const [captchaError, setCaptchaError] = useState(false);
+  const [emailError, setEmailError] = useState('');
+  const [emailTouched, setEmailTouched] = useState(false);
 
   // Check if user has already joined the waitlist on component mount
   useEffect(() => {
@@ -29,6 +31,19 @@ const Landing: React.FC = () => {
       ...prev,
       [name]: value
     }));
+
+    // Validate email in real-time
+    if (name === 'email') {
+      setEmailTouched(true);
+      if (value && !isValidEmailFormat(value)) {
+        setEmailError(language === 'pt' 
+          ? 'Por favor, insira um email válido' 
+          : 'Please enter a valid email address'
+        );
+      } else {
+        setEmailError('');
+      }
+    }
   };
 
   // Handle CAPTCHA verification
@@ -48,6 +63,17 @@ const Landing: React.FC = () => {
     setIsSubmitting(true);
     setSubmitStatus('idle');
     setCaptchaError(false);
+    setEmailError('');
+
+    // Validate email format
+    if (!isValidEmailFormat(formData.email)) {
+      setEmailError(language === 'pt' 
+        ? 'Por favor, insira um email válido' 
+        : 'Please enter a valid email address'
+      );
+      setIsSubmitting(false);
+      return;
+    }
 
     // Validate CAPTCHA
     if (!captchaValue) {
@@ -57,13 +83,16 @@ const Landing: React.FC = () => {
     }
 
     try {
+      // Normalize email for consistent storage
+      const normalizedEmail = normalizeEmail(formData.email);
+      
       // Check if Firebase is properly configured
       if (!db || !import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.VITE_FIREBASE_API_KEY === 'demo-key') {
-        console.warn('Firebase not configured. Form data:', formData);
+        console.warn('Firebase not configured. Form data:', { ...formData, email: normalizedEmail });
         // Simulate success for development
         setTimeout(() => {
           setSubmitStatus('success');
-          setFormData({ name: '', email: '', whatsapp: '' });
+          setFormData({ name: '', email: '' });
           setCaptchaValue(null);
           markWaitlistJoined(); // Set cookie to prevent future submissions
           setHasJoined(true);
@@ -76,14 +105,15 @@ const Landing: React.FC = () => {
       // For now, we'll just validate on the client side
       
       await addDoc(collection(db, 'waitlist'), {
-        ...formData,
+        name: formData.name,
+        email: normalizedEmail, // Use normalized email
         createdAt: serverTimestamp(),
         language: language,
         captchaVerified: true // Mark that CAPTCHA was verified
       });
       
       setSubmitStatus('success');
-      setFormData({ name: '', email: '', whatsapp: '' });
+      setFormData({ name: '', email: '' });
       setCaptchaValue(null);
       markWaitlistJoined(); // Set cookie to prevent future submissions
       setHasJoined(true);
@@ -104,7 +134,8 @@ const Landing: React.FC = () => {
         title: "Junte-se à lista de espera",
         name: "Nome completo",
         email: "Email",
-        whatsapp: "WhatsApp",
+        emailPlaceholder: "seu@email.com",
+        emailError: "Por favor, insira um email válido",
         captcha: "Verificação de segurança",
         captchaError: "Por favor, complete a verificação de segurança.",
         submit: "Entrar na lista",
@@ -121,7 +152,8 @@ const Landing: React.FC = () => {
         title: "Join the waitlist",
         name: "Full name",
         email: "Email",
-        whatsapp: "WhatsApp",
+        emailPlaceholder: "your@email.com",
+        emailError: "Please enter a valid email address",
         captcha: "Security verification",
         captchaError: "Please complete the security verification.",
         submit: "Join waitlist",
@@ -201,9 +233,9 @@ const Landing: React.FC = () => {
       </div>
 
       {/* Waitlist Form Section */}
-      <div id="waitlist-form" className="relative py-20">
+      <div id="waitlist-form" className="relative py-12 sm:py-20">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 sm:p-12 border border-white/20 shadow-2xl">
+          <div className="bg-white/10 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-12 border border-white/20 shadow-2xl">
             <div className="text-center mb-8">
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
                 {currentContent.form.title}
@@ -245,7 +277,7 @@ const Landing: React.FC = () => {
                   </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-white/90 mb-2">
                   {currentContent.form.name}
@@ -272,26 +304,27 @@ const Landing: React.FC = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
+                  onBlur={() => setEmailTouched(true)}
                   required
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                  placeholder={currentContent.form.email}
+                  autoComplete="email"
+                  inputMode="email"
+                  className={`w-full px-4 py-3 bg-white/10 border rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${
+                    emailError && emailTouched
+                      ? 'border-red-400 focus:ring-red-500'
+                      : 'border-white/20 focus:ring-purple-500'
+                  }`}
+                  placeholder={currentContent.form.emailPlaceholder}
                 />
-              </div>
-
-              <div>
-                <label htmlFor="whatsapp" className="block text-sm font-medium text-white/90 mb-2">
-                  {currentContent.form.whatsapp}
-                </label>
-                <input
-                  type="tel"
-                  id="whatsapp"
-                  name="whatsapp"
-                  value={formData.whatsapp}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                  placeholder="+55 11 99999-9999"
-                />
+                {emailError && emailTouched && (
+                  <p className="mt-2 text-sm text-red-400">
+                    {emailError}
+                  </p>
+                )}
+                {formData.email && !emailError && getEmailNormalizationMessage(formData.email) && (
+                  <p className="mt-2 text-xs text-white/60">
+                    {getEmailNormalizationMessage(formData.email)}
+                  </p>
+                )}
               </div>
 
               {/* CAPTCHA Section */}
@@ -299,13 +332,16 @@ const Landing: React.FC = () => {
                 <label className="block text-sm font-medium text-white/90 mb-2">
                   {currentContent.form.captcha}
                 </label>
-                <div className="flex justify-center">
-                  <ReCAPTCHA
-                    sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // This is a test key - replace with your real key
-                    onChange={handleCaptchaChange}
-                    onExpired={handleCaptchaExpired}
-                    theme="dark"
-                  />
+                <div className="flex justify-center overflow-hidden">
+                  <div className="transform scale-90 sm:scale-100">
+                    <ReCAPTCHA
+                      sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // This is a test key - replace with your real key
+                      onChange={handleCaptchaChange}
+                      onExpired={handleCaptchaExpired}
+                      theme="dark"
+                      size="normal"
+                    />
+                  </div>
                 </div>
                 {captchaError && (
                   <p className="mt-2 text-sm text-red-400 text-center">

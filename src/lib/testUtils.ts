@@ -31,7 +31,7 @@ export const simulateJoinedUser = (): void => {
  * Check current waitlist status
  * Useful for debugging
  */
-export const checkWaitlistStatus = (): void => {
+export const checkWaitlistStatus = (): boolean => {
   const hasJoined = hasJoinedWaitlist();
   console.log(`Waitlist status: ${hasJoined ? 'Already joined' : 'Not joined yet'}`);
   return hasJoined;
