@@ -23,6 +23,9 @@ const Landing: React.FC = () => {
   const [isCheckingDuplicate, setIsCheckingDuplicate] = useState(false);
   const [captchaTimeout, setCaptchaTimeout] = useState<NodeJS.Timeout | null>(null);
   const recaptchaRef = useRef<ReCAPTCHA>(null);
+  
+  // Disable CAPTCHA for local development
+  const isLocalDevelopment = import.meta.env.DEV || window.location.hostname === 'localhost';
 
   // Check if user has already joined the waitlist on component mount
   useEffect(() => {
@@ -102,8 +105,16 @@ const Landing: React.FC = () => {
       // Normalize email for consistent storage
       const normalizedEmail = normalizeEmail(formData.email);
       
+      // Debug Firebase configuration
+      console.log('Firebase debug:', {
+        db: !!db,
+        apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+        isDemoKey: import.meta.env.VITE_FIREBASE_API_KEY === 'demo-key',
+        isLocalDev: isLocalDevelopment
+      });
+      
       // Check if Firebase is properly configured
-      if (!db || !import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.VITE_FIREBASE_API_KEY !== 'demo-key') {
+      if (!db || !import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.VITE_FIREBASE_API_KEY === 'demo-key') {
         console.warn('Firebase not configured. Form data:', { ...formData, email: normalizedEmail });
         // Simulate success for development
         setTimeout(() => {
@@ -120,13 +131,22 @@ const Landing: React.FC = () => {
       // Server-side CAPTCHA verification would go here in a real implementation
       // For now, we'll just validate on the client side
       
-      await addDoc(collection(db, 'waitlist'), {
+      console.log('Attempting to save to Firestore:', {
+        name: formData.name,
+        email: normalizedEmail,
+        language: language,
+        captchaVerified: true
+      });
+      
+      const docRef = await addDoc(collection(db, 'waitlist'), {
         name: formData.name,
         email: normalizedEmail, // Use normalized email
         createdAt: serverTimestamp(),
         language: language,
         captchaVerified: true // Mark that CAPTCHA was verified
       });
+      
+      console.log('Document written with ID: ', docRef.id);
       
       setSubmitStatus('success');
       setFormData({ name: '', email: '' });
@@ -178,9 +198,12 @@ const Landing: React.FC = () => {
       }
     }
 
-    // For reCAPTCHA v3, we need to execute it programmatically
-    if (!captchaValue) {
-      // Execute invisible CAPTCHA
+    // Skip CAPTCHA validation in local development
+    if (isLocalDevelopment) {
+      console.log('Local development - skipping CAPTCHA validation');
+      setCaptchaValue('local-dev-bypass');
+    } else if (!captchaValue) {
+      // Execute invisible CAPTCHA only in production
       if (recaptchaRef.current) {
         try {
           recaptchaRef.current.execute();
@@ -422,26 +445,28 @@ const Landing: React.FC = () => {
                 )}
               </div>
 
-              {/* CAPTCHA Section - reCAPTCHA v3 (invisible) */}
-              <div>
-                <div className="flex justify-center overflow-hidden">
-                  <div className="transform scale-90 sm:scale-100">
-                    <ReCAPTCHA
-                      ref={recaptchaRef}
-                      sitekey="6Le6nNArAAAAANxArJSBlIZ1kGrtQ03N8Z1BkI2K"
-                      onChange={handleCaptchaChange}
-                      onExpired={handleCaptchaExpired}
-                      theme="dark"
-                      size="invisible"
-                    />
+              {/* CAPTCHA Section - Hidden in local development */}
+              {!isLocalDevelopment && (
+                <div>
+                  <div className="flex justify-center overflow-hidden">
+                    <div className="transform scale-90 sm:scale-100">
+                      <ReCAPTCHA
+                        ref={recaptchaRef}
+                        sitekey="6Le6nNArAAAAANxArJSBlIZ1kGrtQ03N8Z1BkI2K"
+                        onChange={handleCaptchaChange}
+                        onExpired={handleCaptchaExpired}
+                        theme="dark"
+                        size="invisible"
+                      />
+                    </div>
                   </div>
+                  {captchaError && (
+                    <p className="mt-2 text-sm text-red-400 text-center">
+                      {currentContent.form.captchaError}
+                    </p>
+                  )}
                 </div>
-                {captchaError && (
-                  <p className="mt-2 text-sm text-red-400 text-center">
-                    {currentContent.form.captchaError}
-                  </p>
-                )}
-              </div>
+              )}
 
               <button
                 type="submit"
