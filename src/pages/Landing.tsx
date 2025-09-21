@@ -4,16 +4,18 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import { db } from '../firebase';
 import { hasJoinedWaitlist, markWaitlistJoined } from '../lib/cookieUtils';
 import { normalizeEmail, isValidEmailFormat, getEmailNormalizationMessage } from '../lib/emailUtils';
+import { useLanguage } from '../contexts/LanguageContext';
 import '../lib/testUtils'; // Import test utilities for development
 
 const Landing: React.FC = () => {
+  const { language, setLanguage, t } = useLanguage();
+  
   const [formData, setFormData] = useState({
     name: '',
     email: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [language, setLanguage] = useState<'pt' | 'en'>('pt');
   const [hasJoined, setHasJoined] = useState(false);
   const [captchaValue, setCaptchaValue] = useState<string | null>(null);
   const [captchaError, setCaptchaError] = useState(false);
@@ -43,10 +45,7 @@ const Landing: React.FC = () => {
     if (name === 'email') {
       setEmailTouched(true);
       if (value && !isValidEmailFormat(value)) {
-        setEmailError(language === 'pt' 
-          ? 'Por favor, insira um email válido' 
-          : 'Please enter a valid email address'
-        );
+        setEmailError(t('form.emailError'));
       } else {
         setEmailError('');
       }
@@ -171,10 +170,7 @@ const Landing: React.FC = () => {
 
     // Validate email format
     if (!isValidEmailFormat(formData.email)) {
-      setEmailError(language === 'pt' 
-        ? 'Por favor, insira um email válido' 
-        : 'Please enter a valid email address'
-      );
+      setEmailError(t('form.emailError'));
       setIsSubmitting(false);
       return;
     }
@@ -235,48 +231,10 @@ const Landing: React.FC = () => {
     continueSubmission();
   };
 
-  const content = {
-    pt: {
-      hero: "Entrou no Calendado, compromisso agendado.",
-      subtext: "Seu link de agendamento + WhatsApp. Grátis para começar.",
-      cta: "Quero meu link",
-      form: {
-        title: "Junte-se à lista de espera",
-        name: "Nome completo",
-        email: "Email",
-        emailPlaceholder: "seu@email.com",
-        emailError: "Por favor, insira um email válido",
-        duplicateEmailError: "Este email já está cadastrado na nossa lista de espera",
-        captcha: "Verificação de segurança",
-        captchaError: "Por favor, complete a verificação de segurança.",
-        submit: "Entrar na lista",
-        success: "Obrigado! Você foi adicionado à lista de espera.",
-        error: "Ops! Algo deu errado. Tente novamente.",
-        alreadyJoined: "Você já se inscreveu na lista de espera. Obrigado por se inscrever!"
-      }
-    },
-    en: {
-      hero: "Calendado: get in, get booked.",
-      subtext: "Your booking link + WhatsApp reminders. Free to start.",
-      cta: "Join waitlist",
-      form: {
-        title: "Join the waitlist",
-        name: "Full name",
-        email: "Email",
-        emailPlaceholder: "your@email.com",
-        emailError: "Please enter a valid email address",
-        duplicateEmailError: "This email is already registered in our waitlist",
-        captcha: "Security verification",
-        captchaError: "Please complete the security verification.",
-        submit: "Join waitlist",
-        success: "Thank you! You've been added to the waitlist.",
-        error: "Oops! Something went wrong. Please try again.",
-        alreadyJoined: "You've already joined the waitlist. Thanks for signing up!"
-      }
-    }
+  // Language switching function
+  const handleLanguageChange = (newLanguage: 'pt' | 'en') => {
+    setLanguage(newLanguage);
   };
-
-  const currentContent = content[language];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
@@ -284,7 +242,7 @@ const Landing: React.FC = () => {
       <div className="absolute top-6 right-6 z-10">
         <div className="flex bg-white/10 backdrop-blur-sm rounded-full p-1">
           <button
-            onClick={() => setLanguage('pt')}
+            onClick={() => handleLanguageChange('pt')}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               language === 'pt' 
                 ? 'bg-white text-slate-900 shadow-lg' 
@@ -294,7 +252,7 @@ const Landing: React.FC = () => {
             PT
           </button>
           <button
-            onClick={() => setLanguage('en')}
+            onClick={() => handleLanguageChange('en')}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               language === 'en' 
                 ? 'bg-white text-slate-900 shadow-lg' 
@@ -321,13 +279,13 @@ const Landing: React.FC = () => {
             {/* Main Headline */}
             <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white mb-8 leading-tight">
               <span className="bg-gradient-to-r from-white via-purple-200 to-pink-200 bg-clip-text text-transparent">
-                {currentContent.hero}
+                {t('hero')}
               </span>
             </h1>
             
             {/* Subtext */}
             <p className="text-xl sm:text-2xl text-white/80 mb-12 max-w-3xl mx-auto leading-relaxed">
-              {currentContent.subtext}
+              {t('subtext')}
             </p>
             
             {/* CTA Button */}
@@ -335,7 +293,7 @@ const Landing: React.FC = () => {
               onClick={() => document.getElementById('waitlist-form')?.scrollIntoView({ behavior: 'smooth' })}
               className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold text-lg rounded-full shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-105"
             >
-              {currentContent.cta}
+              {t('cta')}
               <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
@@ -350,7 +308,7 @@ const Landing: React.FC = () => {
           <div className="bg-white/10 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-12 border border-white/20 shadow-2xl">
             <div className="text-center mb-8">
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                {currentContent.form.title}
+                {t('form.title')}
               </h2>
               <div className="w-24 h-1 bg-gradient-to-r from-purple-400 to-pink-400 mx-auto rounded-full"></div>
             </div>
@@ -365,13 +323,10 @@ const Landing: React.FC = () => {
                     </svg>
                   </div>
                   <h3 className="text-2xl font-bold text-white mb-4">
-                    {currentContent.form.alreadyJoined}
+                    {t('form.alreadyJoined')}
                   </h3>
                   <p className="text-white/70 text-lg">
-                    {language === 'pt' 
-                      ? 'Fique atento ao seu email para atualizações sobre o Calendado!'
-                      : 'Keep an eye on your email for Calendado updates!'
-                    }
+                    {t('form.waitlistUpdate')}
                   </p>
                 </div>
               </div>
@@ -379,26 +334,26 @@ const Landing: React.FC = () => {
               <>
                 {submitStatus === 'success' && (
                   <div className="mb-6 p-4 bg-green-500/20 border border-green-400/30 rounded-xl text-green-100 text-center">
-                    {currentContent.form.success}
+                    {t('form.success')}
                   </div>
                 )}
 
                 {submitStatus === 'error' && (
                   <div className="mb-6 p-4 bg-red-500/20 border border-red-400/30 rounded-xl text-red-100 text-center">
-                    {currentContent.form.error}
+                    {t('form.error')}
                   </div>
                 )}
 
                 {duplicateEmailError && (
                   <div className="mb-6 p-4 bg-yellow-500/20 border border-yellow-400/30 rounded-xl text-yellow-100 text-center">
-                    {currentContent.form.duplicateEmailError}
+                    {t('form.duplicateEmailError')}
                   </div>
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-white/90 mb-2">
-                  {currentContent.form.name}
+                  {t('form.name')}
                 </label>
                 <input
                   type="text"
@@ -408,13 +363,13 @@ const Landing: React.FC = () => {
                   onChange={handleInputChange}
                   required
                   className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                  placeholder={currentContent.form.name}
+                  placeholder={t('form.name')}
                 />
               </div>
 
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-white/90 mb-2">
-                  {currentContent.form.email}
+                  {t('form.email')}
                 </label>
                 <input
                   type="email"
@@ -431,7 +386,7 @@ const Landing: React.FC = () => {
                       ? 'border-red-400 focus:ring-red-500'
                       : 'border-white/20 focus:ring-purple-500'
                   }`}
-                  placeholder={currentContent.form.emailPlaceholder}
+                  placeholder={t('form.emailPlaceholder')}
                 />
                 {emailError && emailTouched && (
                   <p className="mt-2 text-sm text-red-400">
@@ -462,7 +417,7 @@ const Landing: React.FC = () => {
                   </div>
                   {captchaError && (
                     <p className="mt-2 text-sm text-red-400 text-center">
-                      {currentContent.form.captchaError}
+                      {t('form.captchaError')}
                     </p>
                   )}
                 </div>
@@ -476,15 +431,15 @@ const Landing: React.FC = () => {
                 {isCheckingDuplicate ? (
                   <div className="flex items-center justify-center">
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    {language === 'pt' ? 'Verificando email...' : 'Checking email...'}
+                    {t('form.checkingEmail')}
                   </div>
                 ) : isSubmitting ? (
                   <div className="flex items-center justify-center">
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    {language === 'pt' ? 'Enviando...' : 'Sending...'}
+                    {t('form.sending')}
                   </div>
                 ) : (
-                  currentContent.form.submit
+                  t('form.submit')
                 )}
               </button>
             </form>
@@ -499,10 +454,7 @@ const Landing: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <p className="text-white/60 text-sm">
-              {language === 'pt' 
-                ? '© 2025 Calendado. Todos os direitos reservados.' 
-                : '© 2025 Calendado. All rights reserved.'
-              }
+              {t('footer.copyright')}
             </p>
           </div>
         </div>

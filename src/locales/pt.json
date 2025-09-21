@@ -1,0 +1,25 @@
+{
+  "hero": "Entrou no Calendado, compromisso agendado.",
+  "subtext": "Seu link de agendamento + WhatsApp. Grátis para começar.",
+  "cta": "Quero meu link",
+  "form": {
+    "title": "Junte-se à lista de espera",
+    "name": "Nome completo",
+    "email": "Email",
+    "emailPlaceholder": "seu@email.com",
+    "emailError": "Por favor, insira um email válido",
+    "duplicateEmailError": "Este email já está cadastrado na nossa lista de espera",
+    "captcha": "Verificação de segurança",
+    "captchaError": "Por favor, complete a verificação de segurança.",
+    "submit": "Entrar na lista",
+    "success": "Obrigado! Você foi adicionado à lista de espera.",
+    "error": "Ops! Algo deu errado. Tente novamente.",
+    "alreadyJoined": "Você já se inscreveu na lista de espera. Obrigado por se inscrever!",
+    "checkingEmail": "Verificando email...",
+    "sending": "Enviando...",
+    "waitlistUpdate": "Fique atento ao seu email para atualizações sobre o Calendado!"
+  },
+  "footer": {
+    "copyright": "© 2025 Calendado. Todos os direitos reservados."
+  }
+}

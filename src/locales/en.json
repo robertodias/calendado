@@ -1,0 +1,25 @@
+{
+  "hero": "Calendado: get in, get booked.",
+  "subtext": "Your booking link + WhatsApp reminders. Free to start.",
+  "cta": "Join waitlist",
+  "form": {
+    "title": "Join the waitlist",
+    "name": "Full name",
+    "email": "Email",
+    "emailPlaceholder": "your@email.com",
+    "emailError": "Please enter a valid email address",
+    "duplicateEmailError": "This email is already registered in our waitlist",
+    "captcha": "Security verification",
+    "captchaError": "Please complete the security verification.",
+    "submit": "Join waitlist",
+    "success": "Thank you! You've been added to the waitlist.",
+    "error": "Oops! Something went wrong. Please try again.",
+    "alreadyJoined": "You've already joined the waitlist. Thanks for signing up!",
+    "checkingEmail": "Checking email...",
+    "sending": "Sending...",
+    "waitlistUpdate": "Keep an eye on your email for Calendado updates!"
+  },
+  "footer": {
+    "copyright": "© 2025 Calendado. All rights reserved."
+  }
+}
