@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { db } from '../firebase';
 import { hasJoinedWaitlist, markWaitlistJoined } from '../lib/cookieUtils';
@@ -19,6 +19,7 @@ const Landing: React.FC = () => {
   const [captchaError, setCaptchaError] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [emailTouched, setEmailTouched] = useState(false);
+  const [duplicateEmailError, setDuplicateEmailError] = useState(false);
   const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   // Check if user has already joined the waitlist on component mount
@@ -59,12 +60,29 @@ const Landing: React.FC = () => {
     setCaptchaError(true);
   };
 
+  // Check if email already exists in Firestore
+  const checkEmailExists = async (email: string): Promise<boolean> => {
+    if (!db) return false;
+    
+    try {
+      const normalizedEmail = normalizeEmail(email);
+      const waitlistRef = collection(db, 'waitlist');
+      const q = query(waitlistRef, where('email', '==', normalizedEmail));
+      const querySnapshot = await getDocs(q);
+      return !querySnapshot.empty;
+    } catch (error) {
+      console.error('Error checking email:', error);
+      return false; // If there's an error, allow submission (fail open)
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('idle');
     setCaptchaError(false);
     setEmailError('');
+    setDuplicateEmailError(false);
 
     // Validate email format
     if (!isValidEmailFormat(formData.email)) {
@@ -74,6 +92,16 @@ const Landing: React.FC = () => {
       );
       setIsSubmitting(false);
       return;
+    }
+
+    // Check if email already exists (only if Firebase is configured)
+    if (db && import.meta.env.VITE_FIREBASE_API_KEY && import.meta.env.VITE_FIREBASE_API_KEY !== 'demo-key') {
+      const emailExists = await checkEmailExists(formData.email);
+      if (emailExists) {
+        setDuplicateEmailError(true);
+        setIsSubmitting(false);
+        return;
+      }
     }
 
     // For reCAPTCHA v3, we need to execute it programmatically
@@ -143,6 +171,7 @@ const Landing: React.FC = () => {
         email: "Email",
         emailPlaceholder: "seu@email.com",
         emailError: "Por favor, insira um email válido",
+        duplicateEmailError: "Este email já está cadastrado na nossa lista de espera",
         captcha: "Verificação de segurança",
         captchaError: "Por favor, complete a verificação de segurança.",
         submit: "Entrar na lista",
@@ -161,6 +190,7 @@ const Landing: React.FC = () => {
         email: "Email",
         emailPlaceholder: "your@email.com",
         emailError: "Please enter a valid email address",
+        duplicateEmailError: "This email is already registered in our waitlist",
         captcha: "Security verification",
         captchaError: "Please complete the security verification.",
         submit: "Join waitlist",
@@ -281,6 +311,12 @@ const Landing: React.FC = () => {
                 {submitStatus === 'error' && (
                   <div className="mb-6 p-4 bg-red-500/20 border border-red-400/30 rounded-xl text-red-100 text-center">
                     {currentContent.form.error}
+                  </div>
+                )}
+
+                {duplicateEmailError && (
+                  <div className="mb-6 p-4 bg-yellow-500/20 border border-yellow-400/30 rounded-xl text-yellow-100 text-center">
+                    {currentContent.form.duplicateEmailError}
                   </div>
                 )}
 
