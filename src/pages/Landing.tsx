@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-// import ReCAPTCHA from 'react-google-recaptcha'; // Temporarily disabled
+import ReCAPTCHA from 'react-google-recaptcha';
 import { db } from '../firebase';
 import { hasJoinedWaitlist, markWaitlistJoined } from '../lib/cookieUtils';
 import { normalizeEmail, isValidEmailFormat, getEmailNormalizationMessage } from '../lib/emailUtils';
@@ -15,8 +15,8 @@ const Landing: React.FC = () => {
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [language, setLanguage] = useState<'pt' | 'en'>('pt');
   const [hasJoined, setHasJoined] = useState(false);
-  // const [captchaValue, setCaptchaValue] = useState<string | null>(null); // Temporarily disabled
-  // const [captchaError, setCaptchaError] = useState(false); // Temporarily disabled
+  const [captchaValue, setCaptchaValue] = useState<string | null>(null);
+  const [captchaError, setCaptchaError] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [emailTouched, setEmailTouched] = useState(false);
 
@@ -46,22 +46,23 @@ const Landing: React.FC = () => {
     }
   };
 
-  // CAPTCHA handlers temporarily disabled
-  // const handleCaptchaChange = (value: string | null) => {
-  //   setCaptchaValue(value);
-  //   setCaptchaError(false); // Clear error when CAPTCHA is completed
-  // };
+  // Handle CAPTCHA verification
+  const handleCaptchaChange = (value: string | null) => {
+    setCaptchaValue(value);
+    setCaptchaError(false); // Clear error when CAPTCHA is completed
+  };
 
-  // const handleCaptchaExpired = () => {
-  //   setCaptchaValue(null);
-  //   setCaptchaError(true);
-  // };
+  // Handle CAPTCHA expiration
+  const handleCaptchaExpired = () => {
+    setCaptchaValue(null);
+    setCaptchaError(true);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('idle');
-    // setCaptchaError(false); // CAPTCHA temporarily disabled
+    setCaptchaError(false);
     setEmailError('');
 
     // Validate email format
@@ -74,12 +75,12 @@ const Landing: React.FC = () => {
       return;
     }
 
-    // CAPTCHA validation temporarily disabled
-    // if (!captchaValue) {
-    //   setCaptchaError(true);
-    //   setIsSubmitting(false);
-    //   return;
-    // }
+    // Validate CAPTCHA
+    if (!captchaValue) {
+      setCaptchaError(true);
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       // Normalize email for consistent storage
@@ -92,7 +93,7 @@ const Landing: React.FC = () => {
         setTimeout(() => {
           setSubmitStatus('success');
           setFormData({ name: '', email: '' });
-          // setCaptchaValue(null); // CAPTCHA temporarily disabled
+          setCaptchaValue(null);
           markWaitlistJoined(); // Set cookie to prevent future submissions
           setHasJoined(true);
           setIsSubmitting(false);
@@ -107,13 +108,13 @@ const Landing: React.FC = () => {
         name: formData.name,
         email: normalizedEmail, // Use normalized email
         createdAt: serverTimestamp(),
-        language: language
-        // captchaVerified: true // CAPTCHA temporarily disabled
+        language: language,
+        captchaVerified: true // Mark that CAPTCHA was verified
       });
       
       setSubmitStatus('success');
       setFormData({ name: '', email: '' });
-      // setCaptchaValue(null); // CAPTCHA temporarily disabled
+      setCaptchaValue(null);
       markWaitlistJoined(); // Set cookie to prevent future submissions
       setHasJoined(true);
     } catch (error) {
@@ -326,8 +327,7 @@ const Landing: React.FC = () => {
                 )}
               </div>
 
-              {/* CAPTCHA Section - Temporarily disabled */}
-              {/* 
+              {/* CAPTCHA Section */}
               <div>
                 <label className="block text-sm font-medium text-white/90 mb-2">
                   {currentContent.form.captcha}
@@ -335,7 +335,7 @@ const Landing: React.FC = () => {
                 <div className="flex justify-center overflow-hidden">
                   <div className="transform scale-90 sm:scale-100">
                     <ReCAPTCHA
-                      sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // This is a test key - replace with your real key
+                      sitekey="6Le6nNArAAAAANxArJSBlIZ1kGrtQ03N8Z1BkI2K"
                       onChange={handleCaptchaChange}
                       onExpired={handleCaptchaExpired}
                       theme="dark"
@@ -349,7 +349,6 @@ const Landing: React.FC = () => {
                   </p>
                 )}
               </div>
-              */}
 
               <button
                 type="submit"
