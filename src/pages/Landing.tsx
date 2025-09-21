@@ -26,6 +26,18 @@ const Landing: React.FC = () => {
     setSubmitStatus('idle');
 
     try {
+      // Check if Firebase is properly configured
+      if (!db || !import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.VITE_FIREBASE_API_KEY === 'demo-key') {
+        console.warn('Firebase not configured. Form data:', formData);
+        // Simulate success for development
+        setTimeout(() => {
+          setSubmitStatus('success');
+          setFormData({ name: '', email: '', whatsapp: '' });
+          setIsSubmitting(false);
+        }, 1000);
+        return;
+      }
+
       await addDoc(collection(db, 'waitlist'), {
         ...formData,
         createdAt: serverTimestamp(),
