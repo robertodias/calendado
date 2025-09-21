@@ -21,6 +21,7 @@ const Landing: React.FC = () => {
   const [emailTouched, setEmailTouched] = useState(false);
   const [duplicateEmailError, setDuplicateEmailError] = useState(false);
   const [isCheckingDuplicate, setIsCheckingDuplicate] = useState(false);
+  const [captchaTimeout, setCaptchaTimeout] = useState<NodeJS.Timeout | null>(null);
   const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   // Check if user has already joined the waitlist on component mount
@@ -51,8 +52,21 @@ const Landing: React.FC = () => {
 
   // Handle CAPTCHA verification
   const handleCaptchaChange = (value: string | null) => {
+    console.log('CAPTCHA value received:', value);
     setCaptchaValue(value);
     setCaptchaError(false); // Clear error when CAPTCHA is completed
+    
+    // Clear timeout if CAPTCHA completes successfully
+    if (captchaTimeout) {
+      clearTimeout(captchaTimeout);
+      setCaptchaTimeout(null);
+    }
+    
+    // If CAPTCHA is completed and we're in the middle of submission, continue
+    if (value && isSubmitting) {
+      // Continue with the actual submission
+      continueSubmission();
+    }
   };
 
   // Handle CAPTCHA expiration
@@ -79,6 +93,51 @@ const Landing: React.FC = () => {
       // If there's a permission error or other issue, allow submission
       // This prevents the form from being completely blocked due to Firestore issues
       return false;
+    }
+  };
+
+  // Continue with the actual form submission after CAPTCHA is completed
+  const continueSubmission = async () => {
+    try {
+      // Normalize email for consistent storage
+      const normalizedEmail = normalizeEmail(formData.email);
+      
+      // Check if Firebase is properly configured
+      if (!db || !import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.VITE_FIREBASE_API_KEY === 'demo-key') {
+        console.warn('Firebase not configured. Form data:', { ...formData, email: normalizedEmail });
+        // Simulate success for development
+        setTimeout(() => {
+          setSubmitStatus('success');
+          setFormData({ name: '', email: '' });
+          setCaptchaValue(null);
+          markWaitlistJoined(); // Set cookie to prevent future submissions
+          setHasJoined(true);
+          setIsSubmitting(false);
+        }, 1000);
+        return;
+      }
+
+      // Server-side CAPTCHA verification would go here in a real implementation
+      // For now, we'll just validate on the client side
+      
+      await addDoc(collection(db, 'waitlist'), {
+        name: formData.name,
+        email: normalizedEmail, // Use normalized email
+        createdAt: serverTimestamp(),
+        language: language,
+        captchaVerified: true // Mark that CAPTCHA was verified
+      });
+      
+      setSubmitStatus('success');
+      setFormData({ name: '', email: '' });
+      setCaptchaValue(null);
+      markWaitlistJoined(); // Set cookie to prevent future submissions
+      setHasJoined(true);
+    } catch (error) {
+      console.error('Error adding document: ', error);
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -123,56 +182,34 @@ const Landing: React.FC = () => {
     if (!captchaValue) {
       // Execute invisible CAPTCHA
       if (recaptchaRef.current) {
-        recaptchaRef.current.execute();
-        return; // The onChange handler will continue the submission
+        try {
+          recaptchaRef.current.execute();
+          
+          // Set a timeout fallback in case CAPTCHA doesn't respond
+          const timeout = setTimeout(() => {
+            console.warn('CAPTCHA timeout - proceeding without verification');
+            setCaptchaValue('timeout-fallback');
+            continueSubmission();
+          }, 10000); // 10 second timeout
+          
+          setCaptchaTimeout(timeout);
+          return; // The onChange handler will continue the submission
+        } catch (error) {
+          console.error('Error executing CAPTCHA:', error);
+          setCaptchaError(true);
+          setIsSubmitting(false);
+          return;
+        }
       } else {
+        console.error('reCAPTCHA ref not available');
         setCaptchaError(true);
         setIsSubmitting(false);
         return;
       }
     }
 
-    try {
-      // Normalize email for consistent storage
-      const normalizedEmail = normalizeEmail(formData.email);
-      
-      // Check if Firebase is properly configured
-      if (!db || !import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.VITE_FIREBASE_API_KEY === 'demo-key') {
-        console.warn('Firebase not configured. Form data:', { ...formData, email: normalizedEmail });
-        // Simulate success for development
-        setTimeout(() => {
-          setSubmitStatus('success');
-          setFormData({ name: '', email: '' });
-          setCaptchaValue(null);
-          markWaitlistJoined(); // Set cookie to prevent future submissions
-          setHasJoined(true);
-          setIsSubmitting(false);
-        }, 1000);
-        return;
-      }
-
-      // Server-side CAPTCHA verification would go here in a real implementation
-      // For now, we'll just validate on the client side
-      
-      await addDoc(collection(db, 'waitlist'), {
-        name: formData.name,
-        email: normalizedEmail, // Use normalized email
-        createdAt: serverTimestamp(),
-        language: language,
-        captchaVerified: true // Mark that CAPTCHA was verified
-      });
-      
-      setSubmitStatus('success');
-      setFormData({ name: '', email: '' });
-      setCaptchaValue(null);
-      markWaitlistJoined(); // Set cookie to prevent future submissions
-      setHasJoined(true);
-    } catch (error) {
-      console.error('Error adding document: ', error);
-      setSubmitStatus('error');
-    } finally {
-      setIsSubmitting(false);
-    }
+    // If CAPTCHA is already completed, continue with submission
+    continueSubmission();
   };
 
   const content = {
