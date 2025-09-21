@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import ReCAPTCHA from 'react-google-recaptcha';
 import { db } from '../firebase';
+import { hasJoinedWaitlist, markWaitlistJoined } from '../lib/cookieUtils';
+import '../lib/testUtils'; // Import test utilities for development
 
 const Landing: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +14,14 @@ const Landing: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [language, setLanguage] = useState<'pt' | 'en'>('pt');
+  const [hasJoined, setHasJoined] = useState(false);
+  const [captchaValue, setCaptchaValue] = useState<string | null>(null);
+  const [captchaError, setCaptchaError] = useState(false);
+
+  // Check if user has already joined the waitlist on component mount
+  useEffect(() => {
+    setHasJoined(hasJoinedWaitlist());
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -20,10 +31,30 @@ const Landing: React.FC = () => {
     }));
   };
 
+  // Handle CAPTCHA verification
+  const handleCaptchaChange = (value: string | null) => {
+    setCaptchaValue(value);
+    setCaptchaError(false); // Clear error when CAPTCHA is completed
+  };
+
+  // Handle CAPTCHA expiration
+  const handleCaptchaExpired = () => {
+    setCaptchaValue(null);
+    setCaptchaError(true);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('idle');
+    setCaptchaError(false);
+
+    // Validate CAPTCHA
+    if (!captchaValue) {
+      setCaptchaError(true);
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       // Check if Firebase is properly configured
@@ -33,19 +64,29 @@ const Landing: React.FC = () => {
         setTimeout(() => {
           setSubmitStatus('success');
           setFormData({ name: '', email: '', whatsapp: '' });
+          setCaptchaValue(null);
+          markWaitlistJoined(); // Set cookie to prevent future submissions
+          setHasJoined(true);
           setIsSubmitting(false);
         }, 1000);
         return;
       }
 
+      // Server-side CAPTCHA verification would go here in a real implementation
+      // For now, we'll just validate on the client side
+      
       await addDoc(collection(db, 'waitlist'), {
         ...formData,
         createdAt: serverTimestamp(),
-        language: language
+        language: language,
+        captchaVerified: true // Mark that CAPTCHA was verified
       });
       
       setSubmitStatus('success');
       setFormData({ name: '', email: '', whatsapp: '' });
+      setCaptchaValue(null);
+      markWaitlistJoined(); // Set cookie to prevent future submissions
+      setHasJoined(true);
     } catch (error) {
       console.error('Error adding document: ', error);
       setSubmitStatus('error');
@@ -64,9 +105,12 @@ const Landing: React.FC = () => {
         name: "Nome completo",
         email: "Email",
         whatsapp: "WhatsApp",
+        captcha: "Verificação de segurança",
+        captchaError: "Por favor, complete a verificação de segurança.",
         submit: "Entrar na lista",
         success: "Obrigado! Você foi adicionado à lista de espera.",
-        error: "Ops! Algo deu errado. Tente novamente."
+        error: "Ops! Algo deu errado. Tente novamente.",
+        alreadyJoined: "Você já se inscreveu na lista de espera. Obrigado por se inscrever!"
       }
     },
     en: {
@@ -78,9 +122,12 @@ const Landing: React.FC = () => {
         name: "Full name",
         email: "Email",
         whatsapp: "WhatsApp",
+        captcha: "Security verification",
+        captchaError: "Please complete the security verification.",
         submit: "Join waitlist",
         success: "Thank you! You've been added to the waitlist.",
-        error: "Oops! Something went wrong. Please try again."
+        error: "Oops! Something went wrong. Please try again.",
+        alreadyJoined: "You've already joined the waitlist. Thanks for signing up!"
       }
     }
   };
@@ -164,19 +211,41 @@ const Landing: React.FC = () => {
               <div className="w-24 h-1 bg-gradient-to-r from-purple-400 to-pink-400 mx-auto rounded-full"></div>
             </div>
 
-            {submitStatus === 'success' && (
-              <div className="mb-6 p-4 bg-green-500/20 border border-green-400/30 rounded-xl text-green-100 text-center">
-                {currentContent.form.success}
+            {/* Show different content based on whether user has already joined */}
+            {hasJoined ? (
+              <div className="text-center py-12">
+                <div className="mb-6">
+                  <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-4">
+                    {currentContent.form.alreadyJoined}
+                  </h3>
+                  <p className="text-white/70 text-lg">
+                    {language === 'pt' 
+                      ? 'Fique atento ao seu email para atualizações sobre o Calendado!'
+                      : 'Keep an eye on your email for Calendado updates!'
+                    }
+                  </p>
+                </div>
               </div>
-            )}
+            ) : (
+              <>
+                {submitStatus === 'success' && (
+                  <div className="mb-6 p-4 bg-green-500/20 border border-green-400/30 rounded-xl text-green-100 text-center">
+                    {currentContent.form.success}
+                  </div>
+                )}
 
-            {submitStatus === 'error' && (
-              <div className="mb-6 p-4 bg-red-500/20 border border-red-400/30 rounded-xl text-red-100 text-center">
-                {currentContent.form.error}
-              </div>
-            )}
+                {submitStatus === 'error' && (
+                  <div className="mb-6 p-4 bg-red-500/20 border border-red-400/30 rounded-xl text-red-100 text-center">
+                    {currentContent.form.error}
+                  </div>
+                )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-white/90 mb-2">
                   {currentContent.form.name}
@@ -225,6 +294,26 @@ const Landing: React.FC = () => {
                 />
               </div>
 
+              {/* CAPTCHA Section */}
+              <div>
+                <label className="block text-sm font-medium text-white/90 mb-2">
+                  {currentContent.form.captcha}
+                </label>
+                <div className="flex justify-center">
+                  <ReCAPTCHA
+                    sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // This is a test key - replace with your real key
+                    onChange={handleCaptchaChange}
+                    onExpired={handleCaptchaExpired}
+                    theme="dark"
+                  />
+                </div>
+                {captchaError && (
+                  <p className="mt-2 text-sm text-red-400 text-center">
+                    {currentContent.form.captchaError}
+                  </p>
+                )}
+              </div>
+
               <button
                 type="submit"
                 disabled={isSubmitting}
@@ -240,6 +329,8 @@ const Landing: React.FC = () => {
                 )}
               </button>
             </form>
+              </>
+            )}
           </div>
         </div>
       </div>
