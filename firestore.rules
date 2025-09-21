@@ -8,8 +8,9 @@ service cloud.firestore {
       // Allow anyone to write to waitlist (for public signup)
       allow write: if true;
       
-      // Only authenticated users can read waitlist data
-      allow read: if request.auth != null;
+      // Allow reading for duplicate email checking (public read for email validation)
+      // This is needed for the duplicate email check functionality
+      allow read: if true;
     }
     
     // TODO: Add user profiles collection rules

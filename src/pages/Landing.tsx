@@ -20,6 +20,7 @@ const Landing: React.FC = () => {
   const [emailError, setEmailError] = useState('');
   const [emailTouched, setEmailTouched] = useState(false);
   const [duplicateEmailError, setDuplicateEmailError] = useState(false);
+  const [isCheckingDuplicate, setIsCheckingDuplicate] = useState(false);
   const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   // Check if user has already joined the waitlist on component mount
@@ -62,7 +63,10 @@ const Landing: React.FC = () => {
 
   // Check if email already exists in Firestore
   const checkEmailExists = async (email: string): Promise<boolean> => {
-    if (!db) return false;
+    if (!db) {
+      console.warn('Firestore not available for duplicate check');
+      return false; // Allow submission if Firestore is not available
+    }
     
     try {
       const normalizedEmail = normalizeEmail(email);
@@ -72,7 +76,9 @@ const Landing: React.FC = () => {
       return !querySnapshot.empty;
     } catch (error) {
       console.error('Error checking email:', error);
-      return false; // If there's an error, allow submission (fail open)
+      // If there's a permission error or other issue, allow submission
+      // This prevents the form from being completely blocked due to Firestore issues
+      return false;
     }
   };
 
@@ -96,11 +102,20 @@ const Landing: React.FC = () => {
 
     // Check if email already exists (only if Firebase is configured)
     if (db && import.meta.env.VITE_FIREBASE_API_KEY && import.meta.env.VITE_FIREBASE_API_KEY !== 'demo-key') {
-      const emailExists = await checkEmailExists(formData.email);
-      if (emailExists) {
-        setDuplicateEmailError(true);
-        setIsSubmitting(false);
-        return;
+      setIsCheckingDuplicate(true);
+      try {
+        const emailExists = await checkEmailExists(formData.email);
+        if (emailExists) {
+          setDuplicateEmailError(true);
+          setIsSubmitting(false);
+          setIsCheckingDuplicate(false);
+          return;
+        }
+      } catch (error) {
+        console.error('Error during duplicate check:', error);
+        // Continue with submission if duplicate check fails
+      } finally {
+        setIsCheckingDuplicate(false);
       }
     }
 
@@ -393,10 +408,15 @@ const Landing: React.FC = () => {
 
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || isCheckingDuplicate}
                 className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-semibold text-lg rounded-xl shadow-lg hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-[1.02] disabled:transform-none disabled:cursor-not-allowed"
               >
-                {isSubmitting ? (
+                {isCheckingDuplicate ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    {language === 'pt' ? 'Verificando email...' : 'Checking email...'}
+                  </div>
+                ) : isSubmitting ? (
                   <div className="flex items-center justify-center">
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                     {language === 'pt' ? 'Enviando...' : 'Sending...'}
