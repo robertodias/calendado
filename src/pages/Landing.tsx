@@ -103,7 +103,7 @@ const Landing: React.FC = () => {
       const normalizedEmail = normalizeEmail(formData.email);
       
       // Check if Firebase is properly configured
-      if (!db || !import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.VITE_FIREBASE_API_KEY === 'demo-key') {
+      if (!db || !import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.VITE_FIREBASE_API_KEY !== 'demo-key') {
         console.warn('Firebase not configured. Form data:', { ...formData, email: normalizedEmail });
         // Simulate success for development
         setTimeout(() => {
