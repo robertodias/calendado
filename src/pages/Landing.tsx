@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { db } from '../firebase';
@@ -19,6 +19,7 @@ const Landing: React.FC = () => {
   const [captchaError, setCaptchaError] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [emailTouched, setEmailTouched] = useState(false);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   // Check if user has already joined the waitlist on component mount
   useEffect(() => {
@@ -75,11 +76,17 @@ const Landing: React.FC = () => {
       return;
     }
 
-    // Validate CAPTCHA
+    // For reCAPTCHA v3, we need to execute it programmatically
     if (!captchaValue) {
-      setCaptchaError(true);
-      setIsSubmitting(false);
-      return;
+      // Execute invisible CAPTCHA
+      if (recaptchaRef.current) {
+        recaptchaRef.current.execute();
+        return; // The onChange handler will continue the submission
+      } else {
+        setCaptchaError(true);
+        setIsSubmitting(false);
+        return;
+      }
     }
 
     try {
@@ -327,19 +334,17 @@ const Landing: React.FC = () => {
                 )}
               </div>
 
-              {/* CAPTCHA Section */}
+              {/* CAPTCHA Section - reCAPTCHA v3 (invisible) */}
               <div>
-                <label className="block text-sm font-medium text-white/90 mb-2">
-                  {currentContent.form.captcha}
-                </label>
                 <div className="flex justify-center overflow-hidden">
                   <div className="transform scale-90 sm:scale-100">
                     <ReCAPTCHA
+                      ref={recaptchaRef}
                       sitekey="6Le6nNArAAAAANxArJSBlIZ1kGrtQ03N8Z1BkI2K"
                       onChange={handleCaptchaChange}
                       onExpired={handleCaptchaExpired}
                       theme="dark"
-                      size="normal"
+                      size="invisible"
                     />
                   </div>
                 </div>
