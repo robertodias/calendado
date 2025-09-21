@@ -13,7 +13,11 @@ export const detectBrowserLanguage = (): SupportedLanguage => {
     return 'en'; // Default for SSR
   }
 
-  const browserLang = navigator.language || (navigator as any).userLanguage;
+  const browserLang = navigator.language || (navigator as { userLanguage?: string }).userLanguage;
+  
+  if (!browserLang) {
+    return 'en';
+  }
   
   // Check if browser language starts with 'pt' (Portuguese)
   if (browserLang.startsWith('pt')) {

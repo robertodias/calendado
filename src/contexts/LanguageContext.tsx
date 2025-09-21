@@ -1,7 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { ReactNode } from 'react';
-import { getInitialLanguage, saveLanguagePreference } from '../lib/languageUtils';
-import type { SupportedLanguage } from '../lib/languageUtils';
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { getInitialLanguage, saveLanguagePreference, type SupportedLanguage } from '../lib/languageUtils';
 
 // Import language bundles
 import ptTranslations from '../locales/pt.json';
@@ -25,8 +23,19 @@ const translations: Record<SupportedLanguage, Translations> = {
 };
 
 // Helper function to get nested translation value
-const getNestedValue = (obj: any, path: string): string => {
-  return path.split('.').reduce((current, key) => current?.[key], obj) || path;
+const getNestedValue = (obj: Record<string, unknown>, path: string): string => {
+  const keys = path.split('.');
+  let current: unknown = obj;
+  
+  for (const key of keys) {
+    if (current && typeof current === 'object' && current !== null && key in current) {
+      current = (current as Record<string, unknown>)[key];
+    } else {
+      return path; // Return the path if key not found
+    }
+  }
+  
+  return typeof current === 'string' ? current : path;
 };
 
 interface LanguageProviderProps {

@@ -133,7 +133,7 @@ const Landing: React.FC = () => {
       console.log('Attempting to save to Firestore:', {
         name: formData.name,
         email: normalizedEmail,
-        language: language,
+        language,
         captchaVerified: true
       });
       
@@ -141,7 +141,7 @@ const Landing: React.FC = () => {
         name: formData.name,
         email: normalizedEmail, // Use normalized email
         createdAt: serverTimestamp(),
-        language: language,
+        language,
         captchaVerified: true // Mark that CAPTCHA was verified
       });
       

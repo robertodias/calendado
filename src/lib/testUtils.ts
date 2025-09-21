@@ -39,7 +39,19 @@ export const checkWaitlistStatus = (): boolean => {
 
 // Make functions available globally for testing in browser console
 if (typeof window !== 'undefined') {
-  (window as any).clearWaitlistForTesting = clearWaitlistForTesting;
-  (window as any).simulateJoinedUser = simulateJoinedUser;
-  (window as any).checkWaitlistStatus = checkWaitlistStatus;
+  (window as { 
+    clearWaitlistForTesting?: typeof clearWaitlistForTesting;
+    simulateJoinedUser?: typeof simulateJoinedUser;
+    checkWaitlistStatus?: typeof checkWaitlistStatus;
+  }).clearWaitlistForTesting = clearWaitlistForTesting;
+  (window as { 
+    clearWaitlistForTesting?: typeof clearWaitlistForTesting;
+    simulateJoinedUser?: typeof simulateJoinedUser;
+    checkWaitlistStatus?: typeof checkWaitlistStatus;
+  }).simulateJoinedUser = simulateJoinedUser;
+  (window as { 
+    clearWaitlistForTesting?: typeof clearWaitlistForTesting;
+    simulateJoinedUser?: typeof simulateJoinedUser;
+    checkWaitlistStatus?: typeof checkWaitlistStatus;
+  }).checkWaitlistStatus = checkWaitlistStatus;
 }
