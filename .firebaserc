@@ -1,5 +1,20 @@
 {
   "projects": {
     "calendado-prod": "calendado-prod"
+  },
+  "targets": {
+    "calendado-prod": {
+      "hosting": {
+        "calendado-prod": [
+          "calendado-prod"
+        ],
+        "calendado-com": [
+          "calendado-com"
+        ],
+        "calendado-ai": [
+          "calendado-ai"
+        ]
+      }
+    }
   }
 }
