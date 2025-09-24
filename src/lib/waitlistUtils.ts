@@ -5,8 +5,8 @@
 
 import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
-import { normalizeEmail, generateDedupeKey } from './crypto';
-import { Locale } from '../types/models';
+import { normalizeEmail, generateDedupeKeySync } from './crypto';
+import type { Locale } from '../types/models';
 
 export interface WaitlistSignupData {
   email: string;
@@ -55,7 +55,7 @@ export async function signupForWaitlist(
     }
 
     // Generate dedupe key
-    const dedupeKey = generateDedupeKey(normalizedEmail);
+    const dedupeKey = generateDedupeKeySync(normalizedEmail);
 
     // Prepare waitlist data
     const waitlistData = {
@@ -79,7 +79,7 @@ export async function signupForWaitlist(
     };
 
     // Add to Firestore
-    const docRef = await addDoc(collection(db, 'waitlist'), waitlistData);
+    const docRef = await addDoc(collection(db, 'waitlist'), waitlistData as any);
 
     console.log('Waitlist signup successful:', {
       waitlistId: docRef.id,
@@ -107,12 +107,12 @@ export async function signupForWaitlist(
 export async function checkIfAlreadyJoined(email: string): Promise<boolean> {
   try {
     const normalizedEmail = normalizeEmail(email);
-    const dedupeKey = generateDedupeKey(normalizedEmail);
+    const dedupeKey = generateDedupeKeySync(normalizedEmail);
     
     const q = query(
       collection(db, 'waitlist'),
       where('dedupeKey', '==', dedupeKey)
-    );
+    ) as any; // Type assertion to fix Firestore query type issue
     
     const querySnapshot = await getDocs(q);
     return !querySnapshot.empty;
