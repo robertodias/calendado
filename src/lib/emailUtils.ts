@@ -76,21 +76,6 @@ export const isNormalizableProvider = (email: string): boolean => {
  * @returns Message explaining normalization if applicable
  */
 export const getEmailNormalizationMessage = (email: string): string => {
-  if (!isNormalizableProvider(email)) return '';
-  
-  const domain = email.split('@')[1]?.toLowerCase();
-  
-  if (domain === 'gmail.com' || domain === 'googlemail.com') {
-    return 'Note: Gmail ignores dots and text after + in email addresses (e.g., john.doe@gmail.com = johndoe@gmail.com)';
-  }
-  
-  if (['outlook.com', 'hotmail.com', 'live.com'].includes(domain || '')) {
-    return 'Note: Outlook ignores dots in email addresses';
-  }
-  
-  if (domain === 'yahoo.com') {
-    return 'Note: Yahoo ignores dots in email addresses';
-  }
-  
+  // UI should not display provider-specific validation/normalization notes
   return '';
 };
