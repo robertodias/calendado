@@ -3,7 +3,8 @@ import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'fire
 import ReCAPTCHA from 'react-google-recaptcha';
 import { db } from '../firebase';
 import { hasJoinedWaitlist, markWaitlistJoined } from '../lib/cookieUtils';
-import { normalizeEmail, isValidEmailFormat, getEmailNormalizationMessage } from '../lib/emailUtils';
+import { normalizeEmail, isValidEmailFormat } from '../lib/emailUtils';
+import { generateDedupeKeySync } from '../lib/crypto';
 import { useLanguage } from '../contexts/LanguageContext';
 import '../lib/testUtils'; // Import test utilities for development
 
@@ -138,11 +139,25 @@ const Landing: React.FC = () => {
       });
       
       const docRef = await addDoc(collection(db, 'waitlist'), {
-        name: formData.name,
-        email: normalizedEmail, // Use normalized email
+        // Required by security rules
+        email: normalizedEmail,
         createdAt: serverTimestamp(),
+        status: 'pending',
+        comms: {
+          confirmation: {
+            sent: false,
+            sentAt: null,
+            messageId: null,
+            error: null
+          }
+        },
+        dedupeKey: generateDedupeKeySync(normalizedEmail),
+
+        // Additional metadata (optional)
+        name: formData.name || null,
         language,
-        captchaVerified: true // Mark that CAPTCHA was verified
+        userAgent: navigator.userAgent,
+        captchaVerified: true
       });
       
       console.log('Document written with ID: ', docRef.id);
@@ -395,11 +410,7 @@ const Landing: React.FC = () => {
                     {emailError}
                   </p>
                 )}
-                {formData.email && !emailError && getEmailNormalizationMessage(formData.email) && (
-                  <p className="mt-2 text-xs text-white/60">
-                    {getEmailNormalizationMessage(formData.email)}
-                  </p>
-                )}
+                {/* Removed provider-specific email normalization note */}
               </div>
 
               {/* CAPTCHA Section - Hidden in local development */}

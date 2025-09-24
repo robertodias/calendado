@@ -12,7 +12,8 @@ service cloud.firestore {
         request.resource.data.keys().hasAll(['email', 'createdAt', 'status', 'comms', 'dedupeKey']) &&
         request.resource.data.email is string &&
         request.resource.data.email.matches('^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$') &&
-        request.resource.data.createdAt == request.time &&
+        // Accept serverTimestamp() writes
+        request.resource.data.createdAt is timestamp &&
         request.resource.data.status == 'pending' &&
         request.resource.data.comms.confirmation.sent == false &&
         request.resource.data.comms.confirmation.sentAt == null &&
