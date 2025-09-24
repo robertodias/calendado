@@ -37,15 +37,19 @@ const Landing: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    
+    // Sanitize input
+    const sanitizedValue = value.trim().replace(/[<>]/g, '');
+    
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: sanitizedValue
     }));
 
     // Validate email in real-time
     if (name === 'email') {
       setEmailTouched(true);
-      if (value && !isValidEmailFormat(value)) {
+      if (sanitizedValue && !isValidEmailFormat(sanitizedValue)) {
         setEmailError(t('form.emailError'));
       } else {
         setEmailError('');
@@ -420,7 +424,7 @@ const Landing: React.FC = () => {
                     <div className="transform scale-90 sm:scale-100">
                       <ReCAPTCHA
                         ref={recaptchaRef}
-                        sitekey="6Le6nNArAAAAANxArJSBlIZ1kGrtQ03N8Z1BkI2K"
+                        sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || ''}
                         onChange={handleCaptchaChange}
                         onExpired={handleCaptchaExpired}
                         theme="dark"

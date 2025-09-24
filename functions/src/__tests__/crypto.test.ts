@@ -51,7 +51,7 @@ describe('Crypto utilities', () => {
     it('should verify valid signature', () => {
       const payload = '{"test": "data"}';
       const secret = 'test-secret';
-      const signature = 'a1b2c3d4e5f6'; // This would be the actual HMAC in real usage
+      // const signature = 'a1b2c3d4e5f6'; // This would be the actual HMAC in real usage
       
       // Mock the HMAC creation for testing
       const crypto = require('crypto');

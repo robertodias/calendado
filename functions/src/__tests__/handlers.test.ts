@@ -1,5 +1,5 @@
-import { testEnv } from './setup';
-import { sendWaitlistConfirmation } from '../handlers/sendWaitlistConfirmation';
+// import { testEnv } from './setup';
+import { sendWaitlistConfirmationFnFn } from '../handlers/sendWaitlistConfirmationFn';
 import { resendWebhook } from '../handlers/resendWebhook';
 import { adminResendConfirmation } from '../handlers/adminResendConfirmation';
 import { WaitlistDoc } from '../types/models';
@@ -14,7 +14,7 @@ describe('Handlers', () => {
     jest.clearAllMocks();
   });
 
-  describe('sendWaitlistConfirmation', () => {
+  describe('sendWaitlistConfirmationFn', () => {
     it('should send confirmation email for new waitlist entry', async () => {
       const mockWaitlistData: WaitlistDoc = {
         email: 'test@example.com',
@@ -33,7 +33,8 @@ describe('Handlers', () => {
             error: null
           }
         },
-        dedupeKey: 'test-dedupe-key'
+        dedupeKey: 'test-dedupe-key',
+        id: 'test-waitlist-id'
       };
 
       const mockEvent = {
@@ -46,7 +47,7 @@ describe('Handlers', () => {
       // Mock dependencies
       const { createResendClient } = require('../lib/resend');
       const mockResendClient = {
-        sendWaitlistConfirmation: jest.fn().mockResolvedValue({
+        sendWaitlistConfirmationFn: jest.fn().mockResolvedValue({
           id: 'test-message-id',
           error: null
         })
@@ -62,9 +63,9 @@ describe('Handlers', () => {
       process.env.FROM_NAME = 'Test Sender';
       process.env.APP_BASE_URL = 'https://calendado.com';
 
-      await sendWaitlistConfirmation(mockEvent as any);
+      await sendWaitlistConfirmationFn(mockEvent as any);
 
-      expect(mockResendClient.sendWaitlistConfirmation).toHaveBeenCalledWith(
+      expect(mockResendClient.sendWaitlistConfirmationFn).toHaveBeenCalledWith(
         'test@example.com',
         expect.any(String),
         expect.any(String),
@@ -97,7 +98,8 @@ describe('Handlers', () => {
             error: null
           }
         },
-        dedupeKey: 'test-dedupe-key'
+        dedupeKey: 'test-dedupe-key',
+        id: 'test-waitlist-id'
       };
 
       const mockEvent = {
@@ -109,13 +111,13 @@ describe('Handlers', () => {
 
       const { createResendClient } = require('../lib/resend');
       const mockResendClient = {
-        sendWaitlistConfirmation: jest.fn()
+        sendWaitlistConfirmationFn: jest.fn()
       };
       createResendClient.mockReturnValue(mockResendClient);
 
-      await sendWaitlistConfirmation(mockEvent as any);
+      await sendWaitlistConfirmationFn(mockEvent as any);
 
-      expect(mockResendClient.sendWaitlistConfirmation).not.toHaveBeenCalled();
+      expect(mockResendClient.sendWaitlistConfirmationFn).not.toHaveBeenCalled();
     });
   });
 
@@ -247,7 +249,8 @@ describe('Handlers', () => {
             error: null
           }
         },
-        dedupeKey: 'test-dedupe-key'
+        dedupeKey: 'test-dedupe-key',
+        id: 'test-waitlist-id'
       };
       getWaitlistById.mockResolvedValue(mockWaitlistData);
       wasEmailSentRecently.mockResolvedValue(false);
@@ -256,7 +259,7 @@ describe('Handlers', () => {
       // Mock Resend
       const { createResendClient } = require('../lib/resend');
       const mockResendClient = {
-        sendWaitlistConfirmation: jest.fn().mockResolvedValue({
+        sendWaitlistConfirmationFn: jest.fn().mockResolvedValue({
           id: 'test-message-id',
           error: null
         })

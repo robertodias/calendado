@@ -7,7 +7,7 @@ exports.getFallbackLocale = getFallbackLocale;
 exports.resolveLocale = resolveLocale;
 const strings = {
     'en-US': {
-        subject: "You're on the Calendado waitlist ",
+        subject: "You're on the Calendado waitlist ���",
         greeting: "Hi {{name}}, you're officially on the Calendado waitlist!",
         body: "We're building something special that will revolutionize how you manage your time and schedule. We'll start sending early invites soon and will contact you at {{email}}.",
         expectations: {
@@ -21,14 +21,14 @@ const strings = {
                 "Mobile-first design for on-the-go productivity"
             ]
         },
-        closing: "Thanks for being part of our journey from the beginning.\n Team Calendado",
+        closing: "Thanks for being part of our journey from the beginning.\n— Team Calendado",
         footer: {
             why: "You received this email because you signed up for early access to Calendado.",
             privacy: "Privacy Policy"
         }
     },
     'pt-BR': {
-        subject: "Você entrou na lista de espera do Calendado ",
+        subject: "Você entrou na lista de espera do Calendado ���",
         greeting: "Olá {{name}}, você está oficialmente na lista de espera do Calendado!",
         body: "Estamos construindo algo especial que revolucionará como você gerencia seu tempo e agenda. Começaremos a enviar convites antecipados em breve e entraremos em contato em {{email}}.",
         expectations: {
@@ -42,14 +42,14 @@ const strings = {
                 "Design mobile-first para produtividade em movimento"
             ]
         },
-        closing: "Obrigado por fazer parte da nossa jornada desde o início.\n Equipe Calendado",
+        closing: "Obrigado por fazer parte da nossa jornada desde o início.\n— Equipe Calendado",
         footer: {
             why: "Você recebeu este email porque se inscreveu para acesso antecipado ao Calendado.",
             privacy: "Política de Privacidade"
         }
     },
     'it-IT': {
-        subject: "Sei nella lista d'attesa di Calendado ",
+        subject: "Sei nella lista d'attesa di Calendado ���",
         greeting: "Ciao {{name}}, sei ufficialmente nella lista d'attesa di Calendado!",
         body: "Stiamo costruendo qualcosa di speciale che rivoluzionerà come gestisci il tuo tempo e la tua agenda. Inizieremo a inviare inviti anticipati presto e ti contatteremo a {{email}}.",
         expectations: {
@@ -63,7 +63,7 @@ const strings = {
                 "Design mobile-first per la produttività in movimento"
             ]
         },
-        closing: "Grazie per essere parte del nostro viaggio fin dall'inizio.\n Team Calendado",
+        closing: "Grazie per essere parte del nostro viaggio fin dall'inizio.\n— Team Calendado",
         footer: {
             why: "Hai ricevuto questa email perché ti sei iscritto per l'accesso anticipato a Calendado.",
             privacy: "Informativa sulla Privacy"
@@ -98,9 +98,10 @@ function getFallbackLocale() {
  * Resolve locale with fallback
  */
 function resolveLocale(locale) {
-    if (!locale || !isSupportedLocale(locale)) {
+    if (!locale)
         return getFallbackLocale();
-    }
-    return locale;
+    if (isSupportedLocale(locale))
+        return locale;
+    return getFallbackLocale();
 }
 //# sourceMappingURL=i18n.js.map

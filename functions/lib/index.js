@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.dlqReplayerFn = exports.adminResendConfirmationFn = exports.resendWebhookFn = exports.sendWaitlistConfirmationFn = void 0;
+exports.readinessCheck = exports.livenessCheck = exports.healthCheck = exports.dlqReplayerFn = exports.adminResendConfirmationFn = exports.resendWebhookFn = exports.sendWaitlistConfirmationFn = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const params_1 = require("firebase-functions/params");
 const app_1 = require("firebase-admin/app");
@@ -9,6 +9,10 @@ Object.defineProperty(exports, "sendWaitlistConfirmationFn", { enumerable: true,
 const resendWebhook_1 = require("./handlers/resendWebhook");
 const adminResendConfirmation_1 = require("./handlers/adminResendConfirmation");
 const dlqReplayer_1 = require("./handlers/dlqReplayer");
+const healthCheck_1 = require("./handlers/healthCheck");
+Object.defineProperty(exports, "healthCheck", { enumerable: true, get: function () { return healthCheck_1.healthCheck; } });
+Object.defineProperty(exports, "livenessCheck", { enumerable: true, get: function () { return healthCheck_1.livenessCheck; } });
+Object.defineProperty(exports, "readinessCheck", { enumerable: true, get: function () { return healthCheck_1.readinessCheck; } });
 // Initialize Firebase Admin
 (0, app_1.initializeApp)();
 // Define secrets

@@ -86,7 +86,7 @@ describe('Email utilities', () => {
       expect(template.html).toContain('<head>');
       expect(template.html).toContain('<body>');
       expect(template.html).toContain('Calendado');
-      expect(template.html).toContain('Early access waves');
+      expect(template.html).toContain('What\'s coming in Calendado');
       expect(template.html).toContain('Privacy Policy');
     });
   });

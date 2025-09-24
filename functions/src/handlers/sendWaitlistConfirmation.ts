@@ -2,18 +2,26 @@ import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import { createResendClient } from '../lib/resend';
 import { buildWaitlistConfirmationEmail } from '../lib/email';
 import { 
-  updateWaitlistConfirmation, 
-  saveToDeadLetterQueue 
+  updateWaitlistConfirmation
 } from '../lib/firestore';
 import { WaitlistDoc } from '../types/models';
-import { generateDedupeKey, normalizeEmail } from '../lib/crypto';
+import { generateDedupeKey } from '../lib/crypto';
+import { 
+  AppError, 
+  createEmailServiceError,
+  validateEmail,
+  validateName,
+  validateLocale,
+  asyncHandler
+} from '../lib/errorHandler';
+import { sanitizeEmail, sanitizeName } from '../lib/sanitizer';
 
 export const sendWaitlistConfirmationFn = onDocumentCreated(
   {
     document: 'waitlist/{waitlistId}',
     region: 'us-central1'
   },
-  async (event) => {
+  asyncHandler(async (event) => {
     const waitlistId = event.params.waitlistId;
     const waitlistData = event.data?.data() as WaitlistDoc;
     
@@ -23,100 +31,75 @@ export const sendWaitlistConfirmationFn = onDocumentCreated(
       locale: waitlistData?.locale
     });
 
-    try {
-      // Validate waitlist data
-      if (!waitlistData) {
-        throw new Error('Waitlist data not found');
-      }
-
-      // Check if confirmation was already sent (idempotency)
-      if (waitlistData.comms?.confirmation?.sent) {
-        console.log('Confirmation already sent, skipping:', waitlistId);
-        return;
-      }
-
-      // Validate email
-      const normalizedEmail = normalizeEmail(waitlistData.email);
-      if (!normalizedEmail || !normalizedEmail.includes('@')) {
-        throw new Error('Invalid email address');
-      }
-
-      // Generate dedupe key
-      const dedupeKey = generateDedupeKey(normalizedEmail);
-
-      // Build email template
-      const emailTemplate = buildWaitlistConfirmationEmail(
-        normalizedEmail,
-        waitlistData.name,
-        waitlistData.locale,
-        process.env.APP_BASE_URL || 'https://calendado.com'
-      );
-
-      // Create Resend client
-      const resendClient = createResendClient(
-        process.env.RESEND_API_KEY!,
-        process.env.FROM_EMAIL!,
-        process.env.FROM_NAME!
-      );
-
-      // Send email
-      const result = await resendClient.sendWaitlistConfirmation(
-        normalizedEmail,
-        emailTemplate.subject,
-        emailTemplate.html,
-        dedupeKey,
-        waitlistData.locale || 'en-US'
-      );
-
-      if (result.error) {
-        throw new Error(`Resend API error: ${JSON.stringify(result.error)}`);
-      }
-
-      // Update waitlist document with success
-      await updateWaitlistConfirmation(
-        waitlistId,
-        true,
-        result.id,
-        null
-      );
-
-      console.log('Waitlist confirmation sent successfully:', {
-        waitlistId,
-        email: normalizedEmail,
-        messageId: result.id,
-        locale: waitlistData.locale
+    // Validate waitlist data
+    if (!waitlistData) {
+      throw new AppError({
+        code: 'MISSING_DATA' as any,
+        message: 'Waitlist data not found',
+        statusCode: 400,
+        retryable: false
       });
-
-    } catch (error) {
-      console.error('Error sending waitlist confirmation:', {
-        waitlistId,
-        email: waitlistData?.email,
-        error: error instanceof Error ? error.message : String(error)
-      });
-
-      // Update waitlist document with error
-      await updateWaitlistConfirmation(
-        waitlistId,
-        false,
-        null,
-        {
-          code: 'SEND_FAILED',
-          msg: error instanceof Error ? error.message : String(error)
-        }
-      );
-
-      // Save to dead letter queue for retry
-      await saveToDeadLetterQueue(
-        waitlistId,
-        waitlistData?.email || 'unknown',
-        {
-          code: 'SEND_FAILED',
-          msg: error instanceof Error ? error.message : String(error)
-        }
-      );
-
-      // Re-throw to trigger retry
-      throw error;
     }
-  }
+
+    // Check if confirmation was already sent (idempotency)
+    if (waitlistData.comms?.confirmation?.sent) {
+      console.log('Confirmation already sent, skipping:', waitlistId);
+      return;
+    }
+
+    // Sanitize and validate input
+    const sanitizedEmail = sanitizeEmail(waitlistData.email);
+    const sanitizedName = sanitizeName(waitlistData.name);
+    
+    validateEmail(sanitizedEmail);
+    validateName(sanitizedName);
+    validateLocale(waitlistData.locale);
+
+    // Generate dedupe key
+    const dedupeKey = generateDedupeKey(sanitizedEmail);
+
+    // Build email template
+    const emailTemplate = buildWaitlistConfirmationEmail(
+      sanitizedEmail,
+      sanitizedName,
+      waitlistData.locale,
+      process.env.APP_BASE_URL || 'https://calendado.com'
+    );
+
+    // Create Resend client
+    const resendClient = createResendClient(
+      process.env.RESEND_API_KEY!,
+      process.env.FROM_EMAIL!,
+      process.env.FROM_NAME!
+    );
+
+    // Send email
+    const result = await resendClient.sendWaitlistConfirmation(
+      sanitizedEmail,
+      emailTemplate.subject,
+      emailTemplate.html,
+      dedupeKey,
+      waitlistData.locale || 'en-US'
+    );
+
+    if (result.error) {
+      throw createEmailServiceError(`Resend API error: ${JSON.stringify(result.error)}`);
+    }
+
+    // Update waitlist document with success
+    await updateWaitlistConfirmation(
+      waitlistId,
+      true,
+      result.id,
+      null
+    );
+
+    console.log('Waitlist confirmation sent successfully:', {
+      waitlistId,
+      email: sanitizedEmail,
+      messageId: result.id,
+      locale: waitlistData.locale
+    });
+
+  })
 );

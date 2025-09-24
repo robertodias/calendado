@@ -1,5 +1,5 @@
 import { ResendClient, createResendClient } from '../lib/resend';
-import { ResendWebhookPayload } from '../types/models';
+// import { ResendWebhookPayload } from '../types/models';
 
 // Mock Resend SDK
 jest.mock('resend', () => {

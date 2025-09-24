@@ -40,6 +40,12 @@ jobs:
           cd functions
           npm test || echo "Tests failed - deployment will be blocked"
         continue-on-error: false
+        
+      - name: Run security tests
+        run: |
+          cd functions
+          npm test -- --testPathPattern=security.test.ts
+        continue-on-error: false
           
       - name: Build functions
         run: |

@@ -6,12 +6,22 @@ service cloud.firestore {
     // Waitlist collection rules
     match /waitlist/{document} {
       // Allow anyone to create waitlist entries (public signup)
-      // Simplified rules for easier debugging
+      // Enhanced security with stricter validation
       allow create: if 
         request.auth == null && // Only allow unauthenticated requests
         request.resource.data.email is string &&
         request.resource.data.email.matches('^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$') &&
-        request.resource.data.status == 'pending';
+        request.resource.data.email.size() <= 254 &&
+        request.resource.data.status == 'pending' &&
+        (request.resource.data.name == null || 
+         (request.resource.data.name is string && 
+          request.resource.data.name.size() <= 100 &&
+          !request.resource.data.name.matches('.*[<>].*'))) &&
+        (request.resource.data.language == null || 
+         request.resource.data.language in ['en', 'pt']) &&
+        request.resource.data.createdAt is timestamp &&
+        request.resource.data.comms is map &&
+        request.resource.data.dedupeKey is string;
       
       // Allow reading for duplicate email checking (public read for email validation)
       // This is needed for the duplicate email check functionality

@@ -5,6 +5,7 @@ import { sendWaitlistConfirmationFn } from './handlers/sendWaitlistConfirmation'
 import { resendWebhook } from './handlers/resendWebhook';
 import { adminResendConfirmation } from './handlers/adminResendConfirmation';
 import { dlqReplayer } from './handlers/dlqReplayer';
+import { healthCheck, livenessCheck, readinessCheck } from './handlers/healthCheck';
 
 // Initialize Firebase Admin
 initializeApp();
@@ -48,3 +49,6 @@ export const dlqReplayerFn = onRequest(
   },
   dlqReplayer
 );
+
+// Health check endpoints
+export { healthCheck, livenessCheck, readinessCheck };
