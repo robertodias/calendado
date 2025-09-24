@@ -6,7 +6,6 @@ import { hasJoinedWaitlist, markWaitlistJoined } from '../lib/cookieUtils';
 import { normalizeEmail, isValidEmailFormat } from '../lib/emailUtils';
 import { generateDedupeKeySync } from '../lib/crypto';
 import { useLanguage } from '../contexts/LanguageContext';
-import '../lib/testUtils'; // Import test utilities for development
 
 const Landing: React.FC = () => {
   const { language, setLanguage, t } = useLanguage();

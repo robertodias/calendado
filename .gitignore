@@ -61,3 +61,9 @@ coverage/
 # Temporary files
 *.tmp
 *.temp
+*.backup
+*.bak
+
+# Build artifacts
+functions/lib/
+functions/coverage/
