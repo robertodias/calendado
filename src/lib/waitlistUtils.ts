@@ -80,6 +80,9 @@ export async function signupForWaitlist(
     };
 
     // Add to Firestore
+    if (!db) {
+      throw new Error('Firestore not initialized');
+    }
     const docRef = await addDoc(collection(db, 'waitlist'), waitlistData as DocumentData);
 
     console.log('Waitlist signup successful:', {
@@ -107,6 +110,11 @@ export async function signupForWaitlist(
  */
 export async function checkIfAlreadyJoined(email: string): Promise<boolean> {
   try {
+    if (!db) {
+      console.warn('Firestore not initialized for duplicate check');
+      return false; // Allow signup if Firestore is not available
+    }
+    
     const normalizedEmail = normalizeEmail(email);
     const dedupeKey = generateDedupeKeySync(normalizedEmail);
     
