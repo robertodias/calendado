@@ -75,7 +75,7 @@ export const isNormalizableProvider = (email: string): boolean => {
  * @param email - Email address
  * @returns Message explaining normalization if applicable
  */
-export const getEmailNormalizationMessage = (email: string): string => {
+export const getEmailNormalizationMessage = (_email: string): string => {
   // UI should not display provider-specific validation/normalization notes
   return '';
 };
