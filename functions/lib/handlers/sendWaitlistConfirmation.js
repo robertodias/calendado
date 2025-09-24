@@ -39,6 +39,8 @@ exports.sendWaitlistConfirmationFn = (0, firestore_1.onDocumentCreated)({
     const sanitizedName = (0, sanitizer_1.sanitizeName)(waitlistData.name);
     (0, errorHandler_1.validateEmail)(sanitizedEmail);
     (0, errorHandler_1.validateName)(sanitizedName);
+    // Debug locale value
+    console.log('Locale value received:', waitlistData.locale, 'Type:', typeof waitlistData.locale);
     (0, errorHandler_1.validateLocale)(waitlistData.locale);
     // Generate dedupe key
     const dedupeKey = (0, crypto_1.generateDedupeKey)(sanitizedEmail);

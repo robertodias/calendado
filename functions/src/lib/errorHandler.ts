@@ -178,7 +178,9 @@ export function validateName(name: string | null): void {
 }
 
 export function validateLocale(locale: string | null): void {
-  if (locale !== null && !['en-US', 'pt-BR', 'it-IT'].includes(locale)) {
-    throw createValidationError('locale', 'must be a supported locale');
+  if (locale !== null && locale !== undefined && locale !== '') {
+    if (!['en-US', 'pt-BR', 'it-IT'].includes(locale)) {
+      throw createValidationError('locale', `must be a supported locale, got: ${locale}`);
+    }
   }
 }

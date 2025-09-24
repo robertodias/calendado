@@ -53,6 +53,9 @@ export const sendWaitlistConfirmationFn = onDocumentCreated(
     
     validateEmail(sanitizedEmail);
     validateName(sanitizedName);
+    
+    // Debug locale value
+    console.log('Locale value received:', waitlistData.locale, 'Type:', typeof waitlistData.locale);
     validateLocale(waitlistData.locale);
 
     // Generate dedupe key
