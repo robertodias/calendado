@@ -3,7 +3,7 @@
  * Handles waitlist signup with proper data structure for Firebase Functions
  */
 
-import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, where, getDocs, type DocumentData, type Query } from 'firebase/firestore';
 import { db } from '../firebase';
 import { normalizeEmail, generateDedupeKeySync } from './crypto';
 import type { Locale } from '../types/models';
@@ -79,7 +79,7 @@ export async function signupForWaitlist(
     };
 
     // Add to Firestore
-    const docRef = await addDoc(collection(db, 'waitlist'), waitlistData as any);
+    const docRef = await addDoc(collection(db, 'waitlist'), waitlistData as DocumentData);
 
     console.log('Waitlist signup successful:', {
       waitlistId: docRef.id,
@@ -109,10 +109,10 @@ export async function checkIfAlreadyJoined(email: string): Promise<boolean> {
     const normalizedEmail = normalizeEmail(email);
     const dedupeKey = generateDedupeKeySync(normalizedEmail);
     
-    const q = query(
+    const q: Query<DocumentData> = query(
       collection(db, 'waitlist'),
       where('dedupeKey', '==', dedupeKey)
-    ) as any; // Type assertion to fix Firestore query type issue
+    );
     
     const querySnapshot = await getDocs(q);
     return !querySnapshot.empty;
