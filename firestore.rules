@@ -5,12 +5,38 @@ service cloud.firestore {
     
     // Waitlist collection rules
     match /waitlist/{document} {
-      // Allow anyone to write to waitlist (for public signup)
-      allow write: if true;
+      // Allow anyone to create waitlist entries (public signup)
+      // but validate the data structure
+      allow create: if 
+        request.auth == null && // Only allow unauthenticated requests
+        request.resource.data.keys().hasAll(['email', 'createdAt', 'status', 'comms', 'dedupeKey']) &&
+        request.resource.data.email is string &&
+        request.resource.data.email.matches('^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$') &&
+        request.resource.data.createdAt == request.time &&
+        request.resource.data.status == 'pending' &&
+        request.resource.data.comms.confirmation.sent == false &&
+        request.resource.data.comms.confirmation.sentAt == null &&
+        request.resource.data.comms.confirmation.messageId == null &&
+        request.resource.data.comms.confirmation.error == null &&
+        request.resource.data.dedupeKey is string &&
+        request.resource.data.dedupeKey.size() == 64; // SHA256 hex length
       
       // Allow reading for duplicate email checking (public read for email validation)
       // This is needed for the duplicate email check functionality
       allow read: if true;
+      
+      // Prevent updates and deletes from client
+      allow update, delete: if false;
+    }
+    
+    // Email events collection - server only
+    match /email_events/{document} {
+      allow read, write: if false;
+    }
+    
+    // Dead letter queue - server only
+    match /email_dlq/{document} {
+      allow read, write: if false;
     }
     
     // TODO: Add user profiles collection rules
