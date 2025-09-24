@@ -5,7 +5,8 @@
 
 import { collection, addDoc, serverTimestamp, query, where, getDocs, type DocumentData, type Query } from 'firebase/firestore';
 import { db } from '../firebase';
-import { normalizeEmail, generateDedupeKeySync } from './crypto';
+import { normalizeEmail } from './emailUtils';
+import { generateDedupeKeySync } from './crypto';
 import type { Locale } from '../types/models';
 
 export interface WaitlistSignupData {
