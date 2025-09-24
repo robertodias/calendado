@@ -31,7 +31,7 @@ function buildEmailHTML(
 ): string {
   const greeting = strings.greeting.replace('{{name}}', displayName);
   const body = strings.body.replace('{{email}}', email);
-  const privacyUrl = strings.footer.privacy.replace('{{APP_BASE_URL}}', appBaseUrl);
+  const privacyUrl = `${appBaseUrl}/privacy.html`;
   
   return `
 <!DOCTYPE html>
@@ -207,3 +207,5 @@ export function validateEmailTemplateData(
     errors
   };
 }
+
+

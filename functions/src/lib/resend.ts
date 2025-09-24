@@ -8,8 +8,8 @@ export class ResendClient {
 
   constructor(apiKey: string, fromEmail: string, fromName: string) {
     this.client = new Resend(apiKey);
-    this.fromEmail = fromEmail;
-    this.fromName = fromName;
+    this.fromEmail = fromEmail.trim();
+    this.fromName = fromName.trim();
   }
 
   /**

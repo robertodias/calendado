@@ -39,8 +39,8 @@ const resend_1 = require("resend");
 class ResendClient {
     constructor(apiKey, fromEmail, fromName) {
         this.client = new resend_1.Resend(apiKey);
-        this.fromEmail = fromEmail;
-        this.fromName = fromName;
+        this.fromEmail = fromEmail.trim();
+        this.fromName = fromName.trim();
     }
     /**
      * Send email via Resend

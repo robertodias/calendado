@@ -153,7 +153,7 @@ const Landing: React.FC = () => {
         },
         dedupeKey: generateDedupeKeySync(normalizedEmail),
 
-        // Additional metadata (optional)
+        // Optional fields (now allowed by security rules)
         name: formData.name || null,
         language,
         userAgent: navigator.userAgent,

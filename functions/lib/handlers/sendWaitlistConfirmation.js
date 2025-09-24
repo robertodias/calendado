@@ -1,12 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendWaitlistConfirmation = void 0;
+exports.sendWaitlistConfirmationFn = void 0;
 const firestore_1 = require("firebase-functions/v2/firestore");
 const resend_1 = require("../lib/resend");
 const email_1 = require("../lib/email");
 const firestore_2 = require("../lib/firestore");
 const crypto_1 = require("../lib/crypto");
-exports.sendWaitlistConfirmation = (0, firestore_1.onDocumentCreated)('waitlist/{waitlistId}', async (event) => {
+exports.sendWaitlistConfirmationFn = (0, firestore_1.onDocumentCreated)({
+    document: 'waitlist/{waitlistId}',
+    region: 'us-central1'
+}, async (event) => {
     var _a, _b, _c;
     const waitlistId = event.params.waitlistId;
     const waitlistData = (_a = event.data) === null || _a === void 0 ? void 0 : _a.data();

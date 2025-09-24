@@ -8,8 +8,11 @@ import {
 import { WaitlistDoc } from '../types/models';
 import { generateDedupeKey, normalizeEmail } from '../lib/crypto';
 
-export const sendWaitlistConfirmation = onDocumentCreated(
-  'waitlist/{waitlistId}',
+export const sendWaitlistConfirmationFn = onDocumentCreated(
+  {
+    document: 'waitlist/{waitlistId}',
+    region: 'us-central1'
+  },
   async (event) => {
     const waitlistId = event.params.waitlistId;
     const waitlistData = event.data?.data() as WaitlistDoc;

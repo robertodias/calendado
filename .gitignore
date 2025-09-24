@@ -6,10 +6,17 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+firebase-debug.log
+firebase-debug.*.log
 
-node_modules
-dist
-dist-ssr
+# Dependencies
+node_modules/
+functions/node_modules/
+
+# Build outputs
+dist/
+dist-ssr/
+functions/lib/
 *.local
 
 # Environment variables
@@ -18,17 +25,39 @@ dist-ssr
 .env.development.local
 .env.test.local
 .env.production.local
+.env.production
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 
-# Production env file
-.env.production
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Firebase
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+.firebaserc
+
+# Testing
+coverage/
+.nyc_output/
+
+# Temporary files
+*.tmp
+*.temp

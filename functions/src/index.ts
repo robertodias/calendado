@@ -1,8 +1,7 @@
-import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import { onRequest } from 'firebase-functions/v2/https';
 import { defineSecret } from 'firebase-functions/params';
 import { initializeApp } from 'firebase-admin/app';
-import { sendWaitlistConfirmation } from './handlers/sendWaitlistConfirmation';
+import { sendWaitlistConfirmationFn } from './handlers/sendWaitlistConfirmation';
 import { resendWebhook } from './handlers/resendWebhook';
 import { adminResendConfirmation } from './handlers/adminResendConfirmation';
 import { dlqReplayer } from './handlers/dlqReplayer';
@@ -17,17 +16,8 @@ const fromEmail = defineSecret('FROM_EMAIL');
 const fromName = defineSecret('FROM_NAME');
 const appBaseUrl = defineSecret('APP_BASE_URL');
 
-// Export functions
-export const sendWaitlistConfirmationFn = onDocumentCreated(
-  {
-    document: 'waitlist/{waitlistId}',
-    region: 'us-central1',
-    memory: '256MiB',
-    timeoutSeconds: 60,
-    secrets: [resendApiKey, fromEmail, fromName, appBaseUrl]
-  },
-  sendWaitlistConfirmation
-);
+// Export the Firestore trigger function (v2)
+export { sendWaitlistConfirmationFn };
 
 export const resendWebhookFn = onRequest(
   {
