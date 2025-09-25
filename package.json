@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:production": "VITE_RECAPTCHA_SITE_KEY=6Le6nNArAAAAANxArJSBlIZ1kGrtQ03N8Z1BkI2K VITE_APP_ENV=production VITE_APP_BASE_URL=https://calendado.com VITE_DEBUG_MODE=false tsc -b && vite build",
     "build:analyze": "tsc -b && vite build --mode analyze",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
@@ -14,7 +15,8 @@
     "type-check": "tsc --noEmit",
     "preview": "vite preview",
     "clean": "rm -rf dist node_modules/.vite",
-    "pre-commit": "npm run type-check && npm run lint && npm run format:check"
+    "pre-commit": "npm run type-check && npm run lint && npm run format:check",
+    "deploy:production": "npm run build:production && firebase deploy --only hosting"
   },
   "dependencies": {
     "firebase": "^12.3.0",
