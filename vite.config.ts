@@ -3,8 +3,13 @@ import react from '@vitejs/plugin-react';
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
+  // Ensure we're using the correct mode
+  const buildMode = mode || process.env.NODE_ENV || 'development';
+  
   // Load environment variables for the specified mode
-  const env = loadEnv(mode, process.cwd(), '');
+  // This will load .env, .env.local, .env.[mode], and .env.[mode].local
+  const env = loadEnv(buildMode, process.cwd(), '');
+  
   
   // Fallback values for production
   const getEnvValue = (key: string, fallback: string) => {

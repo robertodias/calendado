@@ -210,3 +210,4 @@ npm run dev
 - Update this document when adding new environment variables
 - Keep `.env.example` synchronized with actual requirements
 - Monitor for any new environment variable usage in the codebase
+
