@@ -3,7 +3,7 @@ import { Request, Response } from 'firebase-functions/v1';
 import { Timestamp } from 'firebase-admin/firestore';
 import { createResendClient } from '../lib/resend';
 import { saveEmailEvent, markWaitlistBlocked } from '../lib/firestore';
-import { extractSignature, verifyResendSignature } from '../lib/crypto';
+import { verifyResendSignature } from '../lib/crypto';
 import { EmailEventDoc } from '../types/models';
 import { 
   setSecurityHeaders, 
@@ -58,12 +58,17 @@ export const resendWebhook = onRequest(
         return;
       }
 
-      // Verify webhook signature
-      const authHeader = req.headers.authorization || req.headers.Authorization;
-      const signature = extractSignature(authHeader as string);
+      // Verify webhook signature (Svix format)
+      const svixSignature = req.headers['svix-signature'] as string;
+      const svixTimestamp = req.headers['svix-timestamp'] as string;
+      const svixId = req.headers['svix-id'] as string;
       
-      if (!signature) {
-        console.warn('Missing or invalid authorization header');
+      if (!svixSignature || !svixTimestamp || !svixId) {
+        console.warn('Missing Svix headers:', { 
+          signature: !!svixSignature, 
+          timestamp: !!svixTimestamp, 
+          id: !!svixId 
+        });
         res.status(401).json({ error: 'Unauthorized' });
         return;
       }
@@ -71,7 +76,7 @@ export const resendWebhook = onRequest(
       const payload = JSON.stringify(req.body);
       const isValidSignature = verifyResendSignature(
         payload,
-        signature,
+        svixSignature,
         process.env.RESEND_WEBHOOK_SECRET!
       );
 

@@ -7,7 +7,8 @@ export declare function sha256(input: string): string;
  */
 export declare function generateDedupeKey(email: string): string;
 /**
- * Verify Resend webhook signature using constant-time comparison
+ * Verify Svix webhook signature (used by Resend)
+ * Svix signature format: v1,<signature>
  */
 export declare function verifyResendSignature(payload: string, signature: string, secret: string): boolean;
 /**

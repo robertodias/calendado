@@ -16,7 +16,8 @@ export function generateDedupeKey(email: string): string {
 }
 
 /**
- * Verify Resend webhook signature using constant-time comparison
+ * Verify Svix webhook signature (used by Resend)
+ * Svix signature format: v1,<signature>
  */
 export function verifyResendSignature(
   payload: string,
@@ -24,13 +25,22 @@ export function verifyResendSignature(
   secret: string
 ): boolean {
   try {
+    // Svix signature format: v1,<signature>
+    if (!signature.startsWith('v1,')) {
+      console.warn('Invalid signature format, expected v1,<signature>');
+      return false;
+    }
+    
+    const actualSignature = signature.substring(3);
+    
+    // Svix uses HMAC-SHA256 with the secret as the key
     const expectedSignature = createHmac('sha256', secret)
       .update(payload)
       .digest('hex');
     
     // Use constant-time comparison to prevent timing attacks
     return timingSafeEqual(
-      Buffer.from(signature, 'hex'),
+      Buffer.from(actualSignature, 'hex'),
       Buffer.from(expectedSignature, 'hex')
     );
   } catch (error) {

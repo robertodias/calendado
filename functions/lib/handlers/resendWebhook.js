@@ -42,16 +42,21 @@ exports.resendWebhook = (0, https_1.onRequest)(async (req, res) => {
             (0, security_1.createErrorResponse)(res, 400, 'Invalid payload');
             return;
         }
-        // Verify webhook signature
-        const authHeader = req.headers.authorization || req.headers.Authorization;
-        const signature = (0, crypto_1.extractSignature)(authHeader);
-        if (!signature) {
-            console.warn('Missing or invalid authorization header');
+        // Verify webhook signature (Svix format)
+        const svixSignature = req.headers['svix-signature'];
+        const svixTimestamp = req.headers['svix-timestamp'];
+        const svixId = req.headers['svix-id'];
+        if (!svixSignature || !svixTimestamp || !svixId) {
+            console.warn('Missing Svix headers:', {
+                signature: !!svixSignature,
+                timestamp: !!svixTimestamp,
+                id: !!svixId
+            });
             res.status(401).json({ error: 'Unauthorized' });
             return;
         }
         const payload = JSON.stringify(req.body);
-        const isValidSignature = (0, crypto_1.verifyResendSignature)(payload, signature, process.env.RESEND_WEBHOOK_SECRET);
+        const isValidSignature = (0, crypto_1.verifyResendSignature)(payload, svixSignature, process.env.RESEND_WEBHOOK_SECRET);
         if (!isValidSignature) {
             console.warn('Invalid webhook signature');
             res.status(401).json({ error: 'Unauthorized' });
