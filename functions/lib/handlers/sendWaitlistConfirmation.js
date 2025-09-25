@@ -67,10 +67,14 @@ exports.sendWaitlistConfirmationFn = (0, firestore_1.onDocumentCreated)({
     const dedupeKey = (0, crypto_1.generateDedupeKey)(sanitizedEmail);
     // Build email template
     const emailTemplate = (0, email_1.buildWaitlistConfirmationEmail)(sanitizedEmail, sanitizedName, waitlistData.locale, process.env.APP_BASE_URL || 'https://calendado.com');
+    // Clean the subject to remove any special characters
+    const cleanSubject = emailTemplate.subject.replace(/[^\x20-\x7E]/g, '');
+    console.log('Original subject:', JSON.stringify(emailTemplate.subject));
+    console.log('Clean subject:', JSON.stringify(cleanSubject));
     // Create Resend client
     const resendClient = (0, resend_1.createResendClient)(process.env.RESEND_API_KEY, process.env.FROM_EMAIL, process.env.FROM_NAME);
     // Send email
-    const result = await resendClient.sendWaitlistConfirmation(sanitizedEmail, emailTemplate.subject, emailTemplate.html, dedupeKey, waitlistData.locale || 'en-US');
+    const result = await resendClient.sendWaitlistConfirmation(sanitizedEmail, cleanSubject, emailTemplate.html, dedupeKey, waitlistData.locale || 'en-US');
     if (result.error) {
         throw (0, errorHandler_1.createEmailServiceError)(`Resend API error: ${JSON.stringify(result.error)}`);
     }

@@ -94,6 +94,11 @@ export const sendWaitlistConfirmationFn = onDocumentCreated(
       process.env.APP_BASE_URL || 'https://calendado.com'
     );
 
+    // Clean the subject to remove any special characters
+    const cleanSubject = emailTemplate.subject.replace(/[^\x20-\x7E]/g, '');
+    console.log('Original subject:', JSON.stringify(emailTemplate.subject));
+    console.log('Clean subject:', JSON.stringify(cleanSubject));
+
     // Create Resend client
     const resendClient = createResendClient(
       process.env.RESEND_API_KEY!,
@@ -104,7 +109,7 @@ export const sendWaitlistConfirmationFn = onDocumentCreated(
     // Send email
     const result = await resendClient.sendWaitlistConfirmation(
       sanitizedEmail,
-      emailTemplate.subject,
+      cleanSubject,
       emailTemplate.html,
       dedupeKey,
       waitlistData.locale || 'en-US'
