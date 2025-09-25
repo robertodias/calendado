@@ -15,6 +15,7 @@ import {
   asyncHandler
 } from '../lib/errorHandler';
 import { sanitizeEmail, sanitizeName } from '../lib/sanitizer';
+import { validateRecaptchaWithSecurity } from '../lib/recaptcha';
 
 export const sendWaitlistConfirmationFn = onDocumentCreated(
   {
@@ -57,6 +58,30 @@ export const sendWaitlistConfirmationFn = onDocumentCreated(
     // Debug locale value
     console.log('Locale value received:', waitlistData.locale, 'Type:', typeof waitlistData.locale);
     validateLocale(waitlistData.locale);
+
+    // Validate reCAPTCHA token if present
+    if (waitlistData.captchaToken && waitlistData.captchaVerified) {
+      console.log('Validating reCAPTCHA token...');
+      const recaptchaValidation = await validateRecaptchaWithSecurity(
+        waitlistData.captchaToken,
+        'calendado.com', // Expected hostname
+        undefined // We don't have the remote IP in this context
+      );
+      
+      if (!recaptchaValidation.valid) {
+        console.error('reCAPTCHA validation failed:', recaptchaValidation.reason);
+        throw new AppError({
+          code: 'INVALID_CAPTCHA' as any,
+          message: `reCAPTCHA validation failed: ${recaptchaValidation.reason}`,
+          statusCode: 400,
+          retryable: false
+        });
+      }
+      
+      console.log('reCAPTCHA validation successful');
+    } else {
+      console.log('No reCAPTCHA token provided, skipping validation');
+    }
 
     // Generate dedupe key
     const dedupeKey = generateDedupeKey(sanitizedEmail);

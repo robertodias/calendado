@@ -30,6 +30,8 @@ export interface WaitlistDoc {
         confirmation: ConfirmationComms;
     };
     dedupeKey: string;
+    captchaVerified: boolean;
+    captchaToken: string | null;
 }
 export interface EmailEventDoc {
     messageId: string;

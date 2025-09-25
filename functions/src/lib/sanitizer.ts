@@ -91,3 +91,4 @@ export function isValidLocale(locale: string): boolean {
   const validLocales = ['en-US', 'pt-BR', 'it-IT'];
   return validLocales.includes(locale);
 }
+

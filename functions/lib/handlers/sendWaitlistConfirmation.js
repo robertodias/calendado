@@ -8,6 +8,7 @@ const firestore_2 = require("../lib/firestore");
 const crypto_1 = require("../lib/crypto");
 const errorHandler_1 = require("../lib/errorHandler");
 const sanitizer_1 = require("../lib/sanitizer");
+const recaptcha_1 = require("../lib/recaptcha");
 exports.sendWaitlistConfirmationFn = (0, firestore_1.onDocumentCreated)({
     document: 'waitlist/{waitlistId}',
     region: 'us-central1'
@@ -42,6 +43,26 @@ exports.sendWaitlistConfirmationFn = (0, firestore_1.onDocumentCreated)({
     // Debug locale value
     console.log('Locale value received:', waitlistData.locale, 'Type:', typeof waitlistData.locale);
     (0, errorHandler_1.validateLocale)(waitlistData.locale);
+    // Validate reCAPTCHA token if present
+    if (waitlistData.captchaToken && waitlistData.captchaVerified) {
+        console.log('Validating reCAPTCHA token...');
+        const recaptchaValidation = await (0, recaptcha_1.validateRecaptchaWithSecurity)(waitlistData.captchaToken, 'calendado.com', // Expected hostname
+        undefined // We don't have the remote IP in this context
+        );
+        if (!recaptchaValidation.valid) {
+            console.error('reCAPTCHA validation failed:', recaptchaValidation.reason);
+            throw new errorHandler_1.AppError({
+                code: 'INVALID_CAPTCHA',
+                message: `reCAPTCHA validation failed: ${recaptchaValidation.reason}`,
+                statusCode: 400,
+                retryable: false
+            });
+        }
+        console.log('reCAPTCHA validation successful');
+    }
+    else {
+        console.log('No reCAPTCHA token provided, skipping validation');
+    }
     // Generate dedupe key
     const dedupeKey = (0, crypto_1.generateDedupeKey)(sanitizedEmail);
     // Build email template

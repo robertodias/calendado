@@ -36,6 +36,8 @@ export interface WaitlistDoc {
     confirmation: ConfirmationComms;
   };
   dedupeKey: string; // sha256(lower(email))
+  captchaVerified: boolean; // reCAPTCHA verification status
+  captchaToken: string | null; // reCAPTCHA token for validation
 }
 
 export interface EmailEventDoc {

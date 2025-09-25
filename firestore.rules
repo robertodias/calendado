@@ -21,7 +21,10 @@ service cloud.firestore {
          request.resource.data.language in ['en', 'pt']) &&
         request.resource.data.createdAt is timestamp &&
         request.resource.data.comms is map &&
-        request.resource.data.dedupeKey is string;
+        request.resource.data.dedupeKey is string &&
+        (request.resource.data.captchaToken == null || 
+         request.resource.data.captchaToken is string) &&
+        request.resource.data.captchaVerified is bool;
       
       // Allow reading for duplicate email checking (public read for email validation)
       // This is needed for the duplicate email check functionality

@@ -160,7 +160,8 @@ const Landing: React.FC = () => {
         name: formData.name || null,
         language,
         userAgent: navigator.userAgent,
-        captchaVerified: true
+        captchaVerified: true,
+        captchaToken: captchaValue || null
       });
       
       console.log('Document written with ID: ', docRef.id);
