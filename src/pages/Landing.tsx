@@ -37,8 +37,13 @@ const Landing: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
-    // Sanitize input
-    const sanitizedValue = value.trim().replace(/[<>]/g, '');
+    // Sanitize input - only remove angle brackets, preserve spaces for names
+    let sanitizedValue = value.replace(/[<>]/g, '');
+    
+    // Only trim email field, not name field (to allow spaces between first and last name)
+    if (name === 'email') {
+      sanitizedValue = sanitizedValue.trim();
+    }
     
     setFormData(prev => ({
       ...prev,
