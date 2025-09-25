@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "build:production": "VITE_RECAPTCHA_SITE_KEY=6Le6nNArAAAAANxArJSBlIZ1kGrtQ03N8Z1BkI2K VITE_APP_ENV=production VITE_APP_BASE_URL=https://calendado.com VITE_DEBUG_MODE=false tsc -b && vite build",
+    "build:production": "cross-env VITE_RECAPTCHA_SITE_KEY=6Le6nNArAAAAANxArJSBlIZ1kGrtQ03N8Z1BkI2K VITE_APP_ENV=production VITE_APP_BASE_URL=https://calendado.com VITE_DEBUG_MODE=false tsc -b && vite build",
     "build:analyze": "tsc -b && vite build --mode analyze",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
@@ -32,6 +32,7 @@
     "@types/react-google-recaptcha": "^2.1.9",
     "@vitejs/plugin-react": "^5.0.2",
     "autoprefixer": "^10.4.21",
+    "cross-env": "^10.0.0",
     "eslint": "^9.35.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
