@@ -78,16 +78,27 @@ Language preferences are saved in localStorage and persist across sessions.
 
 ### Environment Variables
 
-Create a `.env` file in the root directory:
+Create a `.env` file in the root directory (copy from `.env.example`):
 
 ```env
-VITE_FIREBASE_API_KEY=your_api_key
-VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+# Firebase Configuration
+VITE_FIREBASE_API_KEY=your_firebase_api_key_here
+VITE_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=your_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
 VITE_FIREBASE_APP_ID=your_app_id
+
+# reCAPTCHA Configuration
+VITE_RECAPTCHA_SITE_KEY=your_recaptcha_site_key_here
+
+# App Configuration
+VITE_APP_ENV=production
+VITE_APP_BASE_URL=https://calendado.com
+VITE_DEBUG_MODE=false
 ```
+
+**Important**: The app will fall back to demo mode if Firebase credentials are not properly configured. Check the browser console for configuration status.
 
 ## 🏗️ Project Structure
 

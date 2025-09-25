@@ -11,18 +11,36 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:123456789:web:demo',
 };
 
+// Check if we have valid Firebase configuration
+const hasValidConfig = firebaseConfig.apiKey && 
+  firebaseConfig.apiKey !== 'demo-key' && 
+  firebaseConfig.projectId && 
+  firebaseConfig.projectId !== 'demo-project';
+
 // Initialize Firebase only if we have valid config
 let app: FirebaseApp | null;
 let auth: Auth | null;
 let db: Firestore | null;
 
-try {
-  app = initializeApp(firebaseConfig);
-  auth = getAuth(app);
-  db = getFirestore(app);
-} catch {
-  console.warn('Firebase not configured. Please add your Firebase credentials to .env file');
-  // Create mock objects for development
+if (hasValidConfig) {
+  try {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+    console.log('Firebase initialized successfully');
+  } catch (error) {
+    console.error('Failed to initialize Firebase:', error);
+    app = null;
+    auth = null;
+    db = null;
+  }
+} else {
+  console.warn('Firebase not configured. Please add your Firebase credentials to .env file or set environment variables');
+  console.warn('Current config:', {
+    apiKey: firebaseConfig.apiKey,
+    projectId: firebaseConfig.projectId,
+    hasValidConfig
+  });
   app = null;
   auth = null;
   db = null;
