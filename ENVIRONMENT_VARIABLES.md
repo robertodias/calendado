@@ -2,19 +2,15 @@
 
 This document provides a comprehensive guide to environment variable configuration in the Calendado project.
 
-## 🚨 **Issues Fixed**
+## 🎯 **Current Approach: Environment Variables (Not .env Files)**
 
-### 1. **Missing Environment Variables in Vite Config**
-- **Problem**: `import.meta.env.DEV`, `import.meta.env.PROD`, `import.meta.env.MODE` were not defined in `vite.config.ts`
-- **Solution**: Added all built-in Vite environment variables to the `define` section
+Calendado uses environment variables set by the hosting platform or deployment script, **not** `.env` files. This approach is more secure and professional.
 
-### 2. **Inconsistent Environment Variable Definitions**
-- **Problem**: Some environment variables were used in code but not properly defined in Vite config
-- **Solution**: Comprehensive audit and addition of all required variables
-
-### 3. **Case Sensitivity Issues**
-- **Problem**: Potential case sensitivity issues between frontend and backend environment variables
-- **Solution**: Standardized naming conventions and added validation
+### ✅ **Why Environment Variables are Better**
+- **Security**: Secrets are stored securely by the hosting platform
+- **No Git Pollution**: Secrets never end up in your repository
+- **Environment Separation**: Different values for dev/staging/production
+- **Team Friendly**: Everyone gets the same environment without sharing files
 
 ## 📋 **Environment Variables Reference**
 
@@ -130,24 +126,27 @@ The script checks for:
 
 ### 1. **Development Setup**
 ```bash
-# Copy environment template
-cp .env.example .env
-
-# Edit with your actual values
-nano .env
-
-# Start development server
+# Start development server (uses fallback values for local development)
 npm run dev
 ```
 
-### 2. **Production Setup**
+### 2. **Production Deployment**
 ```bash
-# Set environment variables in your deployment platform
+# Deploy with environment variables (recommended)
+npm run deploy
+
+# Or deploy without environment variables (uses fallback values)
+npm run deploy:production
+```
+
+### 3. **Manual Environment Variable Setup**
+```bash
+# Set environment variables manually
 export VITE_FIREBASE_API_KEY="your_actual_api_key"
 export VITE_FIREBASE_PROJECT_ID="your_actual_project_id"
 # ... other variables
 
-# Build and deploy
+# Then build and deploy
 npm run build
 firebase deploy --only hosting
 ```

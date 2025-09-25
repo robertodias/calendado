@@ -1,19 +1,12 @@
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-  // Ensure we're using the correct mode
-  const buildMode = mode || process.env.NODE_ENV || 'development';
-  
-  // Load environment variables for the specified mode
-  // This will load .env, .env.local, .env.[mode], and .env.[mode].local
-  const env = loadEnv(buildMode, process.cwd(), '');
-  
-  
-  // Fallback values for production
+  // Get environment variables directly from process.env
+  // No need to load .env files - we use environment variables from the hosting platform
   const getEnvValue = (key: string, fallback: string) => {
-    return env[key] || process.env[key] || fallback;
+    return process.env[key] || fallback;
   };
   
   return {

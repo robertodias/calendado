@@ -19,13 +19,8 @@ dist-ssr/
 functions/lib/
 *.local
 
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env.production
+# Environment variables (using hosting platform environment variables instead)
+# .env files are not used - environment variables are set in deployment platform
 
 # Editor directories and files
 .vscode/*
