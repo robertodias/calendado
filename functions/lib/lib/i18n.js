@@ -7,7 +7,7 @@ exports.getFallbackLocale = getFallbackLocale;
 exports.resolveLocale = resolveLocale;
 const strings = {
     'en-US': {
-        subject: "You're on the Calendado waitlist ���",
+        subject: "You're on the Calendado waitlist!",
         greeting: "Hi {{name}}, you're officially on the Calendado waitlist!",
         body: "We're building something special that will revolutionize how you manage your time and schedule. We'll start sending early invites soon and will contact you at {{email}}.",
         expectations: {
@@ -28,7 +28,7 @@ const strings = {
         }
     },
     'pt-BR': {
-        subject: "Você entrou na lista de espera do Calendado ���",
+        subject: "Você entrou na lista de espera do Calendado!",
         greeting: "Olá {{name}}, você está oficialmente na lista de espera do Calendado!",
         body: "Estamos construindo algo especial que revolucionará como você gerencia seu tempo e agenda. Começaremos a enviar convites antecipados em breve e entraremos em contato em {{email}}.",
         expectations: {
@@ -49,7 +49,7 @@ const strings = {
         }
     },
     'it-IT': {
-        subject: "Sei nella lista d'attesa di Calendado ���",
+        subject: "Sei nella lista d'attesa di Calendado!",
         greeting: "Ciao {{name}}, sei ufficialmente nella lista d'attesa di Calendado!",
         body: "Stiamo costruendo qualcosa di speciale che rivoluzionerà come gestisci il tuo tempo e la tua agenda. Inizieremo a inviare inviti anticipati presto e ti contatteremo a {{email}}.",
         expectations: {
