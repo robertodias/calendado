@@ -59,14 +59,14 @@ export const createValidationError = (field: string, message: string): AppError 
   retryable: false
 });
 
-export const createUnauthorizedError = (message: string = 'Unauthorized'): AppError => new AppError({
+export const createUnauthorizedError = (message = 'Unauthorized'): AppError => new AppError({
   code: ErrorCode.UNAUTHORIZED,
   message,
   statusCode: 401,
   retryable: false
 });
 
-export const createForbiddenError = (message: string = 'Forbidden'): AppError => new AppError({
+export const createForbiddenError = (message = 'Forbidden'): AppError => new AppError({
   code: ErrorCode.FORBIDDEN,
   message,
   statusCode: 403,
@@ -81,21 +81,21 @@ export const createRateLimitError = (retryAfter: number): AppError => new AppErr
   details: { retryAfter }
 });
 
-export const createEmailServiceError = (message: string, retryable: boolean = true): AppError => new AppError({
+export const createEmailServiceError = (message: string, retryable = true): AppError => new AppError({
   code: ErrorCode.EMAIL_SERVICE_ERROR,
   message: `Email service error: ${message}`,
   statusCode: 502,
   retryable
 });
 
-export const createDatabaseError = (message: string, retryable: boolean = true): AppError => new AppError({
+export const createDatabaseError = (message: string, retryable = true): AppError => new AppError({
   code: ErrorCode.DATABASE_ERROR,
   message: `Database error: ${message}`,
   statusCode: 500,
   retryable
 });
 
-export const createInternalError = (message: string = 'Internal server error'): AppError => new AppError({
+export const createInternalError = (message = 'Internal server error'): AppError => new AppError({
   code: ErrorCode.INTERNAL_ERROR,
   message,
   statusCode: 500,

@@ -2,15 +2,16 @@
 
 This document provides a comprehensive guide to environment variable configuration in the Calendado project.
 
-## 🎯 **Current Approach: Environment Variables (Not .env Files)**
+## 🎯 **Current Approach: GitHub Secrets + Actions**
 
-Calendado uses environment variables set by the hosting platform or deployment script, **not** `.env` files. This approach is more secure and professional.
+Calendado uses **GitHub Secrets** for secure environment variable management with automatic deployment via **GitHub Actions**. This is a professional, secure, and maintainable approach.
 
-### ✅ **Why Environment Variables are Better**
-- **Security**: Secrets are stored securely by the hosting platform
-- **No Git Pollution**: Secrets never end up in your repository
-- **Environment Separation**: Different values for dev/staging/production
-- **Team Friendly**: Everyone gets the same environment without sharing files
+### ✅ **Why GitHub Secrets + Actions is Better**
+- **Security**: Secrets are encrypted and managed by GitHub
+- **Automation**: Automatic deployment on every push to master
+- **No Local Configuration**: No need for local `.env` files or scripts
+- **Team Friendly**: Centralized secret management
+- **CI/CD Best Practices**: Industry-standard deployment pipeline
 
 ## 📋 **Environment Variables Reference**
 
@@ -75,33 +76,19 @@ define: {
 }
 ```
 
-### 2. **.env.example**
-Template file with all required environment variables:
+### 2. **GitHub Secrets**
+Environment variables are configured as GitHub Secrets in the repository:
 
-```env
-# Firebase Configuration
-VITE_FIREBASE_API_KEY=your_firebase_api_key_here
-VITE_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=your_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
-VITE_FIREBASE_APP_ID=your_app_id
-
-# reCAPTCHA Configuration
-VITE_RECAPTCHA_SITE_KEY=your_recaptcha_site_key_here
-
-# App Configuration
-VITE_APP_ENV=production
-VITE_APP_BASE_URL=https://calendado.com
-VITE_DEBUG_MODE=false
-
-# Firebase Functions Configuration
-APP_BASE_URL=https://calendado.com
-RESEND_API_KEY=your_resend_api_key_here
-FROM_EMAIL=noreply@calendado.com
-FROM_NAME=Calendado
-RESEND_WEBHOOK_SECRET=your_webhook_secret_here
-```
+- **Location**: `https://github.com/robertodias/calendado/settings/secrets/actions`
+- **Required Secrets**:
+  - `VITE_FIREBASE_API_KEY`
+  - `VITE_FIREBASE_AUTH_DOMAIN` 
+  - `VITE_FIREBASE_PROJECT_ID`
+  - `VITE_FIREBASE_STORAGE_BUCKET`
+  - `VITE_FIREBASE_MESSAGING_SENDER_ID`
+  - `VITE_FIREBASE_APP_ID`
+  - `VITE_RECAPTCHA_SITE_KEY`
+  - `FIREBASE_SERVICE_ACCOUNT_CALENDADO_PROD` (for deployment)
 
 ## 🛠️ **Validation Tools**
 
@@ -126,30 +113,23 @@ The script checks for:
 
 ### 1. **Development Setup**
 ```bash
-# Start development server (uses fallback values for local development)
+# Start development server (uses demo fallback values for local development)
 npm run dev
 ```
 
 ### 2. **Production Deployment**
-```bash
-# Deploy with environment variables (recommended)
-npm run deploy
+Production deployment is **automatic** via GitHub Actions:
 
-# Or deploy without environment variables (uses fallback values)
-npm run deploy:production
-```
+1. **Push to master branch** → GitHub Actions automatically builds and deploys
+2. **Monitor deployment** at `https://github.com/robertodias/calendado/actions`
+3. **Manual deployment** (if needed): `npm run deploy`
 
-### 3. **Manual Environment Variable Setup**
-```bash
-# Set environment variables manually
-export VITE_FIREBASE_API_KEY="your_actual_api_key"
-export VITE_FIREBASE_PROJECT_ID="your_actual_project_id"
-# ... other variables
+### 3. **GitHub Secrets Management**
+To update environment variables:
 
-# Then build and deploy
-npm run build
-firebase deploy --only hosting
-```
+1. Go to `https://github.com/robertodias/calendado/settings/secrets/actions`
+2. Click "New repository secret"
+3. Add/update the required secrets listed above
 
 ### 3. **Firebase Functions Setup**
 ```bash

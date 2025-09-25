@@ -1,4 +1,4 @@
-import { Timestamp } from 'firebase-admin/firestore';
+import type { Timestamp } from 'firebase-admin/firestore';
 export type Locale = 'en-US' | 'pt-BR' | 'it-IT';
 export type WaitlistStatus = 'pending' | 'confirmed' | 'invited' | 'blocked';
 export type EmailEventType = 'delivered' | 'bounced' | 'opened' | 'clicked' | 'complained' | 'dropped';
@@ -63,10 +63,10 @@ export interface ResendEmailPayload {
     subject: string;
     html: string;
     headers?: Record<string, string>;
-    tags?: Array<{
+    tags?: {
         name: string;
         value: string;
-    }>;
+    }[];
 }
 export interface ResendWebhookPayload {
     type: EmailEventType;

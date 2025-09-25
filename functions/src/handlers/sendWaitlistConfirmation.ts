@@ -4,7 +4,7 @@ import { buildWaitlistConfirmationEmail } from '../lib/email';
 import { 
   updateWaitlistConfirmation
 } from '../lib/firestore';
-import { WaitlistDoc } from '../types/models';
+import type { WaitlistDoc } from '../types/models';
 import { generateDedupeKey } from '../lib/crypto';
 import { 
   AppError, 

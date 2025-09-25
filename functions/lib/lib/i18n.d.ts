@@ -1,4 +1,4 @@
-import { Locale, LocalizedStrings } from '../types/models';
+import type { Locale, LocalizedStrings } from '../types/models';
 /**
  * Get localized strings for a given locale
  */

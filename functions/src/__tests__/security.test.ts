@@ -75,7 +75,7 @@ describe('Security Tests', () => {
       });
 
       it('should trim whitespace and limit length', () => {
-        const input = '  ' + 'a'.repeat(2000) + '  ';
+        const input = `  ${  'a'.repeat(2000)  }  `;
         const sanitized = sanitizeString(input);
         expect(sanitized).toHaveLength(1000);
         expect(sanitized).not.toMatch(/^\s/);
@@ -102,7 +102,7 @@ describe('Security Tests', () => {
       });
 
       it('should limit email length', () => {
-        const email = 'a'.repeat(300) + '@example.com';
+        const email = `${'a'.repeat(300)  }@example.com`;
         const sanitized = sanitizeEmail(email);
         expect(sanitized.length).toBeLessThanOrEqual(254);
       });

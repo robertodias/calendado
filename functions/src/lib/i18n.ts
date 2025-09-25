@@ -1,4 +1,4 @@
-import { Locale, LocalizedStrings } from '../types/models';
+import type { Locale, LocalizedStrings } from '../types/models';
 
 const strings: Record<Locale, LocalizedStrings> = {
   'en-US': {

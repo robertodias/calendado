@@ -1,4 +1,4 @@
-import { Locale, EmailTemplate } from '../types/models';
+import type { Locale, EmailTemplate } from '../types/models';
 /**
  * Build email template for waitlist confirmation
  */

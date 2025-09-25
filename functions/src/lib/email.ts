@@ -1,4 +1,4 @@
-import { Locale, EmailTemplate, LocalizedStrings } from '../types/models';
+import type { Locale, EmailTemplate, LocalizedStrings } from '../types/models';
 import { getLocalizedStrings, resolveLocale } from './i18n';
 
 /**

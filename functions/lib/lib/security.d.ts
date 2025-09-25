@@ -1,7 +1,7 @@
 /**
  * Security utilities for Firebase Functions
  */
-import { Request, Response } from 'firebase-functions/v1';
+import type { Request, Response } from 'firebase-functions/v1';
 /**
  * Rate limiting configuration
  */

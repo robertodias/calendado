@@ -1,4 +1,5 @@
-import { ResendClient, createResendClient } from '../lib/resend';
+import type { ResendClient} from '../lib/resend';
+import { createResendClient } from '../lib/resend';
 // import { ResendWebhookPayload } from '../types/models';
 
 // Mock Resend SDK

@@ -12,7 +12,7 @@ export interface UtmData {
 
 export interface ConfirmationComms {
   sent: boolean;
-  sentAt: any | null; // Firestore server timestamp (Timestamp type)
+  sentAt: unknown | null; // Firestore server timestamp (Timestamp type)
   messageId: string | null;
   error: {
     code: string;
@@ -27,7 +27,7 @@ export interface WaitlistDoc {
   utm: UtmData | null;
   userAgent: string | null;
   ip: string | null;
-  createdAt: any; // Firestore server timestamp (Timestamp type)
+  createdAt: unknown; // Firestore server timestamp (Timestamp type)
   status: WaitlistStatus;
   comms: {
     confirmation: ConfirmationComms;

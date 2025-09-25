@@ -1,5 +1,6 @@
-import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
-import { WaitlistDoc, EmailEventDoc, DeadLetterQueueDoc, WaitlistStatus } from '../types/models';
+import type { Timestamp} from 'firebase-admin/firestore';
+import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+import type { WaitlistDoc, EmailEventDoc, DeadLetterQueueDoc, WaitlistStatus } from '../types/models';
 import { generateDedupeKey, normalizeEmail } from './crypto';
 
 // Lazy initialization of Firestore

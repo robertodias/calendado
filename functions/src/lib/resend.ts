@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { ResendEmailPayload, ResendWebhookPayload, EmailEventType } from '../types/models';
+import type { ResendEmailPayload, ResendWebhookPayload, EmailEventType } from '../types/models';
 
 export class ResendClient {
   private client: Resend;

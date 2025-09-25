@@ -1,5 +1,5 @@
 import { onRequest } from 'firebase-functions/v2/https';
-import { Request, Response } from 'firebase-functions/v1';
+import type { Request, Response } from 'firebase-functions/v1';
 import { getAuth } from 'firebase-admin/auth';
 import { createResendClient } from '../lib/resend';
 import { buildWaitlistConfirmationEmail } from '../lib/email';
@@ -9,7 +9,7 @@ import {
   updateWaitlistConfirmation,
   wasEmailSentRecently 
 } from '../lib/firestore';
-import { AdminResendRequest } from '../types/models';
+import type { AdminResendRequest } from '../types/models';
 import { generateDedupeKey, normalizeEmail } from '../lib/crypto';
 
 export const adminResendConfirmation = onRequest(

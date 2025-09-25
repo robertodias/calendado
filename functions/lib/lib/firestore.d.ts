@@ -1,4 +1,4 @@
-import { WaitlistDoc, EmailEventDoc, DeadLetterQueueDoc } from '../types/models';
+import type { WaitlistDoc, EmailEventDoc, DeadLetterQueueDoc } from '../types/models';
 /**
  * Get waitlist document by email
  */

@@ -1,4 +1,4 @@
-import { ResendEmailPayload, ResendWebhookPayload, EmailEventType } from '../types/models';
+import type { ResendEmailPayload, ResendWebhookPayload, EmailEventType } from '../types/models';
 export declare class ResendClient {
     private client;
     private fromEmail;

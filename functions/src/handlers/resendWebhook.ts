@@ -1,10 +1,10 @@
 import { onRequest } from 'firebase-functions/v2/https';
-import { Request, Response } from 'firebase-functions/v1';
+import type { Request, Response } from 'firebase-functions/v1';
 import { Timestamp } from 'firebase-admin/firestore';
 import { createResendClient } from '../lib/resend';
 import { saveEmailEvent, markWaitlistBlocked } from '../lib/firestore';
 import { verifyResendSignature } from '../lib/crypto';
-import { EmailEventDoc } from '../types/models';
+import type { EmailEventDoc } from '../types/models';
 import { 
   setSecurityHeaders, 
   sanitizeLogData, 

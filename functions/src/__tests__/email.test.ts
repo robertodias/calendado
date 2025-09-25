@@ -2,7 +2,7 @@ import {
   buildWaitlistConfirmationEmail, 
   validateEmailTemplateData 
 } from '../lib/email';
-import { Locale } from '../types/models';
+import type { Locale } from '../types/models';
 
 describe('Email utilities', () => {
   describe('buildWaitlistConfirmationEmail', () => {

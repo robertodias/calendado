@@ -2,7 +2,7 @@
 import { sendWaitlistConfirmationFnFn } from '../handlers/sendWaitlistConfirmationFn';
 import { resendWebhook } from '../handlers/resendWebhook';
 import { adminResendConfirmation } from '../handlers/adminResendConfirmation';
-import { WaitlistDoc } from '../types/models';
+import type { WaitlistDoc } from '../types/models';
 
 // Mock dependencies
 jest.mock('../lib/resend');

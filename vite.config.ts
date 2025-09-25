@@ -1,10 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-  // Get environment variables directly from process.env
-  // No need to load .env files - we use environment variables from the hosting platform
   const getEnvValue = (key: string, fallback: string) => {
     return process.env[key] || fallback;
   };
@@ -31,26 +28,6 @@ export default defineConfig(({ mode }) => {
       },
     },
     define: {
-      // Built-in Vite environment variables
-      'import.meta.env.DEV': JSON.stringify(mode === 'development'),
-      'import.meta.env.PROD': JSON.stringify(mode === 'production'),
-      'import.meta.env.MODE': JSON.stringify(mode),
-      'import.meta.env.BASE_URL': JSON.stringify('/'),
-      
-      // Legacy compatibility
-      __DEV__: JSON.stringify(process.env.NODE_ENV === 'development'),
-      
-      // App configuration
-      'import.meta.env.VITE_APP_ENV': JSON.stringify(
-        getEnvValue('VITE_APP_ENV', mode)
-      ),
-      'import.meta.env.VITE_APP_BASE_URL': JSON.stringify(
-        getEnvValue('VITE_APP_BASE_URL', 'https://calendado.com')
-      ),
-      'import.meta.env.VITE_DEBUG_MODE': JSON.stringify(
-        getEnvValue('VITE_DEBUG_MODE', mode === 'development' ? 'true' : 'false')
-      ),
-      
       // Firebase configuration
       'import.meta.env.VITE_FIREBASE_API_KEY': JSON.stringify(
         getEnvValue('VITE_FIREBASE_API_KEY', 'demo-key')
@@ -74,6 +51,17 @@ export default defineConfig(({ mode }) => {
       // reCAPTCHA configuration
       'import.meta.env.VITE_RECAPTCHA_SITE_KEY': JSON.stringify(
         getEnvValue('VITE_RECAPTCHA_SITE_KEY', '6Le6nNArAAAAANxArJSBlIZ1kGrtQ03N8Z1BkI2K')
+      ),
+      
+      // App configuration
+      'import.meta.env.VITE_APP_ENV': JSON.stringify(
+        getEnvValue('VITE_APP_ENV', mode)
+      ),
+      'import.meta.env.VITE_APP_BASE_URL': JSON.stringify(
+        getEnvValue('VITE_APP_BASE_URL', 'https://calendado.com')
+      ),
+      'import.meta.env.VITE_DEBUG_MODE': JSON.stringify(
+        getEnvValue('VITE_DEBUG_MODE', mode === 'development' ? 'true' : 'false')
       ),
     },
     envPrefix: 'VITE_',

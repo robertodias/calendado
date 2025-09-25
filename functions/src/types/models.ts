@@ -1,4 +1,4 @@
-import { Timestamp } from 'firebase-admin/firestore';
+import type { Timestamp } from 'firebase-admin/firestore';
 
 export type Locale = 'en-US' | 'pt-BR' | 'it-IT';
 
@@ -73,7 +73,7 @@ export interface ResendEmailPayload {
   subject: string;
   html: string;
   headers?: Record<string, string>;
-  tags?: Array<{ name: string; value: string }>;
+  tags?: { name: string; value: string }[];
 }
 
 export interface ResendWebhookPayload {

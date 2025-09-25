@@ -21,11 +21,11 @@ export interface CircuitBreakerStats {
 
 export class CircuitBreaker {
   private state: CircuitState = CircuitState.CLOSED;
-  private failures: number = 0;
-  private successes: number = 0;
+  private failures = 0;
+  private successes = 0;
   private lastFailureTime?: Date;
   private nextAttemptTime?: Date;
-  private halfOpenCalls: number = 0;
+  private halfOpenCalls = 0;
 
   constructor(private config: CircuitBreakerConfig) {}
 

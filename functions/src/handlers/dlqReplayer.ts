@@ -1,5 +1,5 @@
 import { onRequest } from 'firebase-functions/v2/https';
-import { Request, Response } from 'firebase-functions/v1';
+import type { Request, Response } from 'firebase-functions/v1';
 import { getAuth } from 'firebase-admin/auth';
 import { createResendClient } from '../lib/resend';
 import { buildWaitlistConfirmationEmail } from '../lib/email';
@@ -10,7 +10,7 @@ import {
   deleteDeadLetterQueueDocument,
   updateDeadLetterQueueAttempts
 } from '../lib/firestore';
-import { DeadLetterQueueDoc } from '../types/models';
+import type { DeadLetterQueueDoc } from '../types/models';
 import { generateDedupeKey, normalizeEmail } from '../lib/crypto';
 
 export const dlqReplayer = onRequest(

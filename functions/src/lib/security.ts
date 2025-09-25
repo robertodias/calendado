@@ -2,7 +2,7 @@
  * Security utilities for Firebase Functions
  */
 
-import { Request, Response } from 'firebase-functions/v1';
+import type { Request, Response } from 'firebase-functions/v1';
 
 /**
  * Rate limiting configuration
@@ -156,7 +156,7 @@ export function createErrorResponse(
   res: Response,
   statusCode: number,
   message: string,
-  includeDetails: boolean = false
+  includeDetails = false
 ): void {
   setSecurityHeaders(res);
   

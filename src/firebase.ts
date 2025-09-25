@@ -35,11 +35,12 @@ if (hasValidConfig) {
     db = null;
   }
 } else {
-  console.warn('Firebase not configured. Please add your Firebase credentials to .env file or set environment variables');
+  console.warn('Firebase not configured. Using demo values for development.');
   console.warn('Current config:', {
     apiKey: firebaseConfig.apiKey,
     projectId: firebaseConfig.projectId,
-    hasValidConfig
+    isDemoKey: firebaseConfig.apiKey === 'demo-key',
+    isLocalDev: import.meta.env.MODE === 'development'
   });
   app = null;
   auth = null;
