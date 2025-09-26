@@ -6,6 +6,7 @@ import { resendWebhook } from './handlers/resendWebhook';
 import { adminResendConfirmation } from './handlers/adminResendConfirmation';
 import { dlqReplayer } from './handlers/dlqReplayer';
 import { healthCheck, livenessCheck, readinessCheck } from './handlers/healthCheck';
+import { updateUserRoles } from './handlers/updateUserRoles';
 
 // Initialize Firebase Admin
 initializeApp();
@@ -52,3 +53,6 @@ export const dlqReplayerFn = onRequest(
 
 // Health check endpoints
 export { healthCheck, livenessCheck, readinessCheck };
+
+// Admin functions
+export { updateUserRoles };
