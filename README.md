@@ -193,3 +193,4 @@ simulateJoinedUser()
 ## 📄 License
 
 This project is private and proprietary.
+# Firebase config via GitHub Secrets
