@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { collection, query, orderBy, onSnapshot, doc, getDoc } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { db } from '../../firebase';
-import { useAuth, UserRole } from '../../contexts/AuthContext';
+import { useAuth, type UserRole } from '../../contexts/AuthContext';
 import LoadingSpinner from '../LoadingSpinner';
 
 interface UserRecord {

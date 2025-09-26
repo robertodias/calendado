@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAuth, UserRole } from '../contexts/AuthContext';
+import { useAuth, type UserRole } from '../contexts/AuthContext';
 import LoadingSpinner from './LoadingSpinner';
 
 interface AdminRouteGuardProps {
