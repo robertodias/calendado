@@ -79,8 +79,8 @@ service cloud.firestore {
       // Allow reading for duplicate email checking (public read for email validation)
       allow read: if true;
       
-      // Prevent updates and deletes from client
-      allow update, delete: if false;
+      // Allow platform admins to update and delete waitlist entries
+      allow update, delete: if isPlatformAdmin();
     }
     
     // ============================================================================

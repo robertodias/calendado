@@ -9,6 +9,7 @@ import {
   deleteDoc,
 } from 'firebase/firestore';
 import { db } from '../../firebase';
+import { useAuth } from '../../contexts/AuthContext';
 import LoadingSpinner from '../LoadingSpinner';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
@@ -69,6 +70,7 @@ type WaitlistStatus =
   | 'active';
 
 const WaitlistPanel: React.FC = () => {
+  const { user } = useAuth();
   const { toast } = useToastContext();
   const [entries, setEntries] = useState<WaitlistEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -240,17 +242,39 @@ const WaitlistPanel: React.FC = () => {
 
   const handleDelete = async (entryId: string) => {
     try {
-      if (!db) return;
+      if (!db) {
+        toast({
+          title: 'Error',
+          description: 'Database not initialized',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Check if user has platform admin role
+      const hasPlatformAdmin = user?.roles?.includes('superadmin') || false;
+      
+      if (!hasPlatformAdmin) {
+        toast({
+          title: 'Permission Denied',
+          description: 'You need superadmin privileges to delete waitlist entries',
+          variant: 'destructive',
+        });
+        setDeleteConfirmOpen(null);
+        return;
+      }
+
       await deleteDoc(doc(db, 'waitlist', entryId));
       toast({
         title: 'Success',
         description: 'Entry deleted successfully',
       });
       setDeleteConfirmOpen(null);
-    } catch {
+    } catch (error) {
+      console.error('Delete error:', error);
       toast({
         title: 'Error',
-        description: 'Failed to delete entry',
+        description: 'Failed to delete entry. Please check your permissions.',
         variant: 'destructive',
       });
     }
@@ -820,16 +844,18 @@ const WaitlistPanel: React.FC = () => {
 
                                 <div className='border-t border-neutral-200 my-1'></div>
 
-                                <button
-                                  className='flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50'
-                                  onClick={e => {
-                                    e.stopPropagation();
-                                    handleDeleteClick(entry.id);
-                                  }}
-                                >
-                                  <Trash2 className='h-4 w-4 mr-3' />
-                                  Delete Entry
-                                </button>
+                                {(user?.roles?.includes('superadmin') || false) && (
+                                  <button
+                                    className='flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50'
+                                    onClick={e => {
+                                      e.stopPropagation();
+                                      handleDeleteClick(entry.id);
+                                    }}
+                                  >
+                                    <Trash2 className='h-4 w-4 mr-3' />
+                                    Delete Entry
+                                  </button>
+                                )}
                               </div>
                             </div>
                           )}
