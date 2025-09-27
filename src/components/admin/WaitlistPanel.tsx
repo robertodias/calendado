@@ -179,9 +179,9 @@ const WaitlistPanel: React.FC = () => {
           <div className='text-sm text-gray-500'>
             Last updated: {new Date().toLocaleTimeString()}
           </div>
-          <Link to="/admin/waitlist">
-            <Button variant="secondary" size="sm">
-              <ExternalLink className="h-4 w-4 mr-2" />
+          <Link to='/admin/waitlist'>
+            <Button variant='secondary' size='sm'>
+              <ExternalLink className='h-4 w-4 mr-2' />
               Full View
             </Button>
           </Link>

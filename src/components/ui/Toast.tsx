@@ -17,11 +17,11 @@ const Toast: React.FC<ToastProps> = ({ toast, onDismiss }) => {
   const getIcon = () => {
     switch (toast.variant) {
       case 'success':
-        return <CheckCircle className="h-5 w-5 text-green-600" />;
+        return <CheckCircle className='h-5 w-5 text-green-600' />;
       case 'destructive':
-        return <AlertCircle className="h-5 w-5 text-red-600" />;
+        return <AlertCircle className='h-5 w-5 text-red-600' />;
       default:
-        return <Info className="h-5 w-5 text-blue-600" />;
+        return <Info className='h-5 w-5 text-blue-600' />;
     }
   };
 
@@ -43,27 +43,21 @@ const Toast: React.FC<ToastProps> = ({ toast, onDismiss }) => {
         getVariantStyles()
       )}
     >
-      <div className="flex-shrink-0 mr-3">
-        {getIcon()}
-      </div>
-      <div className="flex-1 min-w-0">
-        <h4 className="text-sm font-medium text-neutral-900">
-          {toast.title}
-        </h4>
+      <div className='flex-shrink-0 mr-3'>{getIcon()}</div>
+      <div className='flex-1 min-w-0'>
+        <h4 className='text-sm font-medium text-neutral-900'>{toast.title}</h4>
         {toast.description && (
-          <p className="mt-1 text-sm text-neutral-600">
-            {toast.description}
-          </p>
+          <p className='mt-1 text-sm text-neutral-600'>{toast.description}</p>
         )}
       </div>
-      <div className="flex-shrink-0 ml-3">
+      <div className='flex-shrink-0 ml-3'>
         <Button
-          variant="ghost"
-          size="sm"
+          variant='ghost'
+          size='sm'
           onClick={() => onDismiss(toast.id)}
-          className="h-6 w-6 p-0"
+          className='h-6 w-6 p-0'
         >
-          <X className="h-4 w-4" />
+          <X className='h-4 w-4' />
         </Button>
       </div>
     </div>
@@ -71,4 +65,3 @@ const Toast: React.FC<ToastProps> = ({ toast, onDismiss }) => {
 };
 
 export default Toast;
-

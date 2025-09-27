@@ -1,5 +1,4 @@
-import React from 'react';
-import { createContext, useContext } from 'react';
+import React, { createContext, useContext } from 'react';
 import Toast from './ui/Toast';
 import { useToast } from '../hooks/useToast';
 
@@ -37,15 +36,11 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
   return (
     <ToastContext.Provider value={{ toast, dismiss, dismissAll }}>
       {children}
-      
+
       {/* Toast Container */}
-      <div className="fixed top-4 right-4 z-50 space-y-2">
-        {toasts.map((toast) => (
-          <Toast
-            key={toast.id}
-            toast={toast}
-            onDismiss={dismiss}
-          />
+      <div className='fixed top-4 right-4 z-50 space-y-2'>
+        {toasts.map(toast => (
+          <Toast key={toast.id} toast={toast} onDismiss={dismiss} />
         ))}
       </div>
     </ToastContext.Provider>

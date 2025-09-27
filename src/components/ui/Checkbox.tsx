@@ -6,10 +6,10 @@ interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ className, indeterminate, ...props }, ref) => {
+  ({ className, indeterminate: _indeterminate, ...props }, ref) => {
     return (
       <input
-        type="checkbox"
+        type='checkbox'
         className={cn(
           'h-4 w-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500 focus:ring-2',
           className

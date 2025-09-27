@@ -18,21 +18,21 @@ function App() {
         <LanguageProvider>
           <ToastProvider>
             <Router>
-            <Suspense
-              fallback={
-                <LoadingSpinner
-                  size='lg'
-                  text='Loading...'
-                  className='min-h-screen'
-                />
-              }
-            >
-              <Routes>
-                <Route path='/' element={<Landing />} />
-                <Route path='/admin' element={<Admin />} />
-                <Route path='/admin/waitlist' element={<AdminWaitlist />} />
-              </Routes>
-            </Suspense>
+              <Suspense
+                fallback={
+                  <LoadingSpinner
+                    size='lg'
+                    text='Loading...'
+                    className='min-h-screen'
+                  />
+                }
+              >
+                <Routes>
+                  <Route path='/' element={<Landing />} />
+                  <Route path='/admin' element={<Admin />} />
+                  <Route path='/admin/waitlist' element={<AdminWaitlist />} />
+                </Routes>
+              </Suspense>
             </Router>
           </ToastProvider>
         </LanguageProvider>

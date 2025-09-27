@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { 
-  X, 
-  User, 
-  Mail, 
-  Calendar, 
-  Globe, 
-  Smartphone, 
+import {
+  X,
+  User,
+  Mail,
+  Calendar,
+  Globe,
+  Smartphone,
   MapPin,
   History,
   Save,
-  Edit3
+  Edit3,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import type { WaitlistEntry } from '../../pages/admin/waitlist';
@@ -88,7 +88,7 @@ const WaitlistDrawer: React.FC<WaitlistDrawerProps> = ({
   // Handle notes save
   const handleSaveNotes = async () => {
     if (!entry) return;
-    
+
     try {
       // TODO: Implement notes saving
       console.log('Saving notes:', notes);
@@ -152,80 +152,86 @@ const WaitlistDrawer: React.FC<WaitlistDrawerProps> = ({
   if (!entry) return null;
 
   return (
-    <div className={`fixed inset-0 z-50 overflow-hidden ${open ? 'block' : 'hidden'}`}>
+    <div
+      className={`fixed inset-0 z-50 overflow-hidden ${open ? 'block' : 'hidden'}`}
+    >
       {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black bg-opacity-50"
+      <div
+        className='absolute inset-0 bg-black bg-opacity-50'
         onClick={onClose}
       />
-      
+
       {/* Drawer */}
-      <div className="absolute right-0 top-0 h-full w-full max-w-2xl bg-white shadow-xl">
-        <div className="flex flex-col h-full">
+      <div className='absolute right-0 top-0 h-full w-full max-w-2xl bg-white shadow-xl'>
+        <div className='flex flex-col h-full'>
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-neutral-200">
+          <div className='flex items-center justify-between p-6 border-b border-neutral-200'>
             <div>
-              <h2 className="text-xl font-semibold text-neutral-900">
+              <h2 className='text-xl font-semibold text-neutral-900'>
                 Waitlist Entry Details
               </h2>
-              <p className="text-sm text-neutral-600 mt-1">
-                {entry.email}
-              </p>
+              <p className='text-sm text-neutral-600 mt-1'>{entry.email}</p>
             </div>
             <Button
-              variant="ghost"
-              size="sm"
+              variant='ghost'
+              size='sm'
               onClick={onClose}
-              className="h-8 w-8 p-0"
+              className='h-8 w-8 p-0'
             >
-              <X className="h-4 w-4" />
+              <X className='h-4 w-4' />
             </Button>
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto">
-            <div className="p-6 space-y-6">
+          <div className='flex-1 overflow-y-auto'>
+            <div className='p-6 space-y-6'>
               {/* Basic Information */}
               <div>
-                <h3 className="text-lg font-medium text-neutral-900 mb-4">
+                <h3 className='text-lg font-medium text-neutral-900 mb-4'>
                   Basic Information
                 </h3>
-                <div className="space-y-4">
-                  <div className="flex items-center">
-                    <Mail className="h-5 w-5 text-neutral-400 mr-3" />
+                <div className='space-y-4'>
+                  <div className='flex items-center'>
+                    <Mail className='h-5 w-5 text-neutral-400 mr-3' />
                     <div>
-                      <div className="text-sm font-medium text-neutral-900">
+                      <div className='text-sm font-medium text-neutral-900'>
                         {entry.email}
                       </div>
-                      <div className="text-sm text-neutral-500">Email address</div>
+                      <div className='text-sm text-neutral-500'>
+                        Email address
+                      </div>
                     </div>
                   </div>
 
                   {entry.name && (
-                    <div className="flex items-center">
-                      <User className="h-5 w-5 text-neutral-400 mr-3" />
+                    <div className='flex items-center'>
+                      <User className='h-5 w-5 text-neutral-400 mr-3' />
                       <div>
-                        <div className="text-sm font-medium text-neutral-900">
+                        <div className='text-sm font-medium text-neutral-900'>
                           {entry.name}
                         </div>
-                        <div className="text-sm text-neutral-500">Full name</div>
+                        <div className='text-sm text-neutral-500'>
+                          Full name
+                        </div>
                       </div>
                     </div>
                   )}
 
-                  <div className="flex items-center">
-                    <Calendar className="h-5 w-5 text-neutral-400 mr-3" />
+                  <div className='flex items-center'>
+                    <Calendar className='h-5 w-5 text-neutral-400 mr-3' />
                     <div>
-                      <div className="text-sm font-medium text-neutral-900">
+                      <div className='text-sm font-medium text-neutral-900'>
                         {format(entry.createdAt, 'MMM dd, yyyy HH:mm')}
                       </div>
-                      <div className="text-sm text-neutral-500">Created date</div>
+                      <div className='text-sm text-neutral-500'>
+                        Created date
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center">
-                    <div className="h-5 w-5 mr-3 flex items-center justify-center">
-                      <div className="w-2 h-2 bg-neutral-400 rounded-full"></div>
+                  <div className='flex items-center'>
+                    <div className='h-5 w-5 mr-3 flex items-center justify-center'>
+                      <div className='w-2 h-2 bg-neutral-400 rounded-full'></div>
                     </div>
                     <div>
                       <Badge
@@ -234,7 +240,9 @@ const WaitlistDrawer: React.FC<WaitlistDrawerProps> = ({
                       >
                         {entry.status}
                       </Badge>
-                      <div className="text-sm text-neutral-500 mt-1">Current status</div>
+                      <div className='text-sm text-neutral-500 mt-1'>
+                        Current status
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -242,60 +250,66 @@ const WaitlistDrawer: React.FC<WaitlistDrawerProps> = ({
 
               {/* Source Information */}
               <div>
-                <h3 className="text-lg font-medium text-neutral-900 mb-4">
+                <h3 className='text-lg font-medium text-neutral-900 mb-4'>
                   Source Information
                 </h3>
-                <div className="space-y-4">
-                  <div className="flex items-center">
-                    <Globe className="h-5 w-5 text-neutral-400 mr-3" />
+                <div className='space-y-4'>
+                  <div className='flex items-center'>
+                    <Globe className='h-5 w-5 text-neutral-400 mr-3' />
                     <div>
-                      <div className="text-sm font-medium text-neutral-900">
+                      <div className='text-sm font-medium text-neutral-900'>
                         {entry.source || 'Unknown'}
                       </div>
-                      <div className="text-sm text-neutral-500">Source</div>
+                      <div className='text-sm text-neutral-500'>Source</div>
                     </div>
                   </div>
 
                   {entry.utm && (
-                    <div className="space-y-2">
+                    <div className='space-y-2'>
                       {entry.utm.source && (
-                        <div className="flex items-center">
-                          <div className="h-5 w-5 mr-3 flex items-center justify-center">
-                            <div className="w-1.5 h-1.5 bg-neutral-400 rounded-full"></div>
+                        <div className='flex items-center'>
+                          <div className='h-5 w-5 mr-3 flex items-center justify-center'>
+                            <div className='w-1.5 h-1.5 bg-neutral-400 rounded-full'></div>
                           </div>
                           <div>
-                            <div className="text-sm font-medium text-neutral-900">
+                            <div className='text-sm font-medium text-neutral-900'>
                               {entry.utm.source}
                             </div>
-                            <div className="text-sm text-neutral-500">UTM Source</div>
+                            <div className='text-sm text-neutral-500'>
+                              UTM Source
+                            </div>
                           </div>
                         </div>
                       )}
 
                       {entry.utm.medium && (
-                        <div className="flex items-center">
-                          <div className="h-5 w-5 mr-3 flex items-center justify-center">
-                            <div className="w-1.5 h-1.5 bg-neutral-400 rounded-full"></div>
+                        <div className='flex items-center'>
+                          <div className='h-5 w-5 mr-3 flex items-center justify-center'>
+                            <div className='w-1.5 h-1.5 bg-neutral-400 rounded-full'></div>
                           </div>
                           <div>
-                            <div className="text-sm font-medium text-neutral-900">
+                            <div className='text-sm font-medium text-neutral-900'>
                               {entry.utm.medium}
                             </div>
-                            <div className="text-sm text-neutral-500">UTM Medium</div>
+                            <div className='text-sm text-neutral-500'>
+                              UTM Medium
+                            </div>
                           </div>
                         </div>
                       )}
 
                       {entry.utm.campaign && (
-                        <div className="flex items-center">
-                          <div className="h-5 w-5 mr-3 flex items-center justify-center">
-                            <div className="w-1.5 h-1.5 bg-neutral-400 rounded-full"></div>
+                        <div className='flex items-center'>
+                          <div className='h-5 w-5 mr-3 flex items-center justify-center'>
+                            <div className='w-1.5 h-1.5 bg-neutral-400 rounded-full'></div>
                           </div>
                           <div>
-                            <div className="text-sm font-medium text-neutral-900">
+                            <div className='text-sm font-medium text-neutral-900'>
                               {entry.utm.campaign}
                             </div>
-                            <div className="text-sm text-neutral-500">UTM Campaign</div>
+                            <div className='text-sm text-neutral-500'>
+                              UTM Campaign
+                            </div>
                           </div>
                         </div>
                       )}
@@ -303,25 +317,29 @@ const WaitlistDrawer: React.FC<WaitlistDrawerProps> = ({
                   )}
 
                   {entry.userAgent && (
-                    <div className="flex items-center">
-                      <Smartphone className="h-5 w-5 text-neutral-400 mr-3" />
+                    <div className='flex items-center'>
+                      <Smartphone className='h-5 w-5 text-neutral-400 mr-3' />
                       <div>
-                        <div className="text-sm font-medium text-neutral-900 max-w-xs truncate">
+                        <div className='text-sm font-medium text-neutral-900 max-w-xs truncate'>
                           {entry.userAgent}
                         </div>
-                        <div className="text-sm text-neutral-500">User Agent</div>
+                        <div className='text-sm text-neutral-500'>
+                          User Agent
+                        </div>
                       </div>
                     </div>
                   )}
 
                   {entry.ip && (
-                    <div className="flex items-center">
-                      <MapPin className="h-5 w-5 text-neutral-400 mr-3" />
+                    <div className='flex items-center'>
+                      <MapPin className='h-5 w-5 text-neutral-400 mr-3' />
                       <div>
-                        <div className="text-sm font-medium text-neutral-900">
+                        <div className='text-sm font-medium text-neutral-900'>
                           {entry.ip}
                         </div>
-                        <div className="text-sm text-neutral-500">IP Address</div>
+                        <div className='text-sm text-neutral-500'>
+                          IP Address
+                        </div>
                       </div>
                     </div>
                   )}
@@ -330,41 +348,34 @@ const WaitlistDrawer: React.FC<WaitlistDrawerProps> = ({
 
               {/* Notes */}
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-medium text-neutral-900">
+                <div className='flex items-center justify-between mb-4'>
+                  <h3 className='text-lg font-medium text-neutral-900'>
                     Notes
                   </h3>
                   {!isEditingNotes && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleEditNotes}
-                    >
-                      <Edit3 className="h-4 w-4 mr-2" />
+                    <Button variant='ghost' size='sm' onClick={handleEditNotes}>
+                      <Edit3 className='h-4 w-4 mr-2' />
                       Edit
                     </Button>
                   )}
                 </div>
 
                 {isEditingNotes ? (
-                  <div className="space-y-3">
+                  <div className='space-y-3'>
                     <textarea
                       value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
-                      placeholder="Add notes about this waitlist entry..."
-                      className="w-full h-24 px-3 py-2 border border-neutral-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      onChange={e => setNotes(e.target.value)}
+                      placeholder='Add notes about this waitlist entry...'
+                      className='w-full h-24 px-3 py-2 border border-neutral-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent'
                     />
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        onClick={handleSaveNotes}
-                      >
-                        <Save className="h-4 w-4 mr-2" />
+                    <div className='flex gap-2'>
+                      <Button size='sm' onClick={handleSaveNotes}>
+                        <Save className='h-4 w-4 mr-2' />
                         Save
                       </Button>
                       <Button
-                        variant="secondary"
-                        size="sm"
+                        variant='secondary'
+                        size='sm'
                         onClick={handleCancelNotes}
                       >
                         Cancel
@@ -372,8 +383,8 @@ const WaitlistDrawer: React.FC<WaitlistDrawerProps> = ({
                     </div>
                   </div>
                 ) : (
-                  <div className="p-4 bg-neutral-50 rounded-md">
-                    <p className="text-sm text-neutral-900">
+                  <div className='p-4 bg-neutral-50 rounded-md'>
+                    <p className='text-sm text-neutral-900'>
                       {entry.notes || 'No notes added yet.'}
                     </p>
                   </div>
@@ -382,43 +393,47 @@ const WaitlistDrawer: React.FC<WaitlistDrawerProps> = ({
 
               {/* Audit History */}
               <div>
-                <div className="flex items-center mb-4">
-                  <History className="h-5 w-5 text-neutral-400 mr-2" />
-                  <h3 className="text-lg font-medium text-neutral-900">
-                  Audit History
+                <div className='flex items-center mb-4'>
+                  <History className='h-5 w-5 text-neutral-400 mr-2' />
+                  <h3 className='text-lg font-medium text-neutral-900'>
+                    Audit History
                   </h3>
                 </div>
 
                 {loadingAuditLogs ? (
-                  <div className="text-center py-4">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600 mx-auto"></div>
-                    <p className="text-sm text-neutral-600 mt-2">Loading history...</p>
+                  <div className='text-center py-4'>
+                    <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600 mx-auto'></div>
+                    <p className='text-sm text-neutral-600 mt-2'>
+                      Loading history...
+                    </p>
                   </div>
                 ) : auditLogs.length === 0 ? (
-                  <div className="text-center py-4">
-                    <p className="text-sm text-neutral-600">No audit history available</p>
+                  <div className='text-center py-4'>
+                    <p className='text-sm text-neutral-600'>
+                      No audit history available
+                    </p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    {auditLogs.map((log) => (
+                  <div className='space-y-3'>
+                    {auditLogs.map(log => (
                       <div
                         key={log.id}
-                        className="flex items-start p-3 bg-neutral-50 rounded-md"
+                        className='flex items-start p-3 bg-neutral-50 rounded-md'
                       >
-                        <div className="flex-shrink-0 w-2 h-2 bg-primary-600 rounded-full mt-2 mr-3"></div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm font-medium text-neutral-900">
+                        <div className='flex-shrink-0 w-2 h-2 bg-primary-600 rounded-full mt-2 mr-3'></div>
+                        <div className='flex-1 min-w-0'>
+                          <div className='flex items-center justify-between'>
+                            <p className='text-sm font-medium text-neutral-900'>
                               {log.action}
                             </p>
-                            <p className="text-xs text-neutral-500">
+                            <p className='text-xs text-neutral-500'>
                               {format(log.timestamp, 'MMM dd, HH:mm')}
                             </p>
                           </div>
-                          <p className="text-sm text-neutral-600 mt-1">
+                          <p className='text-sm text-neutral-600 mt-1'>
                             {log.details}
                           </p>
-                          <p className="text-xs text-neutral-500 mt-1">
+                          <p className='text-xs text-neutral-500 mt-1'>
                             by {log.actor}
                           </p>
                         </div>
@@ -431,13 +446,9 @@ const WaitlistDrawer: React.FC<WaitlistDrawerProps> = ({
           </div>
 
           {/* Footer */}
-          <div className="p-6 border-t border-neutral-200">
-            <div className="flex gap-3">
-              <Button
-                variant="secondary"
-                onClick={onClose}
-                className="flex-1"
-              >
+          <div className='p-6 border-t border-neutral-200'>
+            <div className='flex gap-3'>
+              <Button variant='secondary' onClick={onClose} className='flex-1'>
                 Close
               </Button>
               <Button
@@ -445,9 +456,9 @@ const WaitlistDrawer: React.FC<WaitlistDrawerProps> = ({
                   // TODO: Implement invite action
                   console.log('Invite entry:', entry.id);
                 }}
-                className="flex-1"
+                className='flex-1'
               >
-                <User className="h-4 w-4 mr-2" />
+                <User className='h-4 w-4 mr-2' />
                 Send Invite
               </Button>
             </div>
