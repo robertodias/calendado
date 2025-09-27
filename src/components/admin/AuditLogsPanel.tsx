@@ -49,38 +49,49 @@ const AuditLogsPanel: React.FC = () => {
   const [selectedLog, setSelectedLog] = useState<AuditLogEntry | null>(null);
 
   useEffect(() => {
-    if (!db) return;
+    if (!db) {
+      setLoading(false);
+      return;
+    }
 
     const logsRef = collection(db, 'admin', 'auditLogs', 'entries');
     const q = query(logsRef, orderBy('timestamp', 'desc'), limit(LOGS_PER_PAGE));
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const auditLogs: AuditLogEntry[] = [];
-      let lastDocument: QueryDocumentSnapshot | null = null;
+    const unsubscribe = onSnapshot(q, 
+      (snapshot) => {
+        const auditLogs: AuditLogEntry[] = [];
+        let lastDocument: QueryDocumentSnapshot | null = null;
 
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        auditLogs.push({
-          id: doc.id,
-          timestamp: data.timestamp?.toDate() || new Date(),
-          actorUid: data.actorUid,
-          actorEmail: data.actorEmail,
-          targetUid: data.targetUid,
-          targetEmail: data.targetEmail,
-          action: data.action,
-          resource: data.resource,
-          before: data.before,
-          after: data.after,
-          metadata: data.metadata,
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          auditLogs.push({
+            id: doc.id,
+            timestamp: data.timestamp?.toDate() || new Date(),
+            actorUid: data.actorUid,
+            actorEmail: data.actorEmail,
+            targetUid: data.targetUid,
+            targetEmail: data.targetEmail,
+            action: data.action,
+            resource: data.resource,
+            before: data.before,
+            after: data.after,
+            metadata: data.metadata,
+          });
+          lastDocument = doc;
         });
-        lastDocument = doc;
-      });
 
-      setLogs(auditLogs);
-      setLastDoc(lastDocument);
-      setHasMore(snapshot.size === LOGS_PER_PAGE);
-      setLoading(false);
-    });
+        setLogs(auditLogs);
+        setLastDoc(lastDocument);
+        setHasMore(snapshot.size === LOGS_PER_PAGE);
+        setLoading(false);
+      },
+      (error) => {
+        console.error('Error loading audit logs:', error);
+        setLoading(false);
+        // Set empty array if there's a permission error
+        setLogs([]);
+      }
+    );
 
     return () => unsubscribe();
   }, []);

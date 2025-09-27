@@ -74,17 +74,11 @@ service cloud.firestore {
       allow write: if request.auth != null && 
         hasAnyRole(['admin', 'superadmin']);
       
-      // Subcollections for audit logs
-      match /auditLogs/{logDocument} {
+      // Audit logs subcollection
+      match /auditLogs/entries/{entryId} {
         allow read: if request.auth != null && 
           hasAnyRole(['support', 'admin', 'superadmin']);
         allow write: if false; // Only server can write audit logs
-        
-        match /entries/{entryId} {
-          allow read: if request.auth != null && 
-            hasAnyRole(['support', 'admin', 'superadmin']);
-          allow write: if false; // Only server can write audit logs
-        }
       }
     }
     
