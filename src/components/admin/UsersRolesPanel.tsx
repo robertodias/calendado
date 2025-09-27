@@ -27,33 +27,51 @@ const UsersRolesPanel: React.FC = () => {
   const availableRoles: UserRole[] = ['superadmin', 'admin', 'support', 'editor', 'viewer'];
 
   useEffect(() => {
-    if (!db) return;
+    if (!db) {
+      setLoading(false);
+      return;
+    }
+
+    // Check if current user has permission to view users
+    if (!user?.hasRole(['admin', 'superadmin', 'support'])) {
+      console.warn('User does not have permission to view users list');
+      setLoading(false);
+      return;
+    }
 
     const usersRef = collection(db, 'users');
     // Use a simpler query without orderBy to avoid index issues
     const q = query(usersRef);
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const userList: UserRecord[] = [];
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        userList.push({
-          uid: doc.id,
-          email: data.email,
-          displayName: data.displayName,
-          roles: data.roles || [],
-          createdAt: data.createdAt?.toDate() || new Date(),
-          lastSignIn: data.lastSignIn?.toDate(),
+    const unsubscribe = onSnapshot(q, 
+      (snapshot) => {
+        const userList: UserRecord[] = [];
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          userList.push({
+            uid: doc.id,
+            email: data.email,
+            displayName: data.displayName,
+            roles: data.roles || [],
+            createdAt: data.createdAt?.toDate() || new Date(),
+            lastSignIn: data.lastSignIn?.toDate(),
+          });
         });
-      });
-      // Sort by email since we can't use Firestore orderBy
-      userList.sort((a, b) => a.email.localeCompare(b.email));
-      setUsers(userList);
-      setLoading(false);
-    });
+        // Sort by email since we can't use Firestore orderBy
+        userList.sort((a, b) => a.email.localeCompare(b.email));
+        setUsers(userList);
+        setLoading(false);
+      },
+      (error) => {
+        console.error('Error loading users:', error);
+        setLoading(false);
+        // Set empty array if there's a permission error
+        setUsers([]);
+      }
+    );
 
     return () => unsubscribe();
-  }, []);
+  }, [user]);
 
   const filteredUsers = users.filter(user =>
     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -166,7 +184,16 @@ const UsersRolesPanel: React.FC = () => {
             {filteredUsers.length === 0 ? (
               <tr>
                 <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
-                  {searchTerm ? 'No users found matching your search.' : 'No users found.'}
+                  {searchTerm ? (
+                    'No users found matching your search.'
+                  ) : (
+                    <div className="space-y-2">
+                      <div>No users found in the system yet.</div>
+                      <div className="text-sm text-gray-400">
+                        Users will appear here when roles are assigned to them.
+                      </div>
+                    </div>
+                  )}
                 </td>
               </tr>
             ) : (
