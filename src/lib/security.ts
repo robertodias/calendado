@@ -37,4 +37,3 @@ export function generateCSRFToken(): string {
 export function validateCSRFToken(token: string, storedToken: string): boolean {
   return token === storedToken && token.length === 64;
 }
-

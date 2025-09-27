@@ -67,4 +67,3 @@ export function useLoading(initialLoading = false): UseLoadingReturn {
     reset,
   };
 }
-
