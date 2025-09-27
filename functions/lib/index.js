@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.bootstrapSuperadmin = exports.updateUserRoles = exports.readinessCheck = exports.livenessCheck = exports.healthCheck = exports.dlqReplayerFn = exports.adminResendConfirmationFn = exports.resendWebhookFn = exports.sendWaitlistConfirmationFn = void 0;
+exports.updateUserRoles = exports.readinessCheck = exports.livenessCheck = exports.healthCheck = exports.dlqReplayerFn = exports.adminResendConfirmationFn = exports.resendWebhookFn = exports.sendWaitlistConfirmationFn = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const params_1 = require("firebase-functions/params");
 const app_1 = require("firebase-admin/app");
@@ -15,8 +15,6 @@ Object.defineProperty(exports, "livenessCheck", { enumerable: true, get: functio
 Object.defineProperty(exports, "readinessCheck", { enumerable: true, get: function () { return healthCheck_1.readinessCheck; } });
 const updateUserRoles_1 = require("./handlers/updateUserRoles");
 Object.defineProperty(exports, "updateUserRoles", { enumerable: true, get: function () { return updateUserRoles_1.updateUserRoles; } });
-const bootstrapSuperadmin_1 = require("./handlers/bootstrapSuperadmin");
-Object.defineProperty(exports, "bootstrapSuperadmin", { enumerable: true, get: function () { return bootstrapSuperadmin_1.bootstrapSuperadmin; } });
 // Initialize Firebase Admin
 (0, app_1.initializeApp)();
 // Define secrets

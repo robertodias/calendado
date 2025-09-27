@@ -1,12 +1,13 @@
 # Calendado
 
-A modern, internationalized React application for calendar management with Firebase integration.
+A modern, internationalized React application for calendar management with Firebase integration and comprehensive admin console.
 
 ## 🚀 Features
 
 - **🌍 Internationalization** - Portuguese and English support with browser language detection
-- **🔥 Firebase Integration** - Authentication and Firestore database
-- **🛡️ Security** - reCAPTCHA protection and form validation
+- **🔥 Firebase Integration** - Authentication, Firestore database, and Cloud Functions
+- **👑 Admin Console** - Complete RBAC system with role-based access control
+- **🛡️ Security** - reCAPTCHA protection, form validation, and secure admin functions
 - **📱 Responsive Design** - Mobile-first approach with TailwindCSS
 - **⚡ Performance** - Optimized bundle with code splitting
 - **🔧 Developer Experience** - Comprehensive linting, formatting, and error handling
@@ -65,73 +66,124 @@ Language preferences are saved in localStorage and persist across sessions.
    npm install
    ```
 
-2. **Configure environment variables:**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your Firebase credentials
-   ```
-
-3. **Start development server:**
+2. **Start development server:**
    ```bash
    npm run dev
    ```
 
 ### Environment Variables
 
-Create a `.env` file in the root directory (copy from `.env.example`):
+**🔐 Production Deployment:** Environment variables are managed via **GitHub Secrets** and automatically injected during CI/CD deployment. See [ENVIRONMENT_VARIABLES.md](./ENVIRONMENT_VARIABLES.md) for detailed configuration.
 
-```env
-# Firebase Configuration
-VITE_FIREBASE_API_KEY=your_firebase_api_key_here
-VITE_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=your_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
-VITE_FIREBASE_APP_ID=your_app_id
-
-# reCAPTCHA Configuration
-VITE_RECAPTCHA_SITE_KEY=your_recaptcha_site_key_here
-
-# App Configuration
-VITE_APP_ENV=production
-VITE_APP_BASE_URL=https://calendado.com
-VITE_DEBUG_MODE=false
-```
-
-**Important**: The app will fall back to demo mode if Firebase credentials are not properly configured. Check the browser console for configuration status.
+**🏠 Local Development:** The app will fall back to demo mode if Firebase credentials are not configured. For local development with real Firebase:
+- Check [ENVIRONMENT_VARIABLES.md](./ENVIRONMENT_VARIABLES.md) for setup instructions
+- The app gracefully handles missing configuration and shows appropriate warnings in console
 
 ## 🏗️ Project Structure
 
 ```
 src/
 ├── components/          # Reusable UI components
+│   ├── admin/          # Admin console components
+│   │   ├── AuditLogsPanel.tsx
+│   │   ├── FeatureFlagsPanel.tsx
+│   │   ├── UsersRolesPanel.tsx
+│   │   └── WaitlistPanel.tsx
+│   ├── AdminRouteGuard.tsx
 │   ├── ErrorBoundary.tsx
 │   └── LoadingSpinner.tsx
 ├── contexts/           # React Context providers
+│   ├── AuthContext.tsx  # Firebase Auth with RBAC
 │   └── LanguageContext.tsx
 ├── lib/               # Utility libraries
 │   ├── cookieUtils.ts
+│   ├── crypto.ts
 │   ├── emailUtils.ts
 │   ├── languageUtils.ts
 │   ├── logger.ts
-│   └── testUtils.ts
+│   └── waitlistUtils.ts
 ├── locales/           # Translation files
 │   ├── en.json
 │   └── pt.json
 ├── pages/             # Page components
-│   ├── Dashboard.tsx
-│   └── Landing.tsx
-├── App.tsx
-├── firebase.ts
-└── main.tsx
+│   ├── Admin.tsx      # Admin console main page
+│   └── Landing.tsx    # Public landing page
+├── types/             # TypeScript type definitions
+│   └── models.ts
+├── App.tsx            # Main app component with routing
+├── firebase.ts        # Firebase configuration
+└── main.tsx          # Application entry point
+```
+
+### Backend Structure (Firebase Functions)
+
+```
+functions/src/
+├── handlers/          # Function handlers
+│   ├── adminResendConfirmation.ts
+│   ├── dlqReplayer.ts
+│   ├── healthCheck.ts
+│   ├── resendWebhook.ts
+│   ├── sendWaitlistConfirmation.ts
+│   └── updateUserRoles.ts    # RBAC role management
+├── lib/              # Shared utilities
+│   ├── circuitBreaker.ts
+│   ├── config.ts
+│   ├── crypto.ts
+│   ├── email.ts
+│   ├── errorHandler.ts
+│   ├── firestore.ts
+│   ├── i18n.ts
+│   ├── monitoring.ts
+│   ├── rateLimiter.ts
+│   ├── recaptcha.ts
+│   ├── resend.ts
+│   ├── sanitizer.ts
+│   ├── security.ts
+│   └── validation.ts
+├── types/            # TypeScript definitions
+│   └── models.ts
+└── index.ts          # Functions export
 ```
 
 ## 🔒 Security Features
 
+### Public Application
 - **reCAPTCHA v3** - Invisible bot protection in production
 - **Email Validation** - Client and server-side validation
 - **Duplicate Prevention** - Firestore-based email uniqueness checks
 - **Cookie Management** - Secure waitlist tracking
+
+### Admin Console Security
+- **Role-Based Access Control (RBAC)** - 5 distinct user roles with granular permissions
+- **Firebase Auth Integration** - Google Sign-In with custom claims
+- **Route Protection** - Client-side route guards based on user roles
+- **Firestore Security Rules** - Database-level access control enforcement
+- **Audit Logging** - Complete activity tracking for all admin actions
+- **Secure Role Management** - Server-side only role assignment via Cloud Functions
+
+## 👑 Admin Console Features
+
+The admin console provides comprehensive management tools with role-based access:
+
+### User Roles
+- **superadmin** - Full system access, role management
+- **admin** - Waitlist management, feature flags, content
+- **support** - Read-only access to user data, email resending
+- **editor** - Content and changelog management
+- **viewer** - Read-only analytics and reports
+
+### Admin Panels
+1. **👥 Users & Roles** - Search users, view roles, manage permissions (superadmin only)
+2. **📋 Waitlist Management** - Filter, search, export waitlist entries
+3. **🚀 Feature Flags** - Toggle application features in real-time
+4. **📊 Audit Logs** - Complete administrative activity tracking
+
+### Access the Admin Console
+- **URL**: `/admin`
+- **Authentication**: Google Sign-In required
+- **Authorization**: Requires admin, superadmin, or support role
+- **Setup**: See [ADMIN_SETUP.md](./ADMIN_SETUP.md) for configuration
 
 ## 📱 Responsive Design
 

@@ -9,22 +9,34 @@ This directory contains Firebase Functions for the Calendado waitlist confirmati
 - **Multi-language Support**: Supports English (en-US), Portuguese (pt-BR), and Italian (it-IT)
 - **Dead Letter Queue**: Handles failed email sends with retry logic
 - **Admin Tools**: Admin functions for resending emails and managing failures
+- **Role-Based Access Control**: Secure user role management system
 - **Observability**: Comprehensive logging and error tracking
 
 ## Architecture
 
 ### Functions
 
+#### Core Functions
 1. **`sendWaitlistConfirmation`** - Firestore trigger that sends confirmation emails
 2. **`resendWebhook`** - HTTP endpoint for Resend webhook events
 3. **`adminResendConfirmation`** - Admin-only function to resend emails
 4. **`dlqReplayer`** - Admin-only function to retry failed emails
 
+#### Admin & RBAC Functions
+5. **`updateUserRoles`** - Secure role management (superadmin only)
+6. **`healthCheck`** / **`livenessCheck`** / **`readinessCheck`** - System health monitoring
+
 ### Data Models
 
+#### Core Collections
 - **`/waitlist/{id}`** - Waitlist entries with communication status
 - **`/email_events/{id}`** - Resend webhook events (delivered, bounced, etc.)
 - **`/email_dlq/{id}`** - Dead letter queue for failed emails
+
+#### Admin Collections
+- **`/users/{uid}`** - User profiles with role information (mirrored from Auth custom claims)
+- **`/admin/featureFlags`** - Application feature toggles
+- **`/admin/auditLogs/entries/{id}`** - Administrative action audit trail
 
 ## Setup
 
