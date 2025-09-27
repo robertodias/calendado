@@ -49,7 +49,13 @@ const WaitlistPanel: React.FC = () => {
           status: data.status || 'pending',
           createdAt: data.createdAt?.toDate() || new Date(),
           locale: data.locale || data.language,
-          comms: data.comms,
+          comms: data.comms ? {
+            ...data.comms,
+            confirmation: data.comms.confirmation ? {
+              ...data.comms.confirmation,
+              sentAt: data.comms.confirmation.sentAt?.toDate() || null
+            } : undefined
+          } : undefined,
         });
       });
       setEntries(waitlistEntries);

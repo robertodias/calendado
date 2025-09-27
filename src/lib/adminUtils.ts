@@ -4,7 +4,7 @@ import { db } from '../firebase';
 /**
  * Initialize admin collections with default documents if they don't exist
  */
-export const initializeAdminCollections = async () => {
+export const initializeAdminCollections = async (currentUser?: { uid: string; email: string; displayName?: string; roles: string[] }) => {
   if (!db) {
     console.warn('Firebase not initialized, skipping admin collections initialization');
     return;
@@ -21,6 +21,19 @@ export const initializeAdminCollections = async () => {
       lastUpdated: serverTimestamp(),
       lastUpdatedBy: 'system',
     }, { merge: true });
+
+    // Initialize current user document if provided
+    if (currentUser) {
+      const userRef = doc(db, 'users', currentUser.uid);
+      await setDoc(userRef, {
+        uid: currentUser.uid,
+        email: currentUser.email,
+        displayName: currentUser.displayName || null,
+        roles: currentUser.roles,
+        createdAt: serverTimestamp(),
+        lastUpdated: serverTimestamp(),
+      }, { merge: true });
+    }
 
     console.log('Admin collections initialized successfully');
   } catch (error) {

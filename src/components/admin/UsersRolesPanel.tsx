@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { collection, query, onSnapshot } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { db } from '../../firebase';
 import { useAuth, type UserRole } from '../../contexts/AuthContext';
@@ -30,7 +30,8 @@ const UsersRolesPanel: React.FC = () => {
     if (!db) return;
 
     const usersRef = collection(db, 'users');
-    const q = query(usersRef, orderBy('createdAt', 'desc'));
+    // Use a simpler query without orderBy to avoid index issues
+    const q = query(usersRef);
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const userList: UserRecord[] = [];
@@ -45,6 +46,8 @@ const UsersRolesPanel: React.FC = () => {
           lastSignIn: data.lastSignIn?.toDate(),
         });
       });
+      // Sort by email since we can't use Firestore orderBy
+      userList.sort((a, b) => a.email.localeCompare(b.email));
       setUsers(userList);
       setLoading(false);
     });
