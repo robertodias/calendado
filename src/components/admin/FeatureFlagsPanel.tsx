@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { doc, onSnapshot, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc, serverTimestamp, collection, addDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import LoadingSpinner from '../LoadingSpinner';
@@ -69,10 +69,30 @@ const FeatureFlagsPanel: React.FC = () => {
 
     try {
       const flagsRef = doc(db, 'admin', 'featureFlags');
-      await updateDoc(flagsRef, {
+      
+      // Get current value for audit log
+      const currentValue = flags[flagName] as boolean;
+      
+      // Use setDoc with merge to handle both create and update cases
+      await setDoc(flagsRef, {
         [flagName]: value,
         lastUpdated: serverTimestamp(),
         lastUpdatedBy: user.email,
+      }, { merge: true });
+
+      // Create audit log entry
+      await addDoc(collection(db, 'admin', 'auditLogs', 'entries'), {
+        timestamp: serverTimestamp(),
+        actorUid: user.uid,
+        actorEmail: user.email,
+        action: 'update_feature_flag',
+        resource: 'feature_flags',
+        before: { [flagName]: currentValue },
+        after: { [flagName]: value },
+        metadata: {
+          flagName,
+          userAgent: navigator.userAgent
+        }
       });
 
       setSaveMessage({ 

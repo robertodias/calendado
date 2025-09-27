@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import AdminRouteGuard from '../components/AdminRouteGuard';
 import UsersRolesPanel from '../components/admin/UsersRolesPanel';
 import WaitlistPanel from '../components/admin/WaitlistPanel';
 import FeatureFlagsPanel from '../components/admin/FeatureFlagsPanel';
 import AuditLogsPanel from '../components/admin/AuditLogsPanel';
+import { initializeAdminCollections } from '../lib/adminUtils';
 
 type AdminPanel = 'users' | 'waitlist' | 'flags' | 'audit';
 
@@ -20,6 +21,13 @@ const AdminConsole: React.FC = () => {
   const { user, signOut } = useAuth();
   const [activePanel, setActivePanel] = useState<AdminPanel>('users');
   const [isSigningOut, setIsSigningOut] = useState(false);
+
+  // Initialize admin collections on first load
+  useEffect(() => {
+    if (user?.hasRole(['admin', 'superadmin'])) {
+      initializeAdminCollections();
+    }
+  }, [user]);
 
   const handleSignOut = async () => {
     setIsSigningOut(true);
