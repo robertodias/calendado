@@ -8,6 +8,7 @@ import { dlqReplayer } from './handlers/dlqReplayer';
 import { healthCheck, livenessCheck, readinessCheck } from './handlers/healthCheck';
 import { updateUserRoles } from './handlers/updateUserRoles';
 import { inviteFromWaitlist, rejectWaitlist, getWaitlistEntry } from './waitlist';
+import { issueMagicLink, validateMagicLink, redeemMagicLink } from './magicLink';
 
 // Initialize Firebase Admin
 initializeApp();
@@ -60,3 +61,6 @@ export { updateUserRoles };
 
 // Waitlist management functions
 export { inviteFromWaitlist, rejectWaitlist, getWaitlistEntry };
+
+// Magic link functions
+export { issueMagicLink, validateMagicLink, redeemMagicLink };

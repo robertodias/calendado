@@ -9,17 +9,23 @@ import { onCall, HttpsError, CallableRequest } from 'firebase-functions/v2/https
 import { getFirestore } from 'firebase-admin/firestore';
 import { validateAdmin, validateOrgAccess } from './lib/authz';
 import { createWaitlistAuditLog, createInviteAuditLog, formatWaitlistDetails, formatInviteDetails } from './lib/audit';
+import { createInviteToken } from './tokens';
+import { sendInviteEmail } from './email';
 
 // Types for function parameters and responses
 export interface InviteFromWaitlistRequest {
   entryId: string;
   role?: string;
   orgId?: string;
+  sendEmail?: boolean;
+  expiresInHours?: number;
 }
 
 export interface InviteFromWaitlistResponse {
   success: boolean;
   inviteId?: string;
+  magicLinkUrl?: string;
+  messageId?: string;
   message: string;
   error?: string;
 }
@@ -91,7 +97,7 @@ export const inviteFromWaitlist = onCall(
         throw new HttpsError('permission-denied', authResult.error || 'Admin privileges required');
       }
 
-      const { entryId, role = 'viewer', orgId } = request.data;
+      const { entryId, role = 'viewer', orgId, sendEmail = true, expiresInHours = 72 } = request.data;
       const actor = authResult.user!;
 
       if (!entryId) {
@@ -132,6 +138,13 @@ export const inviteFromWaitlist = onCall(
         }
       }
 
+      // Create magic link token
+      const tokenResult = createInviteToken(waitlistData.email, waitlistData.email, expiresInHours);
+      
+      if (!tokenResult.success) {
+        throw new HttpsError('internal', tokenResult.error || 'Failed to create magic link token');
+      }
+
       // Create invite document
       const inviteRef = db.collection('invites').doc();
       const inviteId = inviteRef.id;
@@ -149,6 +162,9 @@ export const inviteFromWaitlist = onCall(
         createdAt: new Date(),
         expiresAt,
         createdBy: actor.uid,
+        magicLinkToken: tokenResult.token,
+        magicLinkUrl: tokenResult.url,
+        magicLinkExpiresAt: tokenResult.expiresAt,
         metadata: {
           source: 'waitlist',
           waitlistEntryId: entryId
@@ -172,6 +188,25 @@ export const inviteFromWaitlist = onCall(
 
       await batch.commit();
 
+      // Send email if requested
+      let messageId: string | undefined;
+      if (sendEmail) {
+        const emailResult = await sendInviteEmail({
+          email: waitlistData.email,
+          token: tokenResult.token!,
+          brandName: orgId ? 'Organization' : 'Calendado', // You might want to get actual brand name
+          inviteUrl: tokenResult.url,
+          expiresAt: tokenResult.expiresAt
+        });
+
+        if (!emailResult.success) {
+          console.warn('Failed to send invite email:', emailResult.error);
+          // Don't fail the entire operation if email fails
+        } else {
+          messageId = emailResult.messageId;
+        }
+      }
+
       // Create audit logs
       await createWaitlistAuditLog(
         actor,
@@ -180,7 +215,9 @@ export const inviteFromWaitlist = onCall(
         formatWaitlistDetails(entryId, 'invited', waitlistData.email, {
           role,
           orgId,
-          inviteId
+          inviteId,
+          magicLinkUrl: tokenResult.url,
+          messageId
         })
       );
 
@@ -189,14 +226,18 @@ export const inviteFromWaitlist = onCall(
         'create',
         inviteId,
         formatInviteDetails(inviteId, waitlistData.email, role, orgId, {
-          waitlistEntryId: entryId
+          waitlistEntryId: entryId,
+          magicLinkUrl: tokenResult.url,
+          messageId
         })
       );
 
       return {
         success: true,
         inviteId,
-        message: `Successfully invited ${waitlistData.email} from waitlist`
+        magicLinkUrl: tokenResult.url,
+        messageId,
+        message: `Successfully invited ${waitlistData.email} from waitlist${sendEmail ? ' and email sent' : ''}`
       };
 
     } catch (error) {
