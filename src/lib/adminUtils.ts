@@ -37,21 +37,8 @@ export const initializeAdminCollections = async (currentUser?: { uid: string; em
       }
     }
 
-    // Initialize current user document (users can create their own profile)
-    try {
-      const userRef = doc(db, 'users', currentUser.uid);
-      await setDoc(userRef, {
-        uid: currentUser.uid,
-        email: currentUser.email,
-        displayName: currentUser.displayName || null,
-        // Don't set roles here - they're managed by server
-        createdAt: serverTimestamp(),
-        lastUpdated: serverTimestamp(),
-      }, { merge: true });
-      console.log('User profile initialized successfully');
-    } catch (userError) {
-      console.warn('Could not initialize user profile (may already exist):', userError);
-    }
+    // User profiles are created automatically by the updateUserRoles cloud function
+    // when roles are assigned. No client-side creation needed.
 
   } catch (error) {
     console.warn('Some admin collections could not be initialized:', error);
