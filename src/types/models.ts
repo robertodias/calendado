@@ -1,6 +1,13 @@
-export type Locale = 'en-US' | 'pt-BR' | 'it-IT';
+import type { 
+  Locale, 
+  WaitlistStatus, 
+  UtmData, 
+  ConfirmationComms, 
+  WaitlistDoc as SharedWaitlistDoc 
+} from '../../../functions/src/types/shared';
 
-export type WaitlistStatus = 'pending' | 'confirmed' | 'invited' | 'blocked';
+// Re-export shared types for convenience
+export type { Locale, WaitlistStatus, UtmData, ConfirmationComms };
 
 export type EmailEventType =
   | 'delivered'
@@ -10,33 +17,7 @@ export type EmailEventType =
   | 'complained'
   | 'dropped';
 
-export interface UtmData {
-  source?: string;
-  medium?: string;
-  campaign?: string;
-}
-
-export interface ConfirmationComms {
-  sent: boolean;
-  sentAt: unknown | null; // Firestore server timestamp (Timestamp type)
-  messageId: string | null;
-  error: {
-    code: string;
-    msg: string;
-  } | null;
-}
-
-export interface WaitlistDoc {
-  email: string; // required, normalized lowercase
-  name: string | null; // optional
-  locale: Locale | null;
-  utm: UtmData | null;
-  userAgent: string | null;
-  ip: string | null;
+// Frontend-specific WaitlistDoc that extends shared type
+export interface WaitlistDoc extends Omit<SharedWaitlistDoc, 'createdAt'> {
   createdAt: unknown; // Firestore server timestamp (Timestamp type)
-  status: WaitlistStatus;
-  comms: {
-    confirmation: ConfirmationComms;
-  };
-  dedupeKey: string; // sha256(lower(email))
 }

@@ -1,6 +1,5 @@
 import type { User } from 'firebase/auth';
-
-export type UserRole = 'superadmin' | 'admin' | 'support' | 'editor' | 'viewer';
+import type { UserRole } from '../../../functions/src/types/shared';
 
 export interface AuthUser extends User {
   roles: UserRole[];

@@ -1,14 +1,16 @@
 import React, { Component, type ReactNode } from 'react';
-import { logger } from '../lib/logger';
+import { logError, getErrorDisplayMessage } from '../lib/errorHandler';
 
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
+  onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
 }
 
 interface State {
   hasError: boolean;
   error?: Error;
+  errorInfo?: React.ErrorInfo;
 }
 
 class ErrorBoundary extends Component<Props, State> {
@@ -22,7 +24,13 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-    logger.error('ErrorBoundary caught an error:', error, errorInfo);
+    this.setState({ errorInfo });
+    logError(error, 'ErrorBoundary');
+    
+    // Call custom error handler if provided
+    if (this.props.onError) {
+      this.props.onError(error, errorInfo);
+    }
   }
 
   render(): ReactNode {
@@ -53,8 +61,7 @@ class ErrorBoundary extends Component<Props, State> {
               Oops! Something went wrong
             </h2>
             <p className='text-gray-600 text-center mb-4'>
-              We're sorry, but something unexpected happened. Please try
-              refreshing the page.
+              {getErrorDisplayMessage(this.state.error)}
             </p>
             <div className='flex justify-center space-x-4'>
               <button

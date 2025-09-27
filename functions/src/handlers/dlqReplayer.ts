@@ -1,6 +1,6 @@
 import { onRequest } from 'firebase-functions/v2/https';
 import type { Request, Response } from 'firebase-functions/v1';
-import { getAuth } from 'firebase-admin/auth';
+import { withAuth, requireMethod } from '../lib/middleware';
 import { createResendClient } from '../lib/resend';
 import { buildWaitlistConfirmationEmail } from '../lib/email';
 import { 
@@ -14,34 +14,14 @@ import type { DeadLetterQueueDoc } from '../types/models';
 import { generateDedupeKey, normalizeEmail } from '../lib/crypto';
 
 export const dlqReplayer = onRequest(
-  async (req: Request, res: Response) => {
-    console.log('DLQ replayer request:', {
-      method: req.method,
-      body: req.body
-    });
-
-    try {
-      // Only accept POST requests
-      if (req.method !== 'POST') {
-        res.status(405).json({ error: 'Method not allowed' });
-        return;
-      }
-
-      // Verify admin authentication
-      const authHeader = req.headers.authorization || req.headers.Authorization;
-      if (!authHeader || !String(authHeader).startsWith('Bearer ')) {
-        res.status(401).json({ error: 'Missing or invalid authorization header' });
-        return;
-      }
-
-      const token = String(authHeader).substring(7);
-      const decodedToken = await getAuth().verifyIdToken(token);
-      
-      // Check if user has admin role (custom claim)
-      if (!decodedToken.admin) {
-        res.status(403).json({ error: 'Admin access required' });
-        return;
-      }
+  withAuth({ requireAdmin: true })(
+    requireMethod('POST')(
+      async (req: Request, res: Response, user) => {
+        console.log('DLQ replayer request:', {
+          method: req.method,
+          body: req.body,
+          userId: user.uid
+        });
 
       // Get dead letter queue documents
       const dlqDocs = await getDeadLetterQueueDocuments();
@@ -81,19 +61,13 @@ export const dlqReplayer = onRequest(
 
       console.log('DLQ replayer completed:', results);
 
-      res.status(200).json({
-        success: true,
-        ...results
-      });
-
-    } catch (error) {
-      console.error('Error in DLQ replayer:', error);
-      res.status(500).json({ 
-        error: 'Internal server error',
-        message: error instanceof Error ? error.message : String(error)
-      });
-    }
-  }
+        res.status(200).json({
+          success: true,
+          ...results
+        });
+      }
+    )
+  )
 );
 
 /**
