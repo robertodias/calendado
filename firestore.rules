@@ -10,7 +10,9 @@ service cloud.firestore {
     // Platform superadmin has full access to everything
     function isPlatformAdmin() {
       return request.auth != null && 
-        request.auth.token.platformAdmin == true;
+        (request.auth.token.platformAdmin == true ||
+         (request.auth.token.roles != null && 
+          request.auth.token.roles.hasAny(['superadmin'])));
     }
     
     // Check if user has any of the required platform roles
