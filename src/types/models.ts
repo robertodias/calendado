@@ -1,9 +1,9 @@
-import type { 
-  Locale, 
-  WaitlistStatus, 
-  UtmData, 
-  ConfirmationComms, 
-  WaitlistDoc as SharedWaitlistDoc 
+import type {
+  Locale,
+  WaitlistStatus,
+  UtmData,
+  ConfirmationComms,
+  WaitlistDoc as SharedWaitlistDoc,
 } from '../../../functions/src/types/shared';
 
 // Re-export shared types for convenience

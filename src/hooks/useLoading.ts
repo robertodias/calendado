@@ -1,6 +1,6 @@
 /**
  * Loading state hook
- * 
+ *
  * Provides consistent loading state management
  */
 
@@ -34,20 +34,24 @@ export function useLoading(initialLoading = false): UseLoadingReturn {
     setIsLoading(false);
   }, []);
 
-  const execute = useCallback(async <T>(asyncFn: () => Promise<T>): Promise<T | null> => {
-    try {
-      setLoading(true);
-      const result = await asyncFn();
-      setError(null);
-      return result;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An error occurred';
-      setError(errorMessage);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, [setLoading]);
+  const execute = useCallback(
+    async <T>(asyncFn: () => Promise<T>): Promise<T | null> => {
+      try {
+        setLoading(true);
+        const result = await asyncFn();
+        setError(null);
+        return result;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'An error occurred';
+        setError(errorMessage);
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [setLoading]
+  );
 
   const reset = useCallback(() => {
     setIsLoading(false);
@@ -60,6 +64,6 @@ export function useLoading(initialLoading = false): UseLoadingReturn {
     setLoading,
     setError: setErrorState,
     execute,
-    reset
+    reset,
   };
 }

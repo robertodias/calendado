@@ -15,7 +15,15 @@ function App() {
       <AuthProvider>
         <LanguageProvider>
           <Router>
-            <Suspense fallback={<LoadingSpinner size="lg" text="Loading..." className="min-h-screen" />}>
+            <Suspense
+              fallback={
+                <LoadingSpinner
+                  size='lg'
+                  text='Loading...'
+                  className='min-h-screen'
+                />
+              }
+            >
               <Routes>
                 <Route path='/' element={<Landing />} />
                 <Route path='/admin' element={<Admin />} />

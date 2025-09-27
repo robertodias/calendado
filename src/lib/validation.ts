@@ -1,6 +1,6 @@
 /**
  * Unified validation utilities
- * 
+ *
  * Provides consistent validation patterns across the application
  */
 
@@ -27,91 +27,99 @@ export interface ValidationRule {
 export const validationRules = {
   required: (field: string): ValidationRule => ({
     name: 'required',
-    test: (value) => value != null && value !== '',
-    message: `${field} is required`
+    test: value => value != null && value !== '',
+    message: `${field} is required`,
   }),
-  
+
   email: (field: string): ValidationRule => ({
     name: 'email',
-    test: (value) => {
+    test: value => {
       if (typeof value !== 'string') return false;
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(value);
     },
-    message: `${field} must be a valid email address`
+    message: `${field} must be a valid email address`,
   }),
-  
+
   minLength: (field: string, min: number): ValidationRule => ({
     name: 'minLength',
-    test: (value) => {
+    test: value => {
       if (typeof value !== 'string') return false;
       return value.length >= min;
     },
-    message: `${field} must be at least ${min} characters long`
+    message: `${field} must be at least ${min} characters long`,
   }),
-  
+
   maxLength: (field: string, max: number): ValidationRule => ({
     name: 'maxLength',
-    test: (value) => {
+    test: value => {
       if (typeof value !== 'string') return false;
       return value.length <= max;
     },
-    message: `${field} must be no more than ${max} characters long`
+    message: `${field} must be no more than ${max} characters long`,
   }),
-  
+
   pattern: (field: string, regex: RegExp, message: string): ValidationRule => ({
     name: 'pattern',
-    test: (value) => {
+    test: value => {
       if (typeof value !== 'string') return false;
       return regex.test(value);
     },
-    message
+    message,
   }),
-  
+
   oneOf: (field: string, options: unknown[]): ValidationRule => ({
     name: 'oneOf',
-    test: (value) => options.includes(value),
-    message: `${field} must be one of: ${options.join(', ')}`
+    test: value => options.includes(value),
+    message: `${field} must be one of: ${options.join(', ')}`,
   }),
-  
-  custom: (field: string, test: (value: unknown) => boolean, message: string): ValidationRule => ({
+
+  custom: (
+    field: string,
+    test: (value: unknown) => boolean,
+    message: string
+  ): ValidationRule => ({
     name: 'custom',
     test,
-    message
-  })
+    message,
+  }),
 };
 
 // Validate a single field
-export function validateField(fieldValidation: FieldValidation): ValidationResult {
+export function validateField(
+  fieldValidation: FieldValidation
+): ValidationResult {
   const { value, rules } = fieldValidation;
   const errors: string[] = [];
-  
+
   for (const rule of rules) {
     if (!rule.test(value)) {
       errors.push(rule.message);
     }
   }
-  
+
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 }
 
 // Validate multiple fields
-export function validateFields(fieldValidations: FieldValidation[]): ValidationResult {
+export function validateFields(
+  fieldValidations: FieldValidation[]
+): ValidationResult {
   const allErrors: string[] = [];
-  
+
   for (const fieldValidation of fieldValidations) {
     const result = validateField(fieldValidation);
     if (!result.isValid) {
       allErrors.push(...result.errors);
     }
   }
-  
+
   return {
     isValid: allErrors.length === 0,
-    errors: allErrors
+    errors: allErrors,
   };
 }
 
@@ -120,12 +128,14 @@ export function validateFormData<T extends Record<string, unknown>>(
   data: T,
   schema: Record<keyof T, ValidationRule[]>
 ): ValidationResult {
-  const fieldValidations: FieldValidation[] = Object.entries(schema).map(([field, rules]) => ({
-    field,
-    value: data[field],
-    rules
-  }));
-  
+  const fieldValidations: FieldValidation[] = Object.entries(schema).map(
+    ([field, rules]) => ({
+      field,
+      value: data[field],
+      rules,
+    })
+  );
+
   return validateFields(fieldValidations);
 }
 
@@ -134,10 +144,7 @@ export function validateEmail(email: string): ValidationResult {
   return validateField({
     field: 'email',
     value: email,
-    rules: [
-      validationRules.required('Email'),
-      validationRules.email('Email')
-    ]
+    rules: [validationRules.required('Email'), validationRules.email('Email')],
   });
 }
 
@@ -149,8 +156,12 @@ export function validateName(name: string): ValidationResult {
       validationRules.required('Name'),
       validationRules.minLength('Name', 2),
       validationRules.maxLength('Name', 100),
-      validationRules.pattern('Name', /^[a-zA-Z\s\-'.]+$/, 'Name contains invalid characters')
-    ]
+      validationRules.pattern(
+        'Name',
+        /^[a-zA-Z\s\-'.]+$/,
+        'Name contains invalid characters'
+      ),
+    ],
   });
 }
 
@@ -160,25 +171,27 @@ export function validateWaitlistData(data: {
   locale?: string;
 }): ValidationResult {
   const emailResult = validateEmail(data.email);
-  const nameResult = data.name ? validateName(data.name) : { isValid: true, errors: [] };
-  
-  const localeResult = data.locale ? validateField({
-    field: 'locale',
-    value: data.locale,
-    rules: [
-      validationRules.oneOf('Locale', ['en-US', 'pt-BR', 'it-IT'])
-    ]
-  }) : { isValid: true, errors: [] };
-  
+  const nameResult = data.name
+    ? validateName(data.name)
+    : { isValid: true, errors: [] };
+
+  const localeResult = data.locale
+    ? validateField({
+        field: 'locale',
+        value: data.locale,
+        rules: [validationRules.oneOf('Locale', ['en-US', 'pt-BR', 'it-IT'])],
+      })
+    : { isValid: true, errors: [] };
+
   const allErrors = [
     ...emailResult.errors,
     ...nameResult.errors,
-    ...localeResult.errors
+    ...localeResult.errors,
   ];
-  
+
   return {
     isValid: allErrors.length === 0,
-    errors: allErrors
+    errors: allErrors,
   };
 }
 
@@ -192,7 +205,7 @@ export async function validateAsync<T>(
   } catch {
     return {
       isValid: false,
-      errors: ['Validation failed due to an error']
+      errors: ['Validation failed due to an error'],
     };
   }
 }
@@ -204,10 +217,7 @@ export function validateOrThrow<T extends Record<string, unknown>>(
 ): void {
   const result = validateFormData(data, schema);
   if (!result.isValid) {
-    throw createValidationError(
-      'Validation failed',
-      { errors: result.errors }
-    );
+    throw createValidationError('Validation failed', { errors: result.errors });
   }
 }
 
@@ -217,7 +227,7 @@ export function createDebouncedValidator<T>(
   delay = 300
 ): (value: T, callback: (result: ValidationResult) => void) => void {
   let timeoutId: NodeJS.Timeout;
-  
+
   return (value: T, callback: (result: ValidationResult) => void) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => {
@@ -238,8 +248,8 @@ export function createFormValidator<T extends Record<string, unknown>>(
       return validateField({
         field: String(field),
         value,
-        rules
+        rules,
       });
-    }
+    },
   };
 }

@@ -1,13 +1,16 @@
 /**
  * Waitlist signup form component
- * 
+ *
  * Handles form submission, validation, and user feedback
  */
 
 import React, { useState, useRef } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { validateWaitlistData, createDebouncedValidator } from '../../lib/validation';
+import {
+  validateWaitlistData,
+  createDebouncedValidator,
+} from '../../lib/validation';
 import { createValidationError, logError } from '../../lib/errorHandler';
 import { signupForWaitlist } from '../../lib/waitlistUtils';
 import { markWaitlistJoined } from '../../lib/cookieUtils';
@@ -33,41 +36,42 @@ interface FormErrors {
 const WaitlistForm: React.FC<WaitlistFormProps> = ({ onSuccess, onError }) => {
   const { t } = useLanguage();
   const recaptchaRef = useRef<ReCAPTCHA>(null);
-  
+
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
   });
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [captchaValue, setCaptchaValue] = useState<string | null>(null);
   const [captchaError, setCaptchaError] = useState(false);
-  
+
   // Disable CAPTCHA for local development
-  const isLocalDevelopment = import.meta.env.DEV || window.location.hostname === 'localhost';
+  const isLocalDevelopment =
+    import.meta.env.DEV || window.location.hostname === 'localhost';
 
   // Debounced email validation
   const debouncedEmailValidator = createDebouncedValidator((email: string) => {
     const result = validateWaitlistData({ email, name: formData.name });
     return {
       isValid: result.isValid,
-      errors: result.errors.filter(error => error.includes('Email'))
+      errors: result.errors.filter(error => error.includes('Email')),
     };
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    
+
     // Clear field error when user starts typing
     if (errors[name as keyof FormErrors]) {
       setErrors(prev => ({ ...prev, [name]: undefined }));
     }
-    
+
     // Real-time email validation
     if (name === 'email') {
-      debouncedEmailValidator(value, (result) => {
+      debouncedEmailValidator(value, result => {
         if (!result.isValid) {
           setErrors(prev => ({ ...prev, email: result.errors[0] }));
         } else {
@@ -93,7 +97,7 @@ const WaitlistForm: React.FC<WaitlistFormProps> = ({ onSuccess, onError }) => {
       const validation = validateWaitlistData({
         email: formData.email,
         name: formData.name,
-        locale: t('locale') as 'en-US' | 'pt-BR' | 'it-IT'
+        locale: t('locale') as 'en-US' | 'pt-BR' | 'it-IT',
       });
 
       if (!validation.isValid) {
@@ -117,7 +121,7 @@ const WaitlistForm: React.FC<WaitlistFormProps> = ({ onSuccess, onError }) => {
         email: formData.email,
         name: formData.name,
         locale: t('locale') as 'en-US' | 'pt-BR' | 'it-IT',
-        utm: getUtmParams()
+        utm: getUtmParams(),
       });
 
       if (result.success && result.waitlistId) {
@@ -151,12 +155,12 @@ const WaitlistForm: React.FC<WaitlistFormProps> = ({ onSuccess, onError }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-4">
+    <form onSubmit={handleSubmit} className='space-y-6'>
+      <div className='space-y-4'>
         <div>
           <Input
-            type="text"
-            name="name"
+            type='text'
+            name='name'
             placeholder={t('form.namePlaceholder')}
             value={formData.name}
             onChange={handleInputChange}
@@ -165,11 +169,11 @@ const WaitlistForm: React.FC<WaitlistFormProps> = ({ onSuccess, onError }) => {
             required
           />
         </div>
-        
+
         <div>
           <Input
-            type="email"
-            name="email"
+            type='email'
+            name='email'
             placeholder={t('form.emailPlaceholder')}
             value={formData.email}
             onChange={handleInputChange}
@@ -181,7 +185,7 @@ const WaitlistForm: React.FC<WaitlistFormProps> = ({ onSuccess, onError }) => {
       </div>
 
       {!isLocalDevelopment && (
-        <div className="flex justify-center">
+        <div className='flex justify-center'>
           <ReCAPTCHA
             ref={recaptchaRef}
             sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || 'demo-key'}
@@ -190,7 +194,7 @@ const WaitlistForm: React.FC<WaitlistFormProps> = ({ onSuccess, onError }) => {
             onError={() => setCaptchaError(true)}
           />
           {captchaError && (
-            <p className="text-red-500 text-sm mt-2">
+            <p className='text-red-500 text-sm mt-2'>
               {t('form.captchaError')}
             </p>
           )}
@@ -198,17 +202,15 @@ const WaitlistForm: React.FC<WaitlistFormProps> = ({ onSuccess, onError }) => {
       )}
 
       {errors.general && (
-        <div className="text-red-500 text-sm text-center">
-          {errors.general}
-        </div>
+        <div className='text-red-500 text-sm text-center'>{errors.general}</div>
       )}
 
       <Button
-        type="submit"
-        variant="primary"
-        size="lg"
+        type='submit'
+        variant='primary'
+        size='lg'
         disabled={isSubmitting || (!isLocalDevelopment && !captchaValue)}
-        className="w-full"
+        className='w-full'
       >
         {isSubmitting ? t('form.submitting') : t('form.submit')}
       </Button>

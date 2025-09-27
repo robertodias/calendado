@@ -1,6 +1,6 @@
 /**
  * Security utilities
- * 
+ *
  * Provides input sanitization, XSS protection, and security helpers
  */
 
