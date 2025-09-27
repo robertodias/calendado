@@ -86,7 +86,7 @@ service cloud.firestore {
     function hasAnyRole(roles) {
       return request.auth != null && 
         request.auth.token.roles != null &&
-        roles.hasAny(request.auth.token.roles);
+        request.auth.token.roles.hasAny(roles);
     }
     
     // Default deny rule for any unmatched paths

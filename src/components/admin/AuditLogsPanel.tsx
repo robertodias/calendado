@@ -42,7 +42,7 @@ const getActionBadgeColor = (action: string) => {
 };
 
 const AuditLogsPanel: React.FC = () => {
-  const { user, refreshToken } = useAuth();
+  const { user } = useAuth();
   const [logs, setLogs] = useState<AuditLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -58,14 +58,9 @@ const AuditLogsPanel: React.FC = () => {
 
     // Check if current user has permission to view audit logs
     if (!user?.hasRole(['admin', 'superadmin', 'support'])) {
-      console.warn('User does not have permission to view audit logs');
-      console.warn('User roles:', user?.roles);
       setLoading(false);
       return;
     }
-
-    console.log('User has permission to view audit logs. Roles:', user.roles);
-    console.log('Attempting to query collection: admin/auditLogs/entries');
 
     const logsRef = collection(db, 'admin', 'auditLogs', 'entries');
     const q = query(logsRef, orderBy('timestamp', 'desc'), limit(LOGS_PER_PAGE));
@@ -101,7 +96,6 @@ const AuditLogsPanel: React.FC = () => {
       (error) => {
         console.error('Error loading audit logs:', error);
         setLoading(false);
-        // Set empty array if there's a permission error
         setLogs([]);
       }
     );
@@ -184,30 +178,8 @@ const AuditLogsPanel: React.FC = () => {
     );
   }
 
-  const handleRefreshToken = async () => {
-    try {
-      await refreshToken();
-      console.log('Token refreshed successfully');
-    } catch (error) {
-      console.error('Error refreshing token:', error);
-    }
-  };
-
   return (
     <div className="p-6">
-      {/* Debug Info */}
-      <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <h3 className="text-sm font-semibold text-yellow-800 mb-2">Debug Info</h3>
-        <p className="text-xs text-yellow-700">User roles: {user?.roles?.join(', ') || 'none'}</p>
-        <p className="text-xs text-yellow-700">Has audit access: {user?.hasRole(['admin', 'superadmin', 'support']) ? 'Yes' : 'No'}</p>
-        <button 
-          onClick={handleRefreshToken}
-          className="mt-2 px-3 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700"
-        >
-          Refresh Token
-        </button>
-      </div>
-
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-xl font-semibold text-gray-900">Audit Logs</h2>
