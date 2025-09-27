@@ -1,6 +1,6 @@
 /**
  * Shared type definitions between frontend and backend
- * 
+ *
  * This file contains types that are used in both the frontend
  * and backend to ensure consistency.
  */
@@ -9,7 +9,13 @@ export type UserRole = 'superadmin' | 'admin' | 'support' | 'editor' | 'viewer';
 
 export type Locale = 'en-US' | 'pt-BR' | 'it-IT';
 
-export type WaitlistStatus = 'pending' | 'confirmed' | 'invited' | 'blocked' | 'rejected' | 'active';
+export type WaitlistStatus =
+  | 'pending'
+  | 'confirmed'
+  | 'invited'
+  | 'blocked'
+  | 'rejected'
+  | 'active';
 
 export interface UtmData {
   source?: string;
@@ -87,7 +93,13 @@ export interface FeatureFlagsDoc {
 
 export interface EmailEventDoc {
   messageId: string;
-  type: 'delivered' | 'bounced' | 'opened' | 'clicked' | 'complained' | 'dropped';
+  type:
+    | 'delivered'
+    | 'bounced'
+    | 'opened'
+    | 'clicked'
+    | 'complained'
+    | 'dropped';
   timestamp: Date;
   data: Record<string, unknown>;
 }
