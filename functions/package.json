@@ -18,6 +18,7 @@
     "test:coverage": "jest --coverage",
     "test:rules": "jest src/__tests__/rules.test.ts",
     "validate:rules": "ts-node scripts/validate-rules.ts",
+    "test:rules:mock": "ts-node scripts/test-rules-mock.ts",
     "emulate": "firebase emulators:start --only functions,firestore",
     "format": "prettier --write \"src/**/*.{ts,js,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,js,json}\"",
