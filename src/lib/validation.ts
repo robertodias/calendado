@@ -12,7 +12,6 @@ export interface ValidationResult {
 }
 
 export interface FieldValidation {
-  field: string;
   value: unknown;
   rules: ValidationRule[];
 }
@@ -130,7 +129,6 @@ export function validateFormData<T extends Record<string, unknown>>(
 ): ValidationResult {
   const fieldValidations: FieldValidation[] = Object.entries(schema).map(
     ([field, rules]) => ({
-      field,
       value: data[field],
       rules,
     })
@@ -142,7 +140,6 @@ export function validateFormData<T extends Record<string, unknown>>(
 // Specific validators for common use cases
 export function validateEmail(email: string): ValidationResult {
   return validateField({
-    field: 'email',
     value: email,
     rules: [validationRules.required('Email'), validationRules.email('Email')],
   });
@@ -150,7 +147,6 @@ export function validateEmail(email: string): ValidationResult {
 
 export function validateName(name: string): ValidationResult {
   return validateField({
-    field: 'name',
     value: name,
     rules: [
       validationRules.required('Name'),
@@ -177,7 +173,6 @@ export function validateWaitlistData(data: {
 
   const localeResult = data.locale
     ? validateField({
-        field: 'locale',
         value: data.locale,
         rules: [validationRules.oneOf('Locale', ['en-US', 'pt-BR', 'it-IT'])],
       })
@@ -246,7 +241,6 @@ export function createFormValidator<T extends Record<string, unknown>>(
     validateField: (field: keyof T, value: unknown) => {
       const rules = schema[field] || [];
       return validateField({
-        field: String(field),
         value,
         rules,
       });

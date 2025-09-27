@@ -14,8 +14,8 @@ import {
 import { createValidationError, logError } from '../../lib/errorHandler';
 import { signupForWaitlist } from '../../lib/waitlistUtils';
 import { markWaitlistJoined } from '../../lib/cookieUtils';
-import Button from '../ui/Button';
-import Input from '../ui/Input';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
 
 interface WaitlistFormProps {
   onSuccess: (waitlistId: string) => void;

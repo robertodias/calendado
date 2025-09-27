@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
-import Button from './ui/Button';
+import { Button } from './ui/Button';
 
 interface WaitlistSuccessProps {
   onReset: () => void;

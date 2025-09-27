@@ -4,30 +4,32 @@
  * Provides consistent error handling patterns across the application
  */
 
-export enum ErrorCode {
+export const ErrorCode = {
   // Network errors
-  NETWORK_ERROR = 'NETWORK_ERROR',
-  TIMEOUT = 'TIMEOUT',
+  NETWORK_ERROR: 'NETWORK_ERROR',
+  TIMEOUT: 'TIMEOUT',
 
   // Authentication errors
-  UNAUTHORIZED = 'UNAUTHORIZED',
-  FORBIDDEN = 'FORBIDDEN',
-  TOKEN_EXPIRED = 'TOKEN_EXPIRED',
+  UNAUTHORIZED: 'UNAUTHORIZED',
+  FORBIDDEN: 'FORBIDDEN',
+  TOKEN_EXPIRED: 'TOKEN_EXPIRED',
 
   // Validation errors
-  VALIDATION_ERROR = 'VALIDATION_ERROR',
-  INVALID_EMAIL = 'INVALID_EMAIL',
-  INVALID_INPUT = 'INVALID_INPUT',
+  VALIDATION_ERROR: 'VALIDATION_ERROR',
+  INVALID_EMAIL: 'INVALID_EMAIL',
+  INVALID_INPUT: 'INVALID_INPUT',
 
   // Business logic errors
-  DUPLICATE_EMAIL = 'DUPLICATE_EMAIL',
-  WAITLIST_FULL = 'WAITLIST_FULL',
-  CAPTCHA_FAILED = 'CAPTCHA_FAILED',
+  DUPLICATE_EMAIL: 'DUPLICATE_EMAIL',
+  WAITLIST_FULL: 'WAITLIST_FULL',
+  CAPTCHA_FAILED: 'CAPTCHA_FAILED',
 
   // System errors
-  UNKNOWN_ERROR = 'UNKNOWN_ERROR',
-  SERVICE_UNAVAILABLE = 'SERVICE_UNAVAILABLE',
-}
+  UNKNOWN_ERROR: 'UNKNOWN_ERROR',
+  SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
+} as const;
+
+export type ErrorCode = typeof ErrorCode[keyof typeof ErrorCode];
 
 export interface AppErrorData {
   code: ErrorCode;
@@ -127,7 +129,7 @@ export async function handleWithRetry<T>(
   maxRetries = 3,
   delay = 1000
 ): Promise<T> {
-  let lastError: Error;
+  let lastError: Error | undefined;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
@@ -151,7 +153,7 @@ export async function handleWithRetry<T>(
     }
   }
 
-  throw lastError;
+  throw lastError || new Error('Unknown error occurred');
 }
 
 // Error boundary helper
