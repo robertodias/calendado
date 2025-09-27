@@ -1,28 +1,15 @@
 /**
- * Email service using Resend
+ * Email service using existing Resend infrastructure
  * 
  * Provides email sending functionality for invitations,
  * confirmations, and other transactional emails.
  */
 
-import { Resend } from 'resend';
+import { createResendClient } from './lib/resend';
 import { defineSecret } from 'firebase-functions/params';
 
 // Define secrets
-const resendApiKey = defineSecret('RESEND_API_KEY');
 const publicAppUrl = defineSecret('PUBLIC_APP_URL');
-const fromEmail = defineSecret('FROM_EMAIL');
-const fromName = defineSecret('FROM_NAME');
-
-// Initialize Resend client
-let resendClient: Resend | null = null;
-
-function getResendClient(): Resend {
-  if (!resendClient) {
-    resendClient = new Resend(resendApiKey.value());
-  }
-  return resendClient;
-}
 
 export interface InviteEmailData {
   email: string;
@@ -43,7 +30,6 @@ export interface EmailResult {
  */
 export async function sendInviteEmail(data: InviteEmailData): Promise<EmailResult> {
   try {
-    const client = getResendClient();
     const appUrl = publicAppUrl.value();
     const inviteUrl = data.inviteUrl || `${appUrl}/invite/${data.token}`;
     const brandName = data.brandName || 'Calendado';
@@ -54,8 +40,15 @@ export async function sendInviteEmail(data: InviteEmailData): Promise<EmailResul
       expiresAt: data.expiresAt
     });
 
-    const result = await client.emails.send({
-      from: `${fromName.value()} <${fromEmail.value()}>`,
+    // Use existing ResendClient
+    const resendClient = createResendClient(
+      process.env.RESEND_API_KEY!,
+      process.env.FROM_EMAIL!,
+      process.env.FROM_NAME!
+    );
+
+    const result = await resendClient.sendEmail({
+      from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`, // Required by ResendEmailPayload type
       to: [data.email],
       subject: `You're invited to join ${brandName}`,
       html: emailHtml,
@@ -68,13 +61,13 @@ export async function sendInviteEmail(data: InviteEmailData): Promise<EmailResul
     if (result.error) {
       return {
         success: false,
-        error: `Resend error: ${result.error.message}`
+        error: `Resend error: ${result.error}`
       };
     }
 
     return {
       success: true,
-      messageId: result.data?.id
+      messageId: result.id
     };
 
   } catch (error) {
@@ -86,50 +79,8 @@ export async function sendInviteEmail(data: InviteEmailData): Promise<EmailResul
   }
 }
 
-/**
- * Sends a waitlist confirmation email
- */
-export async function sendWaitlistConfirmationEmail(
-  email: string,
-  brandName?: string
-): Promise<EmailResult> {
-  try {
-    const client = getResendClient();
-    const brand = brandName || 'Calendado';
-    
-    const emailHtml = generateWaitlistConfirmationHtml(brand);
-
-    const result = await client.emails.send({
-      from: `${fromName.value()} <${fromEmail.value()}>`,
-      to: [email],
-      subject: `Welcome to ${brand} waitlist`,
-      html: emailHtml,
-      tags: [
-        { name: 'type', value: 'waitlist_confirmation' },
-        { name: 'brand', value: brand }
-      ]
-    });
-
-    if (result.error) {
-      return {
-        success: false,
-        error: `Resend error: ${result.error.message}`
-      };
-    }
-
-    return {
-      success: true,
-      messageId: result.data?.id
-    };
-
-  } catch (error) {
-    console.error('Error sending waitlist confirmation email:', error);
-    return {
-      success: false,
-      error: `Failed to send email: ${error instanceof Error ? error.message : 'Unknown error'}`
-    };
-  }
-}
+// Note: Waitlist confirmation emails are handled by the existing system
+// in functions/src/handlers/sendWaitlistConfirmation.ts and functions/src/lib/email.ts
 
 /**
  * Sends a password reset email
@@ -140,7 +91,6 @@ export async function sendPasswordResetEmail(
   brandName?: string
 ): Promise<EmailResult> {
   try {
-    const client = getResendClient();
     const appUrl = publicAppUrl.value();
     const resetUrl = `${appUrl}/reset-password?token=${resetToken}`;
     const brand = brandName || 'Calendado';
@@ -150,8 +100,15 @@ export async function sendPasswordResetEmail(
       resetUrl
     });
 
-    const result = await client.emails.send({
-      from: `${fromName.value()} <${fromEmail.value()}>`,
+    // Use existing ResendClient
+    const resendClient = createResendClient(
+      process.env.RESEND_API_KEY!,
+      process.env.FROM_EMAIL!,
+      process.env.FROM_NAME!
+    );
+
+    const result = await resendClient.sendEmail({
+      from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`, // Required by ResendEmailPayload type
       to: [email],
       subject: `Reset your ${brand} password`,
       html: emailHtml,
@@ -164,13 +121,13 @@ export async function sendPasswordResetEmail(
     if (result.error) {
       return {
         success: false,
-        error: `Resend error: ${result.error.message}`
+        error: `Resend error: ${result.error}`
       };
     }
 
     return {
       success: true,
-      messageId: result.data?.id
+      messageId: result.id
     };
 
   } catch (error) {
@@ -304,90 +261,8 @@ function generateInviteEmailHtml(data: {
 </html>`;
 }
 
-/**
- * Generates HTML for waitlist confirmation email
- */
-function generateWaitlistConfirmationHtml(brandName: string): string {
-  return `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to ${brandName} waitlist</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f8fafc;
-        }
-        .container {
-            background: white;
-            border-radius: 12px;
-            padding: 40px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .logo {
-            font-size: 28px;
-            font-weight: bold;
-            color: #7c3aed;
-            margin-bottom: 10px;
-        }
-        .title {
-            font-size: 24px;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 20px;
-        }
-        .content {
-            margin-bottom: 30px;
-        }
-        .footer {
-            text-align: center;
-            color: #6b7280;
-            font-size: 14px;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e5e7eb;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <div class="logo">${brandName}</div>
-            <h1 class="title">You're on the waitlist!</h1>
-        </div>
-        
-        <div class="content">
-            <p>Thank you for joining the <strong>${brandName}</strong> waitlist! We're excited to have you on board.</p>
-            
-            <p>We'll notify you as soon as we have a spot available for you. In the meantime, you can:</p>
-            
-            <ul>
-                <li>Follow us on social media for updates</li>
-                <li>Share ${brandName} with your friends</li>
-                <li>Check out our blog for tips and insights</li>
-            </ul>
-            
-            <p>We appreciate your patience and look forward to welcoming you to ${brandName} soon!</p>
-        </div>
-        
-        <div class="footer">
-            <p>© ${new Date().getFullYear()} ${brandName}. All rights reserved.</p>
-        </div>
-    </div>
-</body>
-</html>`;
-}
+// Note: Waitlist confirmation HTML is generated by the existing system
+// in functions/src/lib/email.ts using i18n support
 
 /**
  * Generates HTML for password reset email

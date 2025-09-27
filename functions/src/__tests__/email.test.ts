@@ -6,7 +6,7 @@
  */
 
 import { describe, test, expect } from '@jest/globals';
-import { sendInviteEmail, sendWaitlistConfirmationEmail, sendPasswordResetEmail } from '../email';
+import { sendInviteEmail, sendPasswordResetEmail } from '../email';
 
 describe('Email Functions', () => {
   describe('Function Exports', () => {
@@ -15,10 +15,7 @@ describe('Email Functions', () => {
       expect(typeof sendInviteEmail).toBe('function');
     });
 
-    test('should export sendWaitlistConfirmationEmail function', () => {
-      expect(sendWaitlistConfirmationEmail).toBeDefined();
-      expect(typeof sendWaitlistConfirmationEmail).toBe('function');
-    });
+    // Note: sendWaitlistConfirmationEmail is handled by existing system
 
     test('should export sendPasswordResetEmail function', () => {
       expect(sendPasswordResetEmail).toBeDefined();
