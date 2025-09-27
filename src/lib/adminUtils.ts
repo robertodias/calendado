@@ -3,6 +3,7 @@ import { db } from '../firebase';
 
 /**
  * Initialize admin collections with default documents if they don't exist
+ * Only attempts operations that the current user has permissions for
  */
 export const initializeAdminCollections = async (currentUser?: { uid: string; email: string; displayName?: string; roles: string[] }) => {
   if (!db) {
@@ -10,34 +11,50 @@ export const initializeAdminCollections = async (currentUser?: { uid: string; em
     return;
   }
 
-  try {
-    // Initialize feature flags document with defaults
-    const featureFlagsRef = doc(db, 'admin', 'featureFlags');
-    await setDoc(featureFlagsRef, {
-      bookingAlpha: false,
-      paymentsAlpha: false,
-      advancedCalendar: false,
-      mobileApp: false,
-      lastUpdated: serverTimestamp(),
-      lastUpdatedBy: 'system',
-    }, { merge: true });
+  if (!currentUser || !currentUser.roles || currentUser.roles.length === 0) {
+    console.log('User has no roles, skipping admin collections initialization');
+    return;
+  }
 
-    // Initialize current user document if provided
-    if (currentUser) {
+  const hasAdminRoles = currentUser.roles.some(role => ['admin', 'superadmin'].includes(role));
+
+  try {
+    // Only initialize feature flags if user has admin permissions
+    if (hasAdminRoles) {
+      try {
+        const featureFlagsRef = doc(db, 'admin', 'featureFlags');
+        await setDoc(featureFlagsRef, {
+          bookingAlpha: false,
+          paymentsAlpha: false,
+          advancedCalendar: false,
+          mobileApp: false,
+          lastUpdated: serverTimestamp(),
+          lastUpdatedBy: currentUser.email || 'system',
+        }, { merge: true });
+        console.log('Feature flags initialized successfully');
+      } catch (flagsError) {
+        console.warn('Could not initialize feature flags (may already exist):', flagsError);
+      }
+    }
+
+    // Initialize current user document (users can create their own profile)
+    try {
       const userRef = doc(db, 'users', currentUser.uid);
       await setDoc(userRef, {
         uid: currentUser.uid,
         email: currentUser.email,
         displayName: currentUser.displayName || null,
-        roles: currentUser.roles,
+        // Don't set roles here - they're managed by server
         createdAt: serverTimestamp(),
         lastUpdated: serverTimestamp(),
       }, { merge: true });
+      console.log('User profile initialized successfully');
+    } catch (userError) {
+      console.warn('Could not initialize user profile (may already exist):', userError);
     }
 
-    console.log('Admin collections initialized successfully');
   } catch (error) {
-    console.error('Error initializing admin collections:', error);
+    console.warn('Some admin collections could not be initialized:', error);
     // Don't throw error to prevent blocking the app
   }
 };

@@ -26,7 +26,8 @@ const AdminConsole: React.FC = () => {
 
   // Initialize admin collections on first load
   useEffect(() => {
-    if (user?.hasRole(['admin', 'superadmin'])) {
+    if (user && user.roles.length > 0) {
+      // Only initialize if user has any roles
       initializeAdminCollections({
         uid: user.uid,
         email: user.email || '',
