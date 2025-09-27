@@ -7,6 +7,7 @@ import { adminResendConfirmation } from './handlers/adminResendConfirmation';
 import { dlqReplayer } from './handlers/dlqReplayer';
 import { healthCheck, livenessCheck, readinessCheck } from './handlers/healthCheck';
 import { updateUserRoles } from './handlers/updateUserRoles';
+import { inviteFromWaitlist, rejectWaitlist, getWaitlistEntry } from './waitlist';
 
 // Initialize Firebase Admin
 initializeApp();
@@ -56,3 +57,6 @@ export { healthCheck, livenessCheck, readinessCheck };
 
 // Admin functions
 export { updateUserRoles };
+
+// Waitlist management functions
+export { inviteFromWaitlist, rejectWaitlist, getWaitlistEntry };
