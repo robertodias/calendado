@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
   collection,
   query,
@@ -8,6 +9,8 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../firebase';
 import LoadingSpinner from '../LoadingSpinner';
+import { Button } from '../ui/Button';
+import { ExternalLink } from 'lucide-react';
 
 interface WaitlistEntry {
   id: string;
@@ -172,8 +175,16 @@ const WaitlistPanel: React.FC = () => {
             View and manage waitlist entries. Total entries: {entries.length}
           </p>
         </div>
-        <div className='text-sm text-gray-500'>
-          Last updated: {new Date().toLocaleTimeString()}
+        <div className='flex items-center gap-3'>
+          <div className='text-sm text-gray-500'>
+            Last updated: {new Date().toLocaleTimeString()}
+          </div>
+          <Link to="/admin/waitlist">
+            <Button variant="secondary" size="sm">
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Full View
+            </Button>
+          </Link>
         </div>
       </div>
 

@@ -2,19 +2,22 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { AuthProvider } from './contexts/AuthContext';
+import { ToastProvider } from './components/ToastProvider';
 import ErrorBoundary from './components/ErrorBoundary';
 import LoadingSpinner from './components/LoadingSpinner';
 
 // Lazy load pages for code splitting
 const Landing = lazy(() => import('./pages/Landing'));
 const Admin = lazy(() => import('./pages/Admin'));
+const AdminWaitlist = lazy(() => import('./pages/admin/waitlist'));
 
 function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
         <LanguageProvider>
-          <Router>
+          <ToastProvider>
+            <Router>
             <Suspense
               fallback={
                 <LoadingSpinner
@@ -27,9 +30,11 @@ function App() {
               <Routes>
                 <Route path='/' element={<Landing />} />
                 <Route path='/admin' element={<Admin />} />
+                <Route path='/admin/waitlist' element={<AdminWaitlist />} />
               </Routes>
             </Suspense>
-          </Router>
+            </Router>
+          </ToastProvider>
         </LanguageProvider>
       </AuthProvider>
     </ErrorBoundary>

@@ -212,3 +212,4 @@ firebase deploy --only functions:consumeInvite
 - Monitor error rates and performance
 - Update type definitions as needed
 - Review and update audit logging
+

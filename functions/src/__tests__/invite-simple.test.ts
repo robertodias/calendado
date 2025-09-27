@@ -50,3 +50,4 @@ describe('Invite Consumption Function', () => {
     });
   });
 });
+
