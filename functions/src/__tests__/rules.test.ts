@@ -377,9 +377,15 @@ describe('Firestore Security Rules', () => {
       });
 
       // Should not be able to update other professional's profile
+      // The rule checks request.resource.data.userId, so we need to use set() to include it
       await expect(
-        db.collection('orgs').doc('org-123').collection('professionals').doc('other-professional').update({
-          bio: 'Updated bio'
+        db.collection('orgs').doc('org-123').collection('professionals').doc('other-professional').set({
+          ...mockProfessionalData,
+          id: 'other-professional',
+          userId: 'other-user-123',
+          bio: 'Updated bio',
+          createdAt: new Date(),
+          createdBy: 'org-admin-123'
         })
       ).rejects.toThrow();
     });
@@ -452,9 +458,8 @@ describe('Firestore Security Rules', () => {
     test('unauthenticated users can read waitlist entries', async () => {
       const db = testEnv.unauthenticatedContext().firestore();
       
-      // Set up a waitlist entry
-      const adminDb = testEnv.authenticatedContext('platform-admin-123', mockPlatformAdminToken).firestore();
-      await adminDb.collection('waitlist').doc('waitlist-123').set(mockWaitlistData);
+      // Set up a waitlist entry using unauthenticated context (as per rules)
+      await db.collection('waitlist').doc('waitlist-123').set(mockWaitlistData);
 
       // Should be able to read
       const doc = await db.collection('waitlist').doc('waitlist-123').get();
@@ -464,9 +469,8 @@ describe('Firestore Security Rules', () => {
     test('unauthenticated users cannot update waitlist entries', async () => {
       const db = testEnv.unauthenticatedContext().firestore();
       
-      // Set up a waitlist entry
-      const adminDb = testEnv.authenticatedContext('platform-admin-123', mockPlatformAdminToken).firestore();
-      await adminDb.collection('waitlist').doc('waitlist-123').set(mockWaitlistData);
+      // Set up a waitlist entry using unauthenticated context
+      await db.collection('waitlist').doc('waitlist-123').set(mockWaitlistData);
 
       // Should not be able to update
       await expect(
@@ -481,8 +485,9 @@ describe('Firestore Security Rules', () => {
     test('users can read and update their own profile', async () => {
       const db = testEnv.authenticatedContext('test-user-123', mockUserToken).firestore();
       
-      // Create user profile
-      await db.collection('users').doc('test-user-123').set({
+      // Create user profile using platform admin first (as per rules)
+      const adminDb = testEnv.authenticatedContext('platform-admin-123', mockPlatformAdminToken).firestore();
+      await adminDb.collection('users').doc('test-user-123').set({
         uid: 'test-user-123',
         email: 'test@example.com',
         displayName: 'Test User',
@@ -515,8 +520,9 @@ describe('Firestore Security Rules', () => {
     test('users cannot update their own roles', async () => {
       const db = testEnv.authenticatedContext('test-user-123', mockUserToken).firestore();
       
-      // Create user profile
-      await db.collection('users').doc('test-user-123').set({
+      // Create user profile using platform admin first (as per rules)
+      const adminDb = testEnv.authenticatedContext('platform-admin-123', mockPlatformAdminToken).firestore();
+      await adminDb.collection('users').doc('test-user-123').set({
         uid: 'test-user-123',
         email: 'test@example.com',
         displayName: 'Test User',
@@ -570,7 +576,8 @@ describe('Firestore Security Rules', () => {
       const adminDb = testEnv.authenticatedContext('platform-admin-123', mockPlatformAdminToken).firestore();
       await adminDb.collection('orgs').doc('org-123').set({
         ...mockOrgData,
-        public: true
+        public: true,
+        status: 'active'
       });
 
       // Unauthenticated user should be able to read

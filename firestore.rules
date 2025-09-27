@@ -103,7 +103,7 @@ service cloud.firestore {
         (request.auth != null && 
          request.auth.uid == userId &&
          !('roles' in request.resource.data) && // Prevent client from modifying roles
-         (!('roles' in resource.data) || request.resource.data.roles == resource.data.roles));
+         resource != null); // Ensure document exists
       
       allow delete: if isPlatformAdmin();
     }
@@ -132,8 +132,11 @@ service cloud.firestore {
     
     // Organization documents
     match /orgs/{orgId} {
-      // Read: platform admin or org members
-      allow read: if isPlatformAdmin() || isOrgMember(orgId);
+      // Read: platform admin, org members, or public if org is public
+      allow read: if isPlatformAdmin() || 
+        isOrgMember(orgId) ||
+        (request.auth == null && 
+         get(/databases/$(database)/documents/orgs/$(orgId)).data.public == true);
       
       // Write: platform admin, owner, or org_admin
       allow write: if isPlatformAdmin() || 
@@ -179,10 +182,6 @@ service cloud.firestore {
         hasAnyOrgRole(orgId, ['org_admin', 'store_manager']) ||
         (request.auth != null && 
          request.resource.data.userId == request.auth.uid);
-      
-      // Create: platform admin, org_admin, or store_manager
-      allow create: if isPlatformAdmin() || 
-        hasAnyOrgRole(orgId, ['org_admin', 'store_manager']);
       
       // Delete: platform admin or org_admin only
       allow delete: if isPlatformAdmin() || hasOrgRole(orgId, 'org_admin');
