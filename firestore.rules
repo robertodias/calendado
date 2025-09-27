@@ -66,20 +66,30 @@ service cloud.firestore {
       allow delete: if false;
     }
     
-    // Admin collections - role-based access using custom claims
-    match /admin/{document} {
-      // Feature flags - readable by support+, writable by admin+
+    // Admin feature flags document - readable by support+, writable by admin+
+    match /admin/featureFlags {
       allow read: if request.auth != null && 
-        hasAnyRole(['support', 'editor', 'viewer', 'admin', 'superadmin']);
+        hasAnyRole(['support', 'admin', 'superadmin']);
       allow write: if request.auth != null && 
         hasAnyRole(['admin', 'superadmin']);
-      
-      // Audit logs subcollection
-      match /auditLogs/entries/{entryId} {
-        allow read: if request.auth != null && 
-          hasAnyRole(['support', 'admin', 'superadmin']);
-        allow write: if false; // Only server can write audit logs
-      }
+    }
+
+    // Admin audit logs collection (document metadata and nested entries)
+    match /admin/auditLogs {
+      allow read: if request.auth != null && 
+        hasAnyRole(['support', 'admin', 'superadmin']);
+      allow write: if false; // Audit logs metadata managed by backend only
+    }
+
+    match /admin/auditLogs/entries/{entryId} {
+      allow read: if request.auth != null && 
+        hasAnyRole(['support', 'admin', 'superadmin']);
+      allow write: if false; // Only server can write audit logs entries
+    }
+
+    // Deny access to any other admin documents unless explicitly allowed above
+    match /admin/{document=**} {
+      allow read, write: if false;
     }
     
     // Helper function to check if user has any of the required roles

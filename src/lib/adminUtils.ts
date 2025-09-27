@@ -1,4 +1,4 @@
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 
 /**
@@ -23,15 +23,19 @@ export const initializeAdminCollections = async (currentUser?: { uid: string; em
     if (hasAdminRoles) {
       try {
         const featureFlagsRef = doc(db, 'admin', 'featureFlags');
-        await setDoc(featureFlagsRef, {
-          bookingAlpha: false,
-          paymentsAlpha: false,
-          advancedCalendar: false,
-          mobileApp: false,
-          lastUpdated: serverTimestamp(),
-          lastUpdatedBy: currentUser.email || 'system',
-        }, { merge: true });
-        console.log('Feature flags initialized successfully');
+        const snapshot = await getDoc(featureFlagsRef);
+
+        if (!snapshot.exists()) {
+          await setDoc(featureFlagsRef, {
+            bookingAlpha: false,
+            paymentsAlpha: false,
+            advancedCalendar: false,
+            mobileApp: false,
+            lastUpdated: serverTimestamp(),
+            lastUpdatedBy: currentUser.email || 'system',
+          });
+          console.log('Feature flags initialized successfully');
+        }
       } catch (flagsError) {
         console.warn('Could not initialize feature flags (may already exist):', flagsError);
       }
