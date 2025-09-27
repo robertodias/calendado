@@ -14,7 +14,29 @@ import {
   Edit3,
 } from 'lucide-react';
 import { format } from 'date-fns';
-import type { WaitlistEntry } from '../../pages/admin/waitlist';
+interface WaitlistEntry {
+  id: string;
+  email: string;
+  name: string | null;
+  source?: string;
+  status: 'pending' | 'confirmed' | 'invited' | 'blocked' | 'rejected' | 'active';
+  createdAt: Date;
+  notes?: string;
+  locale?: string;
+  utm?: {
+    source?: string;
+    medium?: string;
+    campaign?: string;
+  };
+  userAgent?: string;
+  ip?: string;
+  comms?: {
+    confirmation?: {
+      sent: boolean;
+      sentAt: Date | null;
+    };
+  };
+}
 
 interface AuditLogEntry {
   id: string;

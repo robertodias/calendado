@@ -9,7 +9,6 @@ import LoadingSpinner from './components/LoadingSpinner';
 // Lazy load pages for code splitting
 const Landing = lazy(() => import('./pages/Landing'));
 const Admin = lazy(() => import('./pages/Admin'));
-const AdminWaitlist = lazy(() => import('./pages/admin/waitlist'));
 
 function App() {
   return (
@@ -27,11 +26,10 @@ function App() {
                   />
                 }
               >
-                <Routes>
-                  <Route path='/' element={<Landing />} />
-                  <Route path='/admin' element={<Admin />} />
-                  <Route path='/admin/waitlist' element={<AdminWaitlist />} />
-                </Routes>
+              <Routes>
+                <Route path='/' element={<Landing />} />
+                <Route path='/admin' element={<Admin />} />
+              </Routes>
               </Suspense>
             </Router>
           </ToastProvider>
