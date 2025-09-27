@@ -48,14 +48,14 @@ describe('Crypto utilities', () => {
   });
 
   describe('verifyResendSignature', () => {
-    it('should verify valid signature', () => {
+    it('should verify valid signature', async () => {
       const payload = '{"test": "data"}';
       const secret = 'test-secret';
       // const signature = 'a1b2c3d4e5f6'; // This would be the actual HMAC in real usage
       
       // Mock the HMAC creation for testing
-      const crypto = require('crypto');
-      const expectedSignature = crypto.createHmac('sha256', secret).update(payload).digest('hex');
+      const cryptoModule = await import('node:crypto');
+      const expectedSignature = cryptoModule.createHmac('sha256', secret).update(payload).digest('hex');
       
       expect(verifyResendSignature(payload, expectedSignature, secret)).toBe(true);
     });

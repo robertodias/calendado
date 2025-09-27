@@ -1,0 +1,8 @@
+# Run linting before push
+npm run lint
+
+# Run type checking
+npm run type-check
+
+# Run format check
+npm run format:check

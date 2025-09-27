@@ -2,7 +2,13 @@ export type Locale = 'en-US' | 'pt-BR' | 'it-IT';
 
 export type WaitlistStatus = 'pending' | 'confirmed' | 'invited' | 'blocked';
 
-export type EmailEventType = 'delivered' | 'bounced' | 'opened' | 'clicked' | 'complained' | 'dropped';
+export type EmailEventType =
+  | 'delivered'
+  | 'bounced'
+  | 'opened'
+  | 'clicked'
+  | 'complained'
+  | 'dropped';
 
 export interface UtmData {
   source?: string;

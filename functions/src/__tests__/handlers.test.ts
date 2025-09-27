@@ -1,5 +1,5 @@
 // import { testEnv } from './setup';
-import { sendWaitlistConfirmationFnFn } from '../handlers/sendWaitlistConfirmationFn';
+import { sendWaitlistConfirmationFn } from '../handlers/sendWaitlistConfirmation';
 import { resendWebhook } from '../handlers/resendWebhook';
 import { adminResendConfirmation } from '../handlers/adminResendConfirmation';
 import type { WaitlistDoc } from '../types/models';

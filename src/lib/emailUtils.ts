@@ -11,26 +11,26 @@
  */
 export const normalizeEmail = (email: string): string => {
   if (!email) return email;
-  
+
   const trimmedEmail = email.trim().toLowerCase();
   const [localPart, domain] = trimmedEmail.split('@');
-  
+
   if (!localPart || !domain) return trimmedEmail;
-  
+
   // Gmail normalization rules
   if (domain === 'gmail.com' || domain === 'googlemail.com') {
     // Remove dots from local part
     let normalizedLocal = localPart.replace(/\./g, '');
-    
+
     // Remove everything after + sign
     const plusIndex = normalizedLocal.indexOf('+');
     if (plusIndex !== -1) {
       normalizedLocal = normalizedLocal.substring(0, plusIndex);
     }
-    
+
     return `${normalizedLocal}@gmail.com`;
   }
-  
+
   // For other providers, just normalize case and trim
   return trimmedEmail;
 };
@@ -42,10 +42,11 @@ export const normalizeEmail = (email: string): string => {
  */
 export const isValidEmailFormat = (email: string): boolean => {
   if (!email) return false;
-  
+
   // Comprehensive email regex that covers most valid email formats
-  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-  
+  const emailRegex =
+    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+
   return emailRegex.test(email.trim());
 };
 
@@ -56,7 +57,7 @@ export const isValidEmailFormat = (email: string): boolean => {
  */
 export const isNormalizableProvider = (email: string): boolean => {
   if (!email) return false;
-  
+
   const domain = email.split('@')[1]?.toLowerCase();
   const normalizableProviders = [
     'gmail.com',
@@ -64,9 +65,9 @@ export const isNormalizableProvider = (email: string): boolean => {
     'outlook.com',
     'hotmail.com',
     'live.com',
-    'yahoo.com'
+    'yahoo.com',
   ];
-  
+
   return normalizableProviders.includes(domain || '');
 };
 

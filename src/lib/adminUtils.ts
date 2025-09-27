@@ -5,9 +5,16 @@ import { db } from '../firebase';
  * Initialize admin collections with default documents if they don't exist
  * Only attempts operations that the current user has permissions for
  */
-export const initializeAdminCollections = async (currentUser?: { uid: string; email: string; displayName?: string; roles: string[] }) => {
+export const initializeAdminCollections = async (currentUser?: {
+  uid: string;
+  email: string;
+  displayName?: string;
+  roles: string[];
+}) => {
   if (!db) {
-    console.warn('Firebase not initialized, skipping admin collections initialization');
+    console.warn(
+      'Firebase not initialized, skipping admin collections initialization'
+    );
     return;
   }
 
@@ -16,7 +23,9 @@ export const initializeAdminCollections = async (currentUser?: { uid: string; em
     return;
   }
 
-  const hasAdminRoles = currentUser.roles.some(role => ['admin', 'superadmin'].includes(role));
+  const hasAdminRoles = currentUser.roles.some(role =>
+    ['admin', 'superadmin'].includes(role)
+  );
 
   try {
     // Only initialize feature flags if user has admin permissions
@@ -37,13 +46,15 @@ export const initializeAdminCollections = async (currentUser?: { uid: string; em
           console.log('Feature flags initialized successfully');
         }
       } catch (flagsError) {
-        console.warn('Could not initialize feature flags (may already exist):', flagsError);
+        console.warn(
+          'Could not initialize feature flags (may already exist):',
+          flagsError
+        );
       }
     }
 
     // User profiles are created automatically by the updateUserRoles cloud function
     // when roles are assigned. No client-side creation needed.
-
   } catch (error) {
     console.warn('Some admin collections could not be initialized:', error);
     // Don't throw error to prevent blocking the app
@@ -60,9 +71,9 @@ export const createAuditLogEntry = async (entry: {
   resource: string;
   targetUid?: string;
   targetEmail?: string;
-  before?: any;
-  after?: any;
-  metadata?: Record<string, any>;
+  before?: Record<string, unknown>;
+  after?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
 }) => {
   if (!db) {
     console.warn('Firebase not initialized, skipping audit log creation');
@@ -71,7 +82,7 @@ export const createAuditLogEntry = async (entry: {
 
   try {
     const { addDoc, collection } = await import('firebase/firestore');
-    
+
     await addDoc(collection(db, 'admin', 'auditLogs', 'entries'), {
       timestamp: serverTimestamp(),
       ...entry,

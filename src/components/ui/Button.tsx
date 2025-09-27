@@ -9,19 +9,23 @@ const buttonVariants = cva(
     variants: {
       variant: {
         // Primary - Brand gradient (Google + Airbnb style)
-        primary: 'bg-gradient-to-r from-primary-600 to-secondary-600 text-white shadow-primary hover:from-primary-700 hover:to-secondary-700 hover:shadow-primary-lg',
-        
+        primary:
+          'bg-gradient-to-r from-primary-600 to-secondary-600 text-white shadow-primary hover:from-primary-700 hover:to-secondary-700 hover:shadow-primary-lg',
+
         // Secondary - Clean outline style
-        secondary: 'border-2 border-neutral-300 bg-white text-neutral-900 shadow-sm hover:bg-neutral-50 hover:border-neutral-400 hover:shadow-md',
-        
+        secondary:
+          'border-2 border-neutral-300 bg-white text-neutral-900 shadow-sm hover:bg-neutral-50 hover:border-neutral-400 hover:shadow-md',
+
         // Ghost - Minimal style
         ghost: 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900',
-        
+
         // Destructive - Error actions
-        destructive: 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-sm hover:from-red-600 hover:to-red-700 hover:shadow-md',
-        
+        destructive:
+          'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-sm hover:from-red-600 hover:to-red-700 hover:shadow-md',
+
         // Success - Confirmation actions
-        success: 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-sm hover:from-green-600 hover:to-green-700 hover:shadow-md',
+        success:
+          'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-sm hover:from-green-600 hover:to-green-700 hover:shadow-md',
       },
       size: {
         sm: 'h-9 px-3 text-body-small',
@@ -52,7 +56,21 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, fullWidth, loading, leftIcon, rightIcon, children, disabled, ...props }, ref) => {
+  (
+    {
+      className,
+      variant,
+      size,
+      fullWidth,
+      loading,
+      leftIcon,
+      rightIcon,
+      children,
+      disabled,
+      ...props
+    },
+    ref
+  ) => {
     return (
       <button
         className={cn(buttonVariants({ variant, size, fullWidth, className }))}
@@ -61,7 +79,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {loading && (
-          <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent" />
+          <div className='animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent' />
         )}
         {!loading && leftIcon && leftIcon}
         {children}
@@ -73,4 +91,4 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
 Button.displayName = 'Button';
 
-export { Button, buttonVariants };
+export { Button };

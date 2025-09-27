@@ -7,17 +7,18 @@ export const LogLevel = {
   WARN: 1,
   INFO: 2,
   DEBUG: 3,
-  VERBOSE: 4
+  VERBOSE: 4,
 } as const;
 
-export type LogLevel = typeof LogLevel[keyof typeof LogLevel];
+export type LogLevel = (typeof LogLevel)[keyof typeof LogLevel];
 
 class Logger {
   private logLevel: LogLevel;
   private isDevelopment: boolean;
 
   constructor() {
-    this.isDevelopment = import.meta.env.DEV || import.meta.env.MODE === 'development';
+    this.isDevelopment =
+      import.meta.env.DEV || import.meta.env.MODE === 'development';
     this.logLevel = this.isDevelopment ? LogLevel.VERBOSE : LogLevel.WARN;
   }
 
@@ -25,7 +26,11 @@ class Logger {
     return level <= this.logLevel;
   }
 
-  private formatMessage(level: string, message: string, ..._args: unknown[]): string {
+  private formatMessage(
+    level: string,
+    message: string,
+    ..._args: unknown[]
+  ): string {
     const timestamp = new Date().toISOString();
     const prefix = `[${timestamp}] [${level}]`;
     return `${prefix} ${message}`;
@@ -100,4 +105,16 @@ class Logger {
 export const logger = new Logger();
 
 // Export individual methods for convenience
-export const { error, warn, info, debug, verbose, firebase, form, i18n, captcha, performance, group } = logger;
+export const {
+  error,
+  warn,
+  info,
+  debug,
+  verbose,
+  firebase,
+  form,
+  i18n,
+  captcha,
+  performance,
+  group,
+} = logger;

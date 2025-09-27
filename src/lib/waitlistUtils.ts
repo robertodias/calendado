@@ -3,7 +3,16 @@
  * Handles waitlist signup with proper data structure for Firebase Functions
  */
 
-import { collection, addDoc, serverTimestamp, query, where, getDocs, type DocumentData, type Query } from 'firebase/firestore';
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  query,
+  where,
+  getDocs,
+  type DocumentData,
+  type Query,
+} from 'firebase/firestore';
 import { db } from '../firebase';
 import { normalizeEmail } from './emailUtils';
 import { generateDedupeKeySync } from './crypto';
@@ -38,20 +47,20 @@ export async function signupForWaitlist(
     if (!data.email || !data.email.includes('@')) {
       return {
         success: false,
-        error: 'Invalid email address'
+        error: 'Invalid email address',
       };
     }
 
     // Normalize email
     const normalizedEmail = normalizeEmail(data.email);
-    
+
     // Check if already joined (optional - server will also check)
     const alreadyJoined = await checkIfAlreadyJoined(normalizedEmail);
     if (alreadyJoined) {
       return {
         success: false,
         error: 'Email already registered',
-        alreadyJoined: true
+        alreadyJoined: true,
       };
     }
 
@@ -73,34 +82,36 @@ export async function signupForWaitlist(
           sent: false,
           sentAt: null,
           messageId: null,
-          error: null
-        }
+          error: null,
+        },
       },
-      dedupeKey
+      dedupeKey,
     };
 
     // Add to Firestore
     if (!db) {
       throw new Error('Firestore not initialized');
     }
-    const docRef = await addDoc(collection(db, 'waitlist'), waitlistData as DocumentData);
+    const docRef = await addDoc(
+      collection(db, 'waitlist'),
+      waitlistData as DocumentData
+    );
 
     console.log('Waitlist signup successful:', {
       waitlistId: docRef.id,
       email: normalizedEmail,
-      locale: data.locale
+      locale: data.locale,
     });
 
     return {
       success: true,
-      waitlistId: docRef.id
+      waitlistId: docRef.id,
     };
-
   } catch (error) {
     console.error('Waitlist signup error:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error occurred'
+      error: error instanceof Error ? error.message : 'Unknown error occurred',
     };
   }
 }
@@ -114,15 +125,15 @@ export async function checkIfAlreadyJoined(email: string): Promise<boolean> {
       console.warn('Firestore not initialized for duplicate check');
       return false; // Allow signup if Firestore is not available
     }
-    
+
     const normalizedEmail = normalizeEmail(email);
     const dedupeKey = generateDedupeKeySync(normalizedEmail);
-    
+
     const q: Query<DocumentData> = query(
       collection(db, 'waitlist'),
       where('dedupeKey', '==', dedupeKey)
     );
-    
+
     const querySnapshot = await getDocs(q);
     return !querySnapshot.empty;
   } catch (error) {
@@ -136,17 +147,17 @@ export async function checkIfAlreadyJoined(email: string): Promise<boolean> {
  */
 export function getUtmParams(): WaitlistSignupData['utm'] {
   const urlParams = new URLSearchParams(window.location.search);
-  
+
   const utm: WaitlistSignupData['utm'] = {};
-  
+
   const source = urlParams.get('utm_source');
   const medium = urlParams.get('utm_medium');
   const campaign = urlParams.get('utm_campaign');
-  
+
   if (source) utm.source = source;
   if (medium) utm.medium = medium;
   if (campaign) utm.campaign = campaign;
-  
+
   return Object.keys(utm).length > 0 ? utm : undefined;
 }
 
@@ -155,7 +166,7 @@ export function getUtmParams(): WaitlistSignupData['utm'] {
  */
 export function getBrowserLocale(): Locale {
   const browserLocale = navigator.language || 'en-US';
-  
+
   // Map browser locale to supported locales
   if (browserLocale.startsWith('pt')) return 'pt-BR';
   if (browserLocale.startsWith('it')) return 'it-IT';
@@ -168,7 +179,7 @@ export function getBrowserLocale(): Locale {
 export function setWaitlistCookie(): void {
   const expires = new Date();
   expires.setFullYear(expires.getFullYear() + 1); // 1 year
-  
+
   document.cookie = `calendado_waitlisted=true; expires=${expires.toUTCString()}; path=/; secure; samesite=strict`;
 }
 
@@ -192,13 +203,13 @@ export async function completeWaitlistSignup(
     return {
       success: false,
       error: 'You have already joined the waitlist',
-      alreadyJoined: true
+      alreadyJoined: true,
     };
   }
 
   // Get UTM parameters
   const utm = getUtmParams();
-  
+
   // Get locale if not provided
   const finalLocale = locale || getBrowserLocale();
 
@@ -207,7 +218,7 @@ export async function completeWaitlistSignup(
     email,
     name,
     locale: finalLocale,
-    utm
+    utm,
   });
 
   // Set cookie on success

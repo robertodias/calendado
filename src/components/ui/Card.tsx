@@ -9,15 +9,16 @@ const Card = React.forwardRef<
     interactive?: boolean;
   }
 >(({ className, variant = 'default', interactive = false, ...props }, ref) => {
-  const baseClasses = 'rounded-2xl bg-white transition-all duration-normal ease-standard';
-  
+  const baseClasses =
+    'rounded-2xl bg-white transition-all duration-normal ease-standard';
+
   const variantClasses = {
     default: 'border border-neutral-200 shadow-sm',
     elevated: 'shadow-lg border-0',
     outlined: 'border-2 border-neutral-300 shadow-none',
   };
-  
-  const interactiveClasses = interactive 
+
+  const interactiveClasses = interactive
     ? 'cursor-pointer hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.98]'
     : '';
 
@@ -56,7 +57,10 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn('text-title-large font-semibold leading-none tracking-tight text-neutral-900', className)}
+    className={cn(
+      'text-title-large font-semibold leading-none tracking-tight text-neutral-900',
+      className
+    )}
     {...props}
   />
 ));
@@ -97,4 +101,11 @@ const CardFooter = React.forwardRef<
 ));
 CardFooter.displayName = 'CardFooter';
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };
+export {
+  Card,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardDescription,
+  CardContent,
+};

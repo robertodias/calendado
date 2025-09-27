@@ -1,20 +1,20 @@
-import React, { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { 
-  type User, 
-  signInWithPopup, 
-  GoogleAuthProvider, 
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from 'react';
+import {
+  type User,
+  signInWithPopup,
+  GoogleAuthProvider,
   signOut as firebaseSignOut,
   onAuthStateChanged,
-  getIdTokenResult
+  getIdTokenResult,
 } from 'firebase/auth';
 import { auth } from '../firebase';
-
-export type UserRole = 'superadmin' | 'admin' | 'support' | 'editor' | 'viewer';
-
-export interface AuthUser extends User {
-  roles: UserRole[];
-  hasRole: (role: UserRole | UserRole[]) => boolean;
-}
+import type { UserRole, AuthUser } from '../types/auth';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -42,16 +42,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const createAuthUser = (firebaseUser: User, roles: UserRole[] = []): AuthUser => ({
+  const createAuthUser = (
+    firebaseUser: User,
+    roles: UserRole[] = []
+  ): AuthUser => ({
     ...firebaseUser,
     roles,
     hasRole: (requiredRoles: UserRole | UserRole[]) => {
-      const rolesArray = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles];
+      const rolesArray = Array.isArray(requiredRoles)
+        ? requiredRoles
+        : [requiredRoles];
       return rolesArray.some(role => roles.includes(role));
-    }
+    },
   });
 
-  const extractRolesFromToken = async (firebaseUser: User): Promise<UserRole[]> => {
+  const extractRolesFromToken = async (
+    firebaseUser: User
+  ): Promise<UserRole[]> => {
     try {
       const tokenResult = await getIdTokenResult(firebaseUser);
       const customClaims = tokenResult.claims;
@@ -67,11 +74,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!auth) {
       throw new Error('Firebase auth not initialized');
     }
-    
+
     const provider = new GoogleAuthProvider();
     provider.addScope('email');
     provider.addScope('profile');
-    
+
     try {
       const result = await signInWithPopup(auth, provider);
       const roles = await extractRolesFromToken(result.user);
@@ -86,7 +93,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!auth) {
       throw new Error('Firebase auth not initialized');
     }
-    
+
     try {
       await firebaseSignOut(auth);
       setUser(null);
@@ -100,7 +107,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!auth?.currentUser) {
       return;
     }
-    
+
     try {
       // Force refresh the ID token to get updated custom claims
       await auth.currentUser.getIdToken(true);
@@ -118,7 +125,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return;
     }
 
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async firebaseUser => {
       if (firebaseUser) {
         const roles = await extractRolesFromToken(firebaseUser);
         setUser(createAuthUser(firebaseUser, roles));
@@ -136,12 +143,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loading,
     signInWithGoogle,
     signOut,
-    refreshToken
+    refreshToken,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

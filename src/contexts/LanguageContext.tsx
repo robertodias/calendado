@@ -1,5 +1,15 @@
-import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { getInitialLanguage, saveLanguagePreference, type SupportedLanguage } from '../lib/languageUtils';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  type ReactNode,
+} from 'react';
+import {
+  getInitialLanguage,
+  saveLanguagePreference,
+  type SupportedLanguage,
+} from '../lib/languageUtils';
 
 // Import language bundles
 import ptTranslations from '../locales/pt.json';
@@ -14,27 +24,34 @@ interface LanguageContextType {
   translations: Translations;
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+const LanguageContext = createContext<LanguageContextType | undefined>(
+  undefined
+);
 
 // Translation bundles
 const translations: Record<SupportedLanguage, Translations> = {
   pt: ptTranslations,
-  en: enTranslations
+  en: enTranslations,
 };
 
 // Helper function to get nested translation value
 const getNestedValue = (obj: Record<string, unknown>, path: string): string => {
   const keys = path.split('.');
   let current: unknown = obj;
-  
+
   for (const key of keys) {
-    if (current && typeof current === 'object' && current !== null && key in current) {
+    if (
+      current &&
+      typeof current === 'object' &&
+      current !== null &&
+      key in current
+    ) {
       current = (current as Record<string, unknown>)[key];
     } else {
       return path; // Return the path if key not found
     }
   }
-  
+
   return typeof current === 'string' ? current : path;
 };
 
@@ -42,8 +59,12 @@ interface LanguageProviderProps {
   children: ReactNode;
 }
 
-export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
-  const [language, setLanguageState] = useState<SupportedLanguage>(() => getInitialLanguage());
+export const LanguageProvider: React.FC<LanguageProviderProps> = ({
+  children,
+}) => {
+  const [language, setLanguageState] = useState<SupportedLanguage>(() =>
+    getInitialLanguage()
+  );
 
   // Load translations for current language
   const currentTranslations = translations[language];
@@ -68,7 +89,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     language,
     setLanguage,
     t,
-    translations: currentTranslations
+    translations: currentTranslations,
   };
 
   return (

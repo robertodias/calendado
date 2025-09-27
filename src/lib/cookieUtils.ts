@@ -15,7 +15,7 @@ const COOKIE_EXPIRY_DAYS = 365; // Cookie expires in 1 year
  */
 export const setCookie = (name: string, value: string, days: number): void => {
   const expires = new Date();
-  expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
   document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
 };
 
@@ -27,7 +27,7 @@ export const setCookie = (name: string, value: string, days: number): void => {
 export const getCookie = (name: string): string | null => {
   const nameEQ = `${name}=`;
   const ca = document.cookie.split(';');
-  
+
   for (const cookie of ca) {
     let c = cookie;
     while (c.charAt(0) === ' ') c = c.substring(1, c.length);

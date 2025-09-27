@@ -13,28 +13,29 @@ export const detectBrowserLanguage = (): SupportedLanguage => {
     return 'en'; // Default for SSR
   }
 
-  const browserLang = navigator.language || (navigator as { userLanguage?: string }).userLanguage;
-  
+  const browserLang =
+    navigator.language || (navigator as { userLanguage?: string }).userLanguage;
+
   if (!browserLang) {
     return 'en';
   }
-  
+
   // Check if browser language starts with 'pt' (Portuguese)
   if (browserLang.startsWith('pt')) {
     return 'pt';
   }
-  
+
   // Check if browser language starts with 'en' (English)
   if (browserLang.startsWith('en')) {
     return 'en';
   }
-  
+
   // Check for other Portuguese variants
   const portugueseVariants = ['pt-BR', 'pt-PT', 'pt-AO', 'pt-MZ'];
   if (portugueseVariants.some(variant => browserLang.startsWith(variant))) {
     return 'pt';
   }
-  
+
   // Default to English for any other language
   return 'en';
 };
@@ -49,7 +50,9 @@ export const getInitialLanguage = (): SupportedLanguage => {
   }
 
   // Check localStorage first
-  const savedLang = localStorage.getItem('calendado-language') as SupportedLanguage;
+  const savedLang = localStorage.getItem(
+    'calendado-language'
+  ) as SupportedLanguage;
   if (savedLang && ['pt', 'en'].includes(savedLang)) {
     return savedLang;
   }
@@ -84,7 +87,7 @@ export const getSupportedLanguages = (): SupportedLanguage[] => {
 export const getLanguageDisplayName = (language: SupportedLanguage): string => {
   const names = {
     pt: 'Português',
-    en: 'English'
+    en: 'English',
   };
   return names[language];
 };

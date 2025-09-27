@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { collection, query, onSnapshot } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { db } from '../../firebase';
-import { useAuth, type UserRole } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
+import type { UserRole } from '../../types/auth';
 import LoadingSpinner from '../LoadingSpinner';
 
 interface UserRecord {
@@ -21,10 +22,19 @@ const UsersRolesPanel: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState<UserRecord | null>(null);
   const [isUpdatingRoles, setIsUpdatingRoles] = useState(false);
-  const [updateMessage, setUpdateMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [updateMessage, setUpdateMessage] = useState<{
+    type: 'success' | 'error';
+    text: string;
+  } | null>(null);
 
   const isSuperAdmin = user?.hasRole('superadmin');
-  const availableRoles: UserRole[] = ['superadmin', 'admin', 'support', 'editor', 'viewer'];
+  const availableRoles: UserRole[] = [
+    'superadmin',
+    'admin',
+    'support',
+    'editor',
+    'viewer',
+  ];
 
   useEffect(() => {
     if (!db) {
@@ -43,10 +53,11 @@ const UsersRolesPanel: React.FC = () => {
     // Use a simpler query without orderBy to avoid index issues
     const q = query(usersRef);
 
-    const unsubscribe = onSnapshot(q, 
-      (snapshot) => {
+    const unsubscribe = onSnapshot(
+      q,
+      snapshot => {
         const userList: UserRecord[] = [];
-        snapshot.forEach((doc) => {
+        snapshot.forEach(doc => {
           const data = doc.data();
           userList.push({
             uid: doc.id,
@@ -62,7 +73,7 @@ const UsersRolesPanel: React.FC = () => {
         setUsers(userList);
         setLoading(false);
       },
-      (error) => {
+      error => {
         console.error('Error loading users:', error);
         setLoading(false);
         // Set empty array if there's a permission error
@@ -73,14 +84,19 @@ const UsersRolesPanel: React.FC = () => {
     return () => unsubscribe();
   }, [user]);
 
-  const filteredUsers = users.filter(user =>
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (user.displayName && user.displayName.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredUsers = users.filter(
+    user =>
+      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (user.displayName &&
+        user.displayName.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const handleRoleUpdate = async (targetUid: string, newRoles: UserRole[]) => {
     if (!isSuperAdmin) {
-      setUpdateMessage({ type: 'error', text: 'Only superadmins can change roles' });
+      setUpdateMessage({
+        type: 'error',
+        text: 'Only superadmins can change roles',
+      });
       return;
     }
 
@@ -90,27 +106,27 @@ const UsersRolesPanel: React.FC = () => {
     try {
       const functions = getFunctions();
       const updateUserRoles = httpsCallable(functions, 'updateUserRoles');
-      
+
       await updateUserRoles({
         targetUid,
-        roles: newRoles
+        roles: newRoles,
       });
 
-      setUpdateMessage({ 
-        type: 'success', 
-        text: 'Roles updated successfully. User must re-login or refresh token to see new access.' 
+      setUpdateMessage({
+        type: 'success',
+        text: 'Roles updated successfully. User must re-login or refresh token to see new access.',
       });
       setSelectedUser(null);
-      
+
       // Refresh our own token if we updated our own roles
       if (targetUid === user?.uid) {
         await refreshToken();
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating roles:', error);
-      setUpdateMessage({ 
-        type: 'error', 
-        text: error.message || 'Failed to update roles' 
+      setUpdateMessage({
+        type: 'error',
+        text: error instanceof Error ? error.message : 'Failed to update roles',
       });
     } finally {
       setIsUpdatingRoles(false);
@@ -119,77 +135,80 @@ const UsersRolesPanel: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="p-6 flex justify-center">
+      <div className='p-6 flex justify-center'>
         <LoadingSpinner />
       </div>
     );
   }
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className='p-6'>
+      <div className='flex justify-between items-center mb-6'>
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">Users & Roles</h2>
-          <p className="text-sm text-gray-600 mt-1">
-            Manage user roles and permissions. Only superadmins can change roles.
+          <h2 className='text-xl font-semibold text-gray-900'>Users & Roles</h2>
+          <p className='text-sm text-gray-600 mt-1'>
+            Manage user roles and permissions. Only superadmins can change
+            roles.
           </p>
         </div>
-        <div className="text-sm text-gray-500">
+        <div className='text-sm text-gray-500'>
           Last updated: {new Date().toLocaleTimeString()}
         </div>
       </div>
 
       {/* Update Message */}
       {updateMessage && (
-        <div className={`mb-4 p-3 rounded-md ${
-          updateMessage.type === 'success' 
-            ? 'bg-green-50 text-green-800 border border-green-200'
-            : 'bg-red-50 text-red-800 border border-red-200'
-        }`}>
+        <div
+          className={`mb-4 p-3 rounded-md ${
+            updateMessage.type === 'success'
+              ? 'bg-green-50 text-green-800 border border-green-200'
+              : 'bg-red-50 text-red-800 border border-red-200'
+          }`}
+        >
           {updateMessage.text}
         </div>
       )}
 
       {/* Search */}
-      <div className="mb-4">
+      <div className='mb-4'>
         <input
-          type="text"
-          placeholder="Search users by email or name..."
+          type='text'
+          placeholder='Search users by email or name...'
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full max-w-md px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          onChange={e => setSearchTerm(e.target.value)}
+          className='w-full max-w-md px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
         />
       </div>
 
       {/* Users Table */}
-      <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 rounded-lg">
-        <table className="min-w-full divide-y divide-gray-300">
-          <thead className="bg-gray-50">
+      <div className='overflow-hidden shadow ring-1 ring-black ring-opacity-5 rounded-lg'>
+        <table className='min-w-full divide-y divide-gray-300'>
+          <thead className='bg-gray-50'>
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">
+              <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide'>
                 User
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">
+              <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide'>
                 Roles
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">
+              <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide'>
                 Created
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">
+              <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide'>
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className='bg-white divide-y divide-gray-200'>
             {filteredUsers.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                <td colSpan={4} className='px-6 py-8 text-center text-gray-500'>
                   {searchTerm ? (
                     'No users found matching your search.'
                   ) : (
-                    <div className="space-y-2">
+                    <div className='space-y-2'>
                       <div>No users found in the system yet.</div>
-                      <div className="text-sm text-gray-400">
+                      <div className='text-sm text-gray-400'>
                         Users will appear here when roles are assigned to them.
                       </div>
                     </div>
@@ -197,40 +216,40 @@ const UsersRolesPanel: React.FC = () => {
                 </td>
               </tr>
             ) : (
-              filteredUsers.map((userRecord) => (
-                <tr key={userRecord.uid} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
+              filteredUsers.map(userRecord => (
+                <tr key={userRecord.uid} className='hover:bg-gray-50'>
+                  <td className='px-6 py-4 whitespace-nowrap'>
+                    <div className='flex items-center'>
                       <div>
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className='text-sm font-medium text-gray-900'>
                           {userRecord.displayName || 'No name'}
                         </div>
-                        <div className="text-sm text-gray-500">
+                        <div className='text-sm text-gray-500'>
                           {userRecord.email}
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex flex-wrap gap-1">
+                  <td className='px-6 py-4 whitespace-nowrap'>
+                    <div className='flex flex-wrap gap-1'>
                       {userRecord.roles.length > 0 ? (
-                        userRecord.roles.map((role) => (
+                        userRecord.roles.map(role => (
                           <span
                             key={role}
-                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                            className='inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800'
                           >
                             {role}
                           </span>
                         ))
                       ) : (
-                        <span className="text-sm text-gray-500">No roles</span>
+                        <span className='text-sm text-gray-500'>No roles</span>
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
                     {userRecord.createdAt.toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <td className='px-6 py-4 whitespace-nowrap text-sm font-medium'>
                     <button
                       onClick={() => setSelectedUser(userRecord)}
                       disabled={!isSuperAdmin}
@@ -254,7 +273,7 @@ const UsersRolesPanel: React.FC = () => {
           user={selectedUser}
           availableRoles={availableRoles}
           isUpdating={isUpdatingRoles}
-          onSave={(newRoles) => handleRoleUpdate(selectedUser.uid, newRoles)}
+          onSave={newRoles => handleRoleUpdate(selectedUser.uid, newRoles)}
           onCancel={() => setSelectedUser(null)}
         />
       )}
@@ -275,15 +294,13 @@ const RoleEditModal: React.FC<RoleEditModalProps> = ({
   availableRoles,
   isUpdating,
   onSave,
-  onCancel
+  onCancel,
 }) => {
   const [selectedRoles, setSelectedRoles] = useState<UserRole[]>(user.roles);
 
   const handleRoleToggle = (role: UserRole) => {
     setSelectedRoles(prev =>
-      prev.includes(role)
-        ? prev.filter(r => r !== role)
-        : [...prev, role]
+      prev.includes(role) ? prev.filter(r => r !== role) : [...prev, role]
     );
   };
 
@@ -292,42 +309,44 @@ const RoleEditModal: React.FC<RoleEditModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <div className="mt-3">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+    <div className='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50'>
+      <div className='relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white'>
+        <div className='mt-3'>
+          <h3 className='text-lg font-medium text-gray-900 mb-4'>
             Edit Roles for {user.displayName || user.email}
           </h3>
-          
-          <div className="space-y-3">
-            {availableRoles.map((role) => (
-              <label key={role} className="flex items-center">
+
+          <div className='space-y-3'>
+            {availableRoles.map(role => (
+              <label key={role} className='flex items-center'>
                 <input
-                  type="checkbox"
+                  type='checkbox'
                   checked={selectedRoles.includes(role)}
                   onChange={() => handleRoleToggle(role)}
                   disabled={isUpdating}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded disabled:opacity-50"
+                  className='h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded disabled:opacity-50'
                 />
-                <span className="ml-2 text-sm text-gray-700 capitalize">{role}</span>
+                <span className='ml-2 text-sm text-gray-700 capitalize'>
+                  {role}
+                </span>
               </label>
             ))}
           </div>
 
-          <div className="flex justify-end space-x-3 mt-6">
+          <div className='flex justify-end space-x-3 mt-6'>
             <button
               onClick={onCancel}
               disabled={isUpdating}
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className='px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed'
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
               disabled={isUpdating}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+              className='px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center'
             >
-              {isUpdating && <LoadingSpinner size="sm" />}
+              {isUpdating && <LoadingSpinner size='sm' />}
               {isUpdating ? 'Updating...' : 'Save Changes'}
             </button>
           </div>

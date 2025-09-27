@@ -12,8 +12,8 @@ function App() {
         <LanguageProvider>
           <Router>
             <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/admin" element={<Admin />} />
+              <Route path='/' element={<Landing />} />
+              <Route path='/admin' element={<Admin />} />
             </Routes>
           </Router>
         </LanguageProvider>

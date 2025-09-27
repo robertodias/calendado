@@ -8,9 +8,12 @@ const inputVariants = cva(
   {
     variants: {
       variant: {
-        default: 'border-neutral-300 shadow-sm hover:border-neutral-400 focus:shadow-md',
-        filled: 'border-transparent bg-neutral-100 hover:bg-neutral-200 focus:bg-white focus:border-primary-600',
-        outlined: 'border-2 border-neutral-300 shadow-none hover:border-neutral-400',
+        default:
+          'border-neutral-300 shadow-sm hover:border-neutral-400 focus:shadow-md',
+        filled:
+          'border-transparent bg-neutral-100 hover:bg-neutral-200 focus:bg-white focus:border-primary-600',
+        outlined:
+          'border-2 border-neutral-300 shadow-none hover:border-neutral-400',
       },
       size: {
         sm: 'h-9 px-3 text-body-small',
@@ -42,40 +45,43 @@ export interface InputProps
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ 
-    className, 
-    variant, 
-    size, 
-    state, 
-    label, 
-    helperText, 
-    error, 
-    leftIcon, 
-    rightIcon, 
-    id,
-    ...props 
-  }, ref) => {
+  (
+    {
+      className,
+      variant,
+      size,
+      state,
+      label,
+      helperText,
+      error,
+      leftIcon,
+      rightIcon,
+      id,
+      ...props
+    },
+    ref
+  ) => {
     const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
     const finalState = error ? 'error' : state;
 
     return (
-      <div className="w-full">
+      <div className='w-full'>
         {label && (
-          <label 
+          <label
             htmlFor={inputId}
-            className="block text-label-large font-medium text-neutral-900 mb-2"
+            className='block text-label-large font-medium text-neutral-900 mb-2'
           >
             {label}
           </label>
         )}
-        
-        <div className="relative">
+
+        <div className='relative'>
           {leftIcon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500">
+            <div className='absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500'>
               {leftIcon}
             </div>
           )}
-          
+
           <input
             id={inputId}
             className={cn(
@@ -87,19 +93,21 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             {...props}
           />
-          
+
           {rightIcon && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500">
+            <div className='absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500'>
               {rightIcon}
             </div>
           )}
         </div>
-        
+
         {(error || helperText) && (
-          <p className={cn(
-            'mt-2 text-body-small',
-            error ? 'text-red-600' : 'text-neutral-600'
-          )}>
+          <p
+            className={cn(
+              'mt-2 text-body-small',
+              error ? 'text-red-600' : 'text-neutral-600'
+            )}
+          >
             {error || helperText}
           </p>
         )}
@@ -110,4 +118,4 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
 Input.displayName = 'Input';
 
-export { Input, inputVariants };
+export { Input };

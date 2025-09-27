@@ -14,7 +14,8 @@ const badgeVariants = cva(
         warning: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200',
         error: 'bg-red-100 text-red-800 hover:bg-red-200',
         info: 'bg-blue-100 text-blue-800 hover:bg-blue-200',
-        outline: 'border border-neutral-300 bg-transparent text-neutral-700 hover:bg-neutral-50',
+        outline:
+          'border border-neutral-300 bg-transparent text-neutral-700 hover:bg-neutral-50',
       },
       size: {
         sm: 'px-2 py-0.5 text-label-small',
@@ -35,13 +36,20 @@ export interface BadgeProps
   icon?: React.ReactNode;
 }
 
-function Badge({ className, variant, size, icon, children, ...props }: BadgeProps) {
+function Badge({
+  className,
+  variant,
+  size,
+  icon,
+  children,
+  ...props
+}: BadgeProps) {
   return (
     <div className={cn(badgeVariants({ variant, size }), className)} {...props}>
-      {icon && <span className="w-3 h-3">{icon}</span>}
+      {icon && <span className='w-3 h-3'>{icon}</span>}
       {children}
     </div>
   );
 }
 
-export { Badge, badgeVariants };
+export { Badge };
