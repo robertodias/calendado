@@ -606,3 +606,4 @@ describe('Firestore Security Rules', () => {
     });
   });
 });
+

@@ -75,3 +75,4 @@ async function testMagicLinks() {
 
 // Run the tests
 testMagicLinks().catch(console.error);
+
