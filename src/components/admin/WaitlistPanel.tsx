@@ -253,11 +253,12 @@ const WaitlistPanel: React.FC = () => {
 
       // Check if user has platform admin role
       const hasPlatformAdmin = user?.roles?.includes('superadmin') || false;
-      
+
       if (!hasPlatformAdmin) {
         toast({
           title: 'Permission Denied',
-          description: 'You need superadmin privileges to delete waitlist entries',
+          description:
+            'You need superadmin privileges to delete waitlist entries',
           variant: 'destructive',
         });
         setDeleteConfirmOpen(null);
@@ -844,7 +845,8 @@ const WaitlistPanel: React.FC = () => {
 
                                 <div className='border-t border-neutral-200 my-1'></div>
 
-                                {(user?.roles?.includes('superadmin') || false) && (
+                                {(user?.roles?.includes('superadmin') ||
+                                  false) && (
                                   <button
                                     className='flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50'
                                     onClick={e => {
