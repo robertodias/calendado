@@ -52,7 +52,7 @@ const WaitlistSuccess: React.FC<WaitlistSuccessProps> = ({ onReset }) => {
           </ul>
         </div>
 
-        <Button variant='outline' onClick={onReset} className='w-full'>
+        <Button variant='secondary' onClick={onReset} className='w-full'>
           {t('success.joinAgain')}
         </Button>
       </div>

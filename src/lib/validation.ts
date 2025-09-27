@@ -64,7 +64,7 @@ export const validationRules = {
       if (typeof value !== 'string') return false;
       return regex.test(value);
     },
-    message,
+    message: message.includes('{{field}}') ? message.replace('{{field}}', field) : message,
   }),
 
   oneOf: (field: string, options: unknown[]): ValidationRule => ({
@@ -80,7 +80,7 @@ export const validationRules = {
   ): ValidationRule => ({
     name: 'custom',
     test,
-    message,
+    message: message.includes('{{field}}') ? message.replace('{{field}}', field) : message,
   }),
 };
 

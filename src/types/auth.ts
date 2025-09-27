@@ -1,5 +1,5 @@
 import type { User } from 'firebase/auth';
-import type { UserRole } from '../../../functions/src/types/shared';
+import type { UserRole } from './shared';
 
 export type { UserRole };
 

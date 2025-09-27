@@ -4,7 +4,7 @@ import type {
   UtmData,
   ConfirmationComms,
   WaitlistDoc as SharedWaitlistDoc,
-} from '../../../functions/src/types/shared';
+} from './shared';
 
 // Re-export shared types for convenience
 export type { Locale, WaitlistStatus, UtmData, ConfirmationComms };
