@@ -19,7 +19,13 @@ interface WaitlistEntry {
   email: string;
   name: string | null;
   source?: string;
-  status: 'pending' | 'confirmed' | 'invited' | 'blocked' | 'rejected' | 'active';
+  status:
+    | 'pending'
+    | 'confirmed'
+    | 'invited'
+    | 'blocked'
+    | 'rejected'
+    | 'active';
   createdAt: Date;
   notes?: string;
   locale?: string;

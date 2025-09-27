@@ -34,7 +34,13 @@ interface WaitlistEntry {
   email: string;
   name: string | null;
   source?: string;
-  status: 'pending' | 'confirmed' | 'invited' | 'blocked' | 'rejected' | 'active';
+  status:
+    | 'pending'
+    | 'confirmed'
+    | 'invited'
+    | 'blocked'
+    | 'rejected'
+    | 'active';
   createdAt: Date;
   notes?: string;
   locale?: string;
@@ -53,7 +59,14 @@ interface WaitlistEntry {
   };
 }
 
-type WaitlistStatus = 'all' | 'pending' | 'confirmed' | 'invited' | 'blocked' | 'rejected' | 'active';
+type WaitlistStatus =
+  | 'all'
+  | 'pending'
+  | 'confirmed'
+  | 'invited'
+  | 'blocked'
+  | 'rejected'
+  | 'active';
 
 const WaitlistPanel: React.FC = () => {
   const { toast } = useToastContext();
@@ -61,11 +74,17 @@ const WaitlistPanel: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<WaitlistStatus>('all');
-  const [selectedEntries, setSelectedEntries] = useState<Set<string>>(new Set());
-  const [selectedEntry, setSelectedEntry] = useState<WaitlistEntry | null>(null);
+  const [selectedEntries, setSelectedEntries] = useState<Set<string>>(
+    new Set()
+  );
+  const [selectedEntry, setSelectedEntry] = useState<WaitlistEntry | null>(
+    null
+  );
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [actionMenuOpen, setActionMenuOpen] = useState<string | null>(null);
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState<string | null>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState<string | null>(
+    null
+  );
   const [isExporting, setIsExporting] = useState(false);
 
   // Debounced search
@@ -119,7 +138,8 @@ const WaitlistPanel: React.FC = () => {
                   confirmation: data.comms.confirmation
                     ? {
                         ...data.comms.confirmation,
-                        sentAt: data.comms.confirmation.sentAt?.toDate() || null,
+                        sentAt:
+                          data.comms.confirmation.sentAt?.toDate() || null,
                       }
                     : undefined,
                 }
@@ -144,10 +164,13 @@ const WaitlistPanel: React.FC = () => {
   }, [selectedStatus, toast]);
 
   // Filter entries based on search
-  const filteredEntries = entries.filter(entry =>
-    entry.email.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-    (entry.name && entry.name.toLowerCase().includes(debouncedSearch.toLowerCase())) ||
-    (entry.source && entry.source.toLowerCase().includes(debouncedSearch.toLowerCase()))
+  const filteredEntries = entries.filter(
+    entry =>
+      entry.email.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      (entry.name &&
+        entry.name.toLowerCase().includes(debouncedSearch.toLowerCase())) ||
+      (entry.source &&
+        entry.source.toLowerCase().includes(debouncedSearch.toLowerCase()))
   );
 
   // Handle search
@@ -635,7 +658,9 @@ const WaitlistPanel: React.FC = () => {
                     <td className='px-6 py-4'>
                       <Checkbox
                         checked={selectedEntries.has(entry.id)}
-                        onChange={e => handleEntrySelect(entry.id, e.target.checked)}
+                        onChange={e =>
+                          handleEntrySelect(entry.id, e.target.checked)
+                        }
                         className='h-4 w-4'
                       />
                     </td>

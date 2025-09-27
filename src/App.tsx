@@ -26,10 +26,10 @@ function App() {
                   />
                 }
               >
-              <Routes>
-                <Route path='/' element={<Landing />} />
-                <Route path='/admin' element={<Admin />} />
-              </Routes>
+                <Routes>
+                  <Route path='/' element={<Landing />} />
+                  <Route path='/admin' element={<Admin />} />
+                </Routes>
               </Suspense>
             </Router>
           </ToastProvider>
