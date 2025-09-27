@@ -1,0 +1,211 @@
+{
+  "info": {
+    "name": "Calendado Invite Consumption API",
+    "description": "Collection for testing the invite consumption endpoint",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Consume Invite - Valid Token (New User)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"token\": \"{{valid_invite_token}}\",\n  \"userData\": {\n    \"displayName\": \"Test User\",\n    \"preferences\": {\n      \"theme\": \"dark\"\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/consumeInvite",
+          "host": ["{{base_url}}"],
+          "path": ["consumeInvite"]
+        },
+        "description": "Test consuming a valid invitation token for a new user"
+      },
+      "response": []
+    },
+    {
+      "name": "Consume Invite - Valid Token (Existing User)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"token\": \"{{valid_invite_token_existing}}\",\n  \"userData\": {\n    \"displayName\": \"Updated Name\",\n    \"preferences\": {\n      \"theme\": \"light\"\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/consumeInvite",
+          "host": ["{{base_url}}"],
+          "path": ["consumeInvite"]
+        },
+        "description": "Test consuming a valid invitation token for an existing user"
+      },
+      "response": []
+    },
+    {
+      "name": "Consume Invite - Invalid Token",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"token\": \"invalid-token-123\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/consumeInvite",
+          "host": ["{{base_url}}"],
+          "path": ["consumeInvite"]
+        },
+        "description": "Test consuming an invalid invitation token (should return 400)"
+      },
+      "response": []
+    },
+    {
+      "name": "Consume Invite - Missing Token",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": {
+          "raw": "{{base_url}}/consumeInvite",
+          "host": ["{{base_url}}"],
+          "path": ["consumeInvite"]
+        },
+        "description": "Test consuming invitation without token (should return 400)"
+      },
+      "response": []
+    },
+    {
+      "name": "Consume Invite - Wrong Method (GET)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/consumeInvite",
+          "host": ["{{base_url}}"],
+          "path": ["consumeInvite"]
+        },
+        "description": "Test using wrong HTTP method (should return 405)"
+      },
+      "response": []
+    },
+    {
+      "name": "Consume Invite - CORS Preflight",
+      "request": {
+        "method": "OPTIONS",
+        "header": [
+          {
+            "key": "Access-Control-Request-Method",
+            "value": "POST"
+          },
+          {
+            "key": "Access-Control-Request-Headers",
+            "value": "Content-Type"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/consumeInvite",
+          "host": ["{{base_url}}"],
+          "path": ["consumeInvite"]
+        },
+        "description": "Test CORS preflight request (should return 200)"
+      },
+      "response": []
+    },
+    {
+      "name": "Consume Invite - Expired Token",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"token\": \"{{expired_invite_token}}\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/consumeInvite",
+          "host": ["{{base_url}}"],
+          "path": ["consumeInvite"]
+        },
+        "description": "Test consuming an expired invitation token (should return 400)"
+      },
+      "response": []
+    },
+    {
+      "name": "Consume Invite - Already Used Token",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"token\": \"{{used_invite_token}}\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/consumeInvite",
+          "host": ["{{base_url}}"],
+          "path": ["consumeInvite"]
+        },
+        "description": "Test consuming an already used invitation token (should return 400)"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5001/your-project-id/us-central1",
+      "description": "Base URL for the Firebase Functions emulator"
+    },
+    {
+      "key": "valid_invite_token",
+      "value": "REPLACE_WITH_VALID_TOKEN",
+      "description": "A valid invitation token for testing"
+    },
+    {
+      "key": "valid_invite_token_existing",
+      "value": "REPLACE_WITH_VALID_TOKEN_FOR_EXISTING_USER",
+      "description": "A valid invitation token for an existing user"
+    },
+    {
+      "key": "expired_invite_token",
+      "value": "REPLACE_WITH_EXPIRED_TOKEN",
+      "description": "An expired invitation token for testing"
+    },
+    {
+      "key": "used_invite_token",
+      "value": "REPLACE_WITH_USED_TOKEN",
+      "description": "An already used invitation token for testing"
+    }
+  ]
+}

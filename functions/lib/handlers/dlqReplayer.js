@@ -2,81 +2,55 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.dlqReplayer = void 0;
 const https_1 = require("firebase-functions/v2/https");
-const auth_1 = require("firebase-admin/auth");
+const middleware_1 = require("../lib/middleware");
 const resend_1 = require("../lib/resend");
 const email_1 = require("../lib/email");
 const firestore_1 = require("../lib/firestore");
 const crypto_1 = require("../lib/crypto");
-exports.dlqReplayer = (0, https_1.onRequest)(async (req, res) => {
+exports.dlqReplayer = (0, https_1.onRequest)((0, middleware_1.withAuth)({ requireAdmin: true })((0, middleware_1.requireMethod)('POST')(async (req, res, user) => {
     console.log('DLQ replayer request:', {
         method: req.method,
-        body: req.body
+        body: req.body,
+        userId: user.uid
     });
-    try {
-        // Only accept POST requests
-        if (req.method !== 'POST') {
-            res.status(405).json({ error: 'Method not allowed' });
-            return;
-        }
-        // Verify admin authentication
-        const authHeader = req.headers.authorization || req.headers.Authorization;
-        if (!authHeader || !String(authHeader).startsWith('Bearer ')) {
-            res.status(401).json({ error: 'Missing or invalid authorization header' });
-            return;
-        }
-        const token = String(authHeader).substring(7);
-        const decodedToken = await (0, auth_1.getAuth)().verifyIdToken(token);
-        // Check if user has admin role (custom claim)
-        if (!decodedToken.admin) {
-            res.status(403).json({ error: 'Admin access required' });
-            return;
-        }
-        // Get dead letter queue documents
-        const dlqDocs = await (0, firestore_1.getDeadLetterQueueDocuments)();
-        if (dlqDocs.length === 0) {
-            res.status(200).json({
-                success: true,
-                message: 'No items in dead letter queue',
-                processed: 0
-            });
-            return;
-        }
-        console.log(`Processing ${dlqDocs.length} items from dead letter queue`);
-        const results = {
-            processed: 0,
-            successful: 0,
-            failed: 0,
-            errors: []
-        };
-        // Process each DLQ item
-        for (const dlqDoc of dlqDocs) {
-            try {
-                await processDLQItem(dlqDoc);
-                results.successful++;
-                results.processed++;
-            }
-            catch (error) {
-                results.failed++;
-                results.processed++;
-                const errorMsg = `Failed to process DLQ item ${dlqDoc.waitlistId}: ${error instanceof Error ? error.message : String(error)}`;
-                results.errors.push(errorMsg);
-                console.error(errorMsg);
-            }
-        }
-        console.log('DLQ replayer completed:', results);
+    // Get dead letter queue documents
+    const dlqDocs = await (0, firestore_1.getDeadLetterQueueDocuments)();
+    if (dlqDocs.length === 0) {
         res.status(200).json({
             success: true,
-            ...results
+            message: 'No items in dead letter queue',
+            processed: 0
         });
+        return;
     }
-    catch (error) {
-        console.error('Error in DLQ replayer:', error);
-        res.status(500).json({
-            error: 'Internal server error',
-            message: error instanceof Error ? error.message : String(error)
-        });
+    console.log(`Processing ${dlqDocs.length} items from dead letter queue`);
+    const results = {
+        processed: 0,
+        successful: 0,
+        failed: 0,
+        errors: []
+    };
+    // Process each DLQ item
+    for (const dlqDoc of dlqDocs) {
+        try {
+            await processDLQItem(dlqDoc);
+            results.successful++;
+            results.processed++;
+        }
+        catch (error) {
+            results.failed++;
+            results.processed++;
+            const errorMsg = `Failed to process DLQ item ${dlqDoc.waitlistId}: ${error instanceof Error ? error.message : String(error)}`;
+            results.errors.push(errorMsg);
+            console.error(errorMsg);
+        }
     }
-});
+    console.log('DLQ replayer completed:', results);
+    res.status(200).json({
+        success: true,
+        ...results
+    });
+})));
 /**
  * Process a single DLQ item
  */

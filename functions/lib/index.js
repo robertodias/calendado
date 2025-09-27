@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getWaitlistEntry = exports.rejectWaitlist = exports.inviteFromWaitlist = exports.updateUserRoles = exports.readinessCheck = exports.livenessCheck = exports.healthCheck = exports.dlqReplayerFn = exports.adminResendConfirmationFn = exports.resendWebhookFn = exports.sendWaitlistConfirmationFn = void 0;
+exports.consumeInvite = exports.redeemMagicLink = exports.validateMagicLink = exports.issueMagicLink = exports.getWaitlistEntry = exports.rejectWaitlist = exports.inviteFromWaitlist = exports.updateUserRoles = exports.readinessCheck = exports.livenessCheck = exports.healthCheck = exports.dlqReplayerFn = exports.adminResendConfirmationFn = exports.resendWebhookFn = exports.sendWaitlistConfirmationFn = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const params_1 = require("firebase-functions/params");
 const app_1 = require("firebase-admin/app");
@@ -19,6 +19,12 @@ const waitlist_1 = require("./waitlist");
 Object.defineProperty(exports, "inviteFromWaitlist", { enumerable: true, get: function () { return waitlist_1.inviteFromWaitlist; } });
 Object.defineProperty(exports, "rejectWaitlist", { enumerable: true, get: function () { return waitlist_1.rejectWaitlist; } });
 Object.defineProperty(exports, "getWaitlistEntry", { enumerable: true, get: function () { return waitlist_1.getWaitlistEntry; } });
+const magicLink_1 = require("./magicLink");
+Object.defineProperty(exports, "issueMagicLink", { enumerable: true, get: function () { return magicLink_1.issueMagicLink; } });
+Object.defineProperty(exports, "validateMagicLink", { enumerable: true, get: function () { return magicLink_1.validateMagicLink; } });
+Object.defineProperty(exports, "redeemMagicLink", { enumerable: true, get: function () { return magicLink_1.redeemMagicLink; } });
+const invite_1 = require("./invite");
+Object.defineProperty(exports, "consumeInvite", { enumerable: true, get: function () { return invite_1.consumeInvite; } });
 // Initialize Firebase Admin
 (0, app_1.initializeApp)();
 // Define secrets

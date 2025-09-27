@@ -9,6 +9,7 @@ import { healthCheck, livenessCheck, readinessCheck } from './handlers/healthChe
 import { updateUserRoles } from './handlers/updateUserRoles';
 import { inviteFromWaitlist, rejectWaitlist, getWaitlistEntry } from './waitlist';
 import { issueMagicLink, validateMagicLink, redeemMagicLink } from './magicLink';
+import { consumeInvite } from './invite';
 
 // Initialize Firebase Admin
 initializeApp();
@@ -64,3 +65,6 @@ export { inviteFromWaitlist, rejectWaitlist, getWaitlistEntry };
 
 // Magic link functions
 export { issueMagicLink, validateMagicLink, redeemMagicLink };
+
+// Invite consumption function
+export { consumeInvite };
