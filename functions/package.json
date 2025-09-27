@@ -16,6 +16,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "test:rules": "jest src/__tests__/rules.test.ts",
+    "validate:rules": "ts-node scripts/validate-rules.ts",
     "emulate": "firebase emulators:start --only functions,firestore",
     "format": "prettier --write \"src/**/*.{ts,js,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,js,json}\"",
@@ -33,6 +35,7 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^3.0.0",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.11.17",
     "@typescript-eslint/eslint-plugin": "^7.0.0",

@@ -3,10 +3,60 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Waitlist collection rules
+    // ============================================================================
+    // PLATFORM-LEVEL RULES
+    // ============================================================================
+    
+    // Platform superadmin has full access to everything
+    function isPlatformAdmin() {
+      return request.auth != null && 
+        request.auth.token.platformAdmin == true;
+    }
+    
+    // Check if user has any of the required platform roles
+    function hasAnyPlatformRole(roles) {
+      return request.auth != null && 
+        request.auth.token.roles != null &&
+        request.auth.token.roles.hasAny(roles);
+    }
+    
+    // Check if user has a specific role for an organization
+    function hasOrgRole(orgId, role) {
+      return request.auth != null && 
+        request.auth.token.roles != null &&
+        request.auth.token.roles[orgId] == role;
+    }
+    
+    // Check if user has any of the specified roles for an organization
+    function hasAnyOrgRole(orgId, roles) {
+      return request.auth != null && 
+        request.auth.token.roles != null &&
+        request.auth.token.roles[orgId] in roles;
+    }
+    
+    // Check if user is a member of an organization (has any role)
+    function isOrgMember(orgId) {
+      return request.auth != null && 
+        request.auth.token.roles != null &&
+        request.auth.token.roles[orgId] != null;
+    }
+    
+    // ============================================================================
+    // PUBLIC COLLECTIONS
+    // ============================================================================
+    
+    // Public links - readable by anyone, writable by platform admin or org members
+    match /publicLinks/{linkId} {
+      allow read: if true; // Public read access
+      allow write: if isPlatformAdmin() || 
+        (request.auth != null && 
+         request.resource.data.orgId != null && 
+         isOrgMember(request.resource.data.orgId));
+    }
+    
+    // Waitlist collection - public signup with validation
     match /waitlist/{document} {
       // Allow anyone to create waitlist entries (public signup)
-      // Enhanced security with stricter validation
       allow create: if 
         request.auth == null && // Only allow unauthenticated requests
         request.resource.data.email is string &&
@@ -27,77 +77,150 @@ service cloud.firestore {
         request.resource.data.captchaVerified is bool;
       
       // Allow reading for duplicate email checking (public read for email validation)
-      // This is needed for the duplicate email check functionality
       allow read: if true;
       
       // Prevent updates and deletes from client
       allow update, delete: if false;
     }
     
-    // Email events collection - server only
+    // ============================================================================
+    // PLATFORM ADMIN COLLECTIONS
+    // ============================================================================
+    
+    // User profiles collection - platform admin or own profile
+    match /users/{userId} {
+      allow read: if isPlatformAdmin() || 
+        (request.auth != null && request.auth.uid == userId);
+      
+      allow create: if isPlatformAdmin() || 
+        (request.auth != null && 
+         request.auth.uid == userId &&
+         !('roles' in request.resource.data) && // Prevent client from setting roles
+         request.resource.data.uid == userId &&
+         request.resource.data.email is string);
+      
+      allow update: if isPlatformAdmin() || 
+        (request.auth != null && 
+         request.auth.uid == userId &&
+         !('roles' in request.resource.data) && // Prevent client from modifying roles
+         (!('roles' in resource.data) || request.resource.data.roles == resource.data.roles));
+      
+      allow delete: if isPlatformAdmin();
+    }
+    
+    // Platform admin collections
+    match /admin/{document} {
+      allow read, write: if isPlatformAdmin();
+    }
+    
+    match /admin/{logDocId}/entries/{entryId} {
+      allow read, write: if isPlatformAdmin();
+    }
+    
+    // Email events and dead letter queue - server only
     match /email_events/{document} {
       allow read, write: if false;
     }
     
-    // Dead letter queue - server only
     match /email_dlq/{document} {
       allow read, write: if false;
     }
     
-    // User profiles collection - role-based access for admin console
-    match /users/{userId} {
-      // Allow users to read their own data, or admins to read all users
-      allow read: if request.auth != null && 
-        (request.auth.uid == userId || hasAnyRole(['admin', 'superadmin', 'support']));
+    // ============================================================================
+    // ORGANIZATION COLLECTIONS
+    // ============================================================================
+    
+    // Organization documents
+    match /orgs/{orgId} {
+      // Read: platform admin or org members
+      allow read: if isPlatformAdmin() || isOrgMember(orgId);
       
-      // Allow users to create/update their own data (roles are server-managed)
-      allow create: if request.auth != null && 
-        request.auth.uid == userId &&
-        !('roles' in request.resource.data) && // Prevent client from setting roles
-        request.resource.data.uid == userId &&
-        request.resource.data.email is string;
+      // Write: platform admin, owner, or org_admin
+      allow write: if isPlatformAdmin() || 
+        hasAnyOrgRole(orgId, ['owner', 'org_admin']);
       
-      allow update: if request.auth != null && 
-        request.auth.uid == userId &&
-        !('roles' in request.resource.data) && // Prevent client from modifying roles
-        (!('roles' in resource.data) || request.resource.data.roles == resource.data.roles); // Keep existing roles unchanged
+      // Create: platform admin only
+      allow create: if isPlatformAdmin();
       
-      // Prevent user deletion from client
-      allow delete: if false;
+      // Delete: platform admin or owner only
+      allow delete: if isPlatformAdmin() || hasOrgRole(orgId, 'owner');
     }
     
-    // Admin feature flags document - readable by support+, writable by admin+
-    match /admin/featureFlags {
-      allow read: if request.auth != null && 
-        hasAnyRole(['support', 'admin', 'superadmin']);
-      allow write: if request.auth != null && 
-        hasAnyRole(['admin', 'superadmin']);
-    }
-
-    // Admin audit logs collection (document metadata and nested entries)
-    match /admin/auditLogs {
-      allow read: if request.auth != null && 
-        hasAnyRole(['support', 'admin', 'superadmin']);
-      allow write: if false; // Audit logs metadata managed by backend only
-    }
-
-    match /admin/auditLogs/entries/{entryId} {
-      allow read: if request.auth != null && 
-        hasAnyRole(['support', 'admin', 'superadmin']);
-      allow write: if false; // Only server can write audit logs entries
-    }
-
-    // Deny access to any other admin documents unless explicitly allowed above
-    match /admin/{document=**} {
-      allow read, write: if false;
+    // Store subcollections
+    match /orgs/{orgId}/stores/{storeId} {
+      // Read: platform admin, org members, or public if org is public
+      allow read: if isPlatformAdmin() || 
+        isOrgMember(orgId) ||
+        (request.auth == null && 
+         get(/databases/$(database)/documents/orgs/$(orgId)).data.public == true);
+      
+      // Write: platform admin, org_admin, or store_manager
+      allow write: if isPlatformAdmin() || 
+        hasAnyOrgRole(orgId, ['org_admin', 'store_manager']);
+      
+      // Create: platform admin, org_admin, or store_manager
+      allow create: if isPlatformAdmin() || 
+        hasAnyOrgRole(orgId, ['org_admin', 'store_manager']);
+      
+      // Delete: platform admin or org_admin only
+      allow delete: if isPlatformAdmin() || hasOrgRole(orgId, 'org_admin');
     }
     
-    // Helper function to check if user has any of the required roles
-    function hasAnyRole(roles) {
-      return request.auth != null && 
-        request.auth.token.roles != null &&
-        request.auth.token.roles.hasAny(roles);
+    // Professional subcollections
+    match /orgs/{orgId}/professionals/{professionalId} {
+      // Read: platform admin, org members, or public if org is public
+      allow read: if isPlatformAdmin() || 
+        isOrgMember(orgId) ||
+        (request.auth == null && 
+         get(/databases/$(database)/documents/orgs/$(orgId)).data.public == true);
+      
+      // Write: platform admin, org_admin, store_manager, or own profile
+      allow write: if isPlatformAdmin() || 
+        hasAnyOrgRole(orgId, ['org_admin', 'store_manager']) ||
+        (request.auth != null && 
+         request.resource.data.userId == request.auth.uid);
+      
+      // Create: platform admin, org_admin, or store_manager
+      allow create: if isPlatformAdmin() || 
+        hasAnyOrgRole(orgId, ['org_admin', 'store_manager']);
+      
+      // Delete: platform admin or org_admin only
+      allow delete: if isPlatformAdmin() || hasOrgRole(orgId, 'org_admin');
     }
+    
+    // ============================================================================
+    // INVITATION SYSTEM
+    // ============================================================================
+    
+    // Invites collection
+    match /invites/{inviteId} {
+      // Read: platform admin or the invited user
+      allow read: if isPlatformAdmin() || 
+        (request.auth != null && 
+         request.resource.data.email == request.auth.token.email);
+      
+      // Write: platform admin or org members (for creating invites)
+      allow write: if isPlatformAdmin() || 
+        (request.auth != null && 
+         request.resource.data.orgId != null && 
+         isOrgMember(request.resource.data.orgId));
+      
+      // Create: platform admin or org members
+      allow create: if isPlatformAdmin() || 
+        (request.auth != null && 
+         request.resource.data.orgId != null && 
+         isOrgMember(request.resource.data.orgId));
+      
+      // Delete: platform admin or org members
+      allow delete: if isPlatformAdmin() || 
+        (request.auth != null && 
+         request.resource.data.orgId != null && 
+         isOrgMember(request.resource.data.orgId));
+    }
+    
+    // ============================================================================
+    // DEFAULT DENY
+    // ============================================================================
     
     // Default deny rule for any unmatched paths
     match /{document=**} {
