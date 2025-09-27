@@ -44,13 +44,19 @@ service cloud.firestore {
       allow read, write: if false;
     }
     
-    // User profiles collection - clients can only read their own data, roles are server-managed
+    // User profiles collection - role-based access for admin console
     match /users/{userId} {
-      allow read: if request.auth != null && request.auth.uid == userId;
+      // Allow users to read their own data, or admins to read all users
+      allow read: if request.auth != null && 
+        (request.auth.uid == userId || hasAnyRole(['admin', 'superadmin', 'support']));
+      
+      // Allow users to create/update their own data (roles are server-managed)
       allow create, update: if request.auth != null && 
         request.auth.uid == userId &&
         !('roles' in request.resource.data); // Prevent client from setting roles
-      allow delete: if false; // Prevent user deletion from client
+      
+      // Prevent user deletion from client
+      allow delete: if false;
     }
     
     // Admin collections - role-based access using custom claims
