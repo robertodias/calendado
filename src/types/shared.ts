@@ -35,6 +35,26 @@ export interface ConfirmationComms {
   } | null;
 }
 
+export interface WaitlistEntry {
+  id: string;
+  email: string;
+  name: string | null;
+  source?: string;
+  status: WaitlistStatus;
+  createdAt: Date;
+  notes?: string;
+  locale?: string;
+  utm?: UtmData;
+  userAgent?: string;
+  ip?: string;
+  comms?: {
+    confirmation?: {
+      sent: boolean;
+      sentAt: Date | null;
+    };
+  };
+}
+
 export interface WaitlistDoc {
   id: string;
   email: string;
@@ -260,3 +280,4 @@ export interface PerformanceMetrics {
   errorRate: number;
   throughput: number;
 }
+

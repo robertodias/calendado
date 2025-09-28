@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { Input } from '../ui/Input';
@@ -14,7 +14,7 @@ import {
   Eye,
   RefreshCw,
 } from 'lucide-react';
-import { format, isValid } from 'date-fns';
+import { format } from 'date-fns';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToastContext } from '../ToastProvider';
 import { db } from '../../firebase';
@@ -27,76 +27,8 @@ import {
   doc,
 } from 'firebase/firestore';
 import WaitlistDrawer from './WaitlistDrawer';
-
-interface WaitlistEntry {
-  id: string;
-  email: string;
-  name: string | null;
-  source?: string;
-  status:
-    | 'pending'
-    | 'confirmed'
-    | 'invited'
-    | 'blocked'
-    | 'rejected'
-    | 'active';
-  createdAt: Date;
-  notes?: string;
-  locale?: string;
-  utm?: {
-    source?: string;
-    medium?: string;
-    campaign?: string;
-  };
-  userAgent?: string;
-  ip?: string;
-  comms?: {
-    confirmation?: {
-      sent: boolean;
-      sentAt: Date | null;
-    };
-  };
-}
-
-// Helper function to safely convert Firestore timestamps to Date
-const safeToDate = (timestamp: unknown): Date | null => {
-  if (!timestamp) return null;
-
-  try {
-    // If it's already a Date, return it
-    if (timestamp instanceof Date) {
-      return isValid(timestamp) ? timestamp : null;
-    }
-
-    // If it's a Firestore Timestamp, convert it
-    if (
-      timestamp &&
-      typeof timestamp === 'object' &&
-      'toDate' in timestamp &&
-      typeof (timestamp as any).toDate === 'function'
-    ) {
-      const date = (timestamp as any).toDate();
-      return isValid(date) ? date : null;
-    }
-
-    // If it's a number (milliseconds), create Date
-    if (typeof timestamp === 'number') {
-      const date = new Date(timestamp);
-      return isValid(date) ? date : null;
-    }
-
-    // If it's a string, try to parse it
-    if (typeof timestamp === 'string') {
-      const date = new Date(timestamp);
-      return isValid(date) ? date : null;
-    }
-
-    return null;
-  } catch (error) {
-    console.warn('Error converting timestamp to date:', error);
-    return null;
-  }
-};
+import { transformWaitlistEntries, filterValidWaitlistEntries } from '../../lib/waitlistTransformers';
+import type { WaitlistEntry } from '../../types/shared';
 
 type WaitlistStatus =
   | 'all'
@@ -112,20 +44,18 @@ const WaitlistPanel: React.FC = () => {
   const { toast } = useToastContext();
   const [entries, setEntries] = useState<WaitlistEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<WaitlistStatus>('all');
   const [selectedEntries, setSelectedEntries] = useState<string[]>([]);
-  const [selectedEntry, setSelectedEntry] = useState<WaitlistEntry | null>(
-    null
-  );
+  const [selectedEntry, setSelectedEntry] = useState<WaitlistEntry | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState<string | null>(
-    null
-  );
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState<string | null>(null);
 
-  // Fetch waitlist entries
+  // Fetch waitlist entries with proper error handling
   useEffect(() => {
     if (!db) {
+      setError('Database not initialized');
       setLoading(false);
       return;
     }
@@ -135,38 +65,23 @@ const WaitlistPanel: React.FC = () => {
     const unsubscribe = onSnapshot(
       q,
       snapshot => {
-        const waitlistEntries: WaitlistEntry[] = snapshot.docs.map(doc => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            email: data.email || '',
-            name: data.name || null,
-            source: data.source || 'Unknown',
-            status: data.status || 'pending',
-            createdAt: safeToDate(data.createdAt) || new Date(),
-            notes: data.notes || '',
-            locale: data.locale || 'en',
-            utm: data.utm || {},
-            userAgent: data.userAgent || '',
-            ip: data.ip || '',
-            comms: data.comms
-              ? {
-                  ...data.comms,
-                  confirmation: data.comms.confirmation
-                    ? {
-                        sent: data.comms.confirmation.sent || false,
-                        sentAt: safeToDate(data.comms.confirmation.sentAt),
-                      }
-                    : undefined,
-                }
-              : {},
-          };
-        });
-        setEntries(waitlistEntries);
-        setLoading(false);
+        try {
+          const transformedEntries = transformWaitlistEntries(snapshot.docs);
+          const validEntries = filterValidWaitlistEntries(transformedEntries);
+          
+          setEntries(validEntries);
+          setError(null);
+        } catch (err) {
+          console.error('Error processing waitlist entries:', err);
+          setError('Failed to process waitlist data');
+          setEntries([]);
+        } finally {
+          setLoading(false);
+        }
       },
       error => {
         console.error('Error fetching waitlist entries:', error);
+        setError('Failed to load waitlist entries');
         setEntries([]);
         setLoading(false);
       }
@@ -192,31 +107,28 @@ const WaitlistPanel: React.FC = () => {
     });
   }, [entries, searchQuery, selectedStatus]);
 
-  const handleSearch = (query: string) => {
+  // Event handlers with useCallback for performance
+  const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
-  };
+  }, []);
 
-  const handleStatusFilter = (status: WaitlistStatus) => {
+  const handleStatusFilter = useCallback((status: WaitlistStatus) => {
     setSelectedStatus(status);
-  };
+  }, []);
 
-  const handleSelectEntry = (entryId: string, checked: boolean) => {
-    if (checked) {
-      setSelectedEntries(prev => [...prev, entryId]);
-    } else {
-      setSelectedEntries(prev => prev.filter(id => id !== entryId));
-    }
-  };
+  const handleSelectEntry = useCallback((entryId: string, checked: boolean) => {
+    setSelectedEntries(prev => 
+      checked 
+        ? [...prev, entryId]
+        : prev.filter(id => id !== entryId)
+    );
+  }, []);
 
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedEntries(filteredEntries.map(entry => entry.id));
-    } else {
-      setSelectedEntries([]);
-    }
-  };
+  const handleSelectAll = useCallback((checked: boolean) => {
+    setSelectedEntries(checked ? filteredEntries.map(entry => entry.id) : []);
+  }, [filteredEntries]);
 
-  const handleInvite = async () => {
+  const handleInvite = useCallback(async () => {
     try {
       // TODO: Implement invite functionality
       toast({
@@ -232,9 +144,9 @@ const WaitlistPanel: React.FC = () => {
         variant: 'destructive',
       });
     }
-  };
+  }, [toast]);
 
-  const handleReject = async () => {
+  const handleReject = useCallback(async () => {
     try {
       // TODO: Implement reject functionality
       toast({
@@ -250,9 +162,9 @@ const WaitlistPanel: React.FC = () => {
         variant: 'destructive',
       });
     }
-  };
+  }, [toast]);
 
-  const handleDelete = async (entryId: string) => {
+  const handleDelete = useCallback(async (entryId: string) => {
     try {
       if (!db) {
         toast({
@@ -291,9 +203,9 @@ const WaitlistPanel: React.FC = () => {
         variant: 'destructive',
       });
     }
-  };
+  }, [user, toast]);
 
-  const handleBulkInvite = async () => {
+  const handleBulkInvite = useCallback(async () => {
     try {
       // TODO: Implement bulk invite functionality
       toast({
@@ -310,9 +222,9 @@ const WaitlistPanel: React.FC = () => {
         variant: 'destructive',
       });
     }
-  };
+  }, [selectedEntries.length, toast]);
 
-  const handleBulkReject = async () => {
+  const handleBulkReject = useCallback(async () => {
     try {
       // TODO: Implement bulk reject functionality
       toast({
@@ -329,38 +241,47 @@ const WaitlistPanel: React.FC = () => {
         variant: 'destructive',
       });
     }
-  };
+  }, [selectedEntries.length, toast]);
 
-  const handleExportCSV = () => {
-    const csvContent = [
-      ['Email', 'Name', 'Source', 'Status', 'Created At', 'Notes'],
-      ...filteredEntries.map(entry => [
-        entry.email,
-        entry.name || '',
-        entry.source || '',
-        entry.status,
-        format(entry.createdAt, 'yyyy-MM-dd HH:mm:ss'),
-        entry.notes || '',
-      ]),
-    ]
-      .map(row => row.map(cell => `"${cell}"`).join(','))
-      .join('\n');
+  const handleExportCSV = useCallback(() => {
+    try {
+      const csvContent = [
+        ['Email', 'Name', 'Source', 'Status', 'Created At', 'Notes'],
+        ...filteredEntries.map(entry => [
+          entry.email,
+          entry.name || '',
+          entry.source || '',
+          entry.status,
+          format(entry.createdAt, 'yyyy-MM-dd HH:mm:ss'),
+          entry.notes || '',
+        ]),
+      ]
+        .map(row => row.map(cell => `"${cell}"`).join(','))
+        .join('\n');
 
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `waitlist-${format(new Date(), 'yyyy-MM-dd')}.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
-  };
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `waitlist-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error exporting CSV:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to export CSV',
+        variant: 'destructive',
+      });
+    }
+  }, [filteredEntries, toast]);
 
-  const handleViewDetails = (entry: WaitlistEntry) => {
+  const handleViewDetails = useCallback((entry: WaitlistEntry) => {
     setSelectedEntry(entry);
     setDrawerOpen(true);
-  };
+  }, []);
 
-  const getStatusBadgeColor = (status: string) => {
+  const getStatusBadgeColor = useCallback((status: string) => {
     switch (status) {
       case 'pending':
         return 'secondary';
@@ -377,13 +298,13 @@ const WaitlistPanel: React.FC = () => {
       default:
         return 'secondary';
     }
-  };
+  }, []);
 
   const statusOptions: {
     value: WaitlistStatus;
     label: string;
     count: number;
-  }[] = [
+  }[] = useMemo(() => [
     { value: 'all', label: 'All', count: entries.length },
     {
       value: 'pending',
@@ -415,8 +336,26 @@ const WaitlistPanel: React.FC = () => {
       label: 'Blocked',
       count: entries.filter(e => e.status === 'blocked').length,
     },
-  ];
+  ], [entries]);
 
+  // Error state
+  if (error) {
+    return (
+      <div className='flex flex-col items-center justify-center h-64 space-y-4'>
+        <div className='text-red-600 text-lg font-medium'>Error Loading Waitlist</div>
+        <div className='text-gray-600 text-center max-w-md'>{error}</div>
+        <Button 
+          variant='secondary' 
+          onClick={() => window.location.reload()}
+        >
+          <RefreshCw className='h-4 w-4 mr-2' />
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
+  // Loading state
   if (loading) {
     return (
       <div className='flex items-center justify-center h-64'>
