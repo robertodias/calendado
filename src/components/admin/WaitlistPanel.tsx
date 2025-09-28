@@ -707,33 +707,35 @@ const WaitlistPanel: React.FC = () => {
         )}
 
       {/* Delete Confirmation Modal */}
-      {deleteConfirmOpen && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]'>
-          <div className='bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl'>
-            <h3 className='text-lg font-medium text-gray-900 mb-4'>
-              Delete Waitlist Entry
-            </h3>
-            <p className='text-sm text-gray-600 mb-6'>
-              Are you sure you want to delete this waitlist entry? This action
-              cannot be undone.
-            </p>
-            <div className='flex justify-end space-x-3'>
-              <Button
-                variant='secondary'
-                onClick={() => setDeleteConfirmOpen(null)}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant='destructive'
-                onClick={() => handleDelete(deleteConfirmOpen)}
-              >
-                Delete
-              </Button>
+      {deleteConfirmOpen &&
+        createPortal(
+          <div className='fixed inset-0 z-[130] flex items-center justify-center bg-black/50'>
+            <div className='mx-4 w-full max-w-md rounded-lg bg-white p-6 shadow-xl'>
+              <h3 className='mb-4 text-lg font-medium text-gray-900'>
+                Delete Waitlist Entry
+              </h3>
+              <p className='mb-6 text-sm text-gray-600'>
+                Are you sure you want to delete this waitlist entry? This action
+                cannot be undone.
+              </p>
+              <div className='flex justify-end space-x-3'>
+                <Button
+                  variant='secondary'
+                  onClick={() => setDeleteConfirmOpen(null)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant='destructive'
+                  onClick={() => handleDelete(deleteConfirmOpen)}
+                >
+                  Delete
+                </Button>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
 
       {/* Waitlist Drawer */}
       <WaitlistDrawer
