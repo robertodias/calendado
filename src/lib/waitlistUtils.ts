@@ -14,7 +14,28 @@ import {
   type Query,
 } from 'firebase/firestore';
 import { db } from '../firebase';
-import { normalizeEmail } from './emailUtils';
+// Simple email normalization (replaces removed emailUtils)
+const normalizeEmail = (email: string): string => {
+  if (!email) return email;
+  const trimmedEmail = email.trim().toLowerCase();
+  const [localPart, domain] = trimmedEmail.split('@');
+  
+  if (!localPart || !domain) return trimmedEmail;
+  
+  // Gmail normalization rules
+  if (domain === 'gmail.com' || domain === 'googlemail.com') {
+    // Remove dots from local part
+    let normalizedLocal = localPart.replace(/\./g, '');
+    // Remove everything after + sign
+    const plusIndex = normalizedLocal.indexOf('+');
+    if (plusIndex !== -1) {
+      normalizedLocal = normalizedLocal.substring(0, plusIndex);
+    }
+    return `${normalizedLocal}@gmail.com`;
+  }
+  
+  return trimmedEmail;
+};
 import { generateDedupeKeySync } from './crypto';
 import type { Locale } from '../types/models';
 
