@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { Input } from '../ui/Input';
@@ -60,23 +61,10 @@ const WaitlistPanel: React.FC = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState<string | null>(
     null
   );
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
-
-  // Close menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Element;
-      if (!target.closest('[data-menu-container]')) {
-        setOpenMenuId(null);
-      }
-    };
-
-    if (openMenuId) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () =>
-        document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [openMenuId]);
+  const [menuAnchor, setMenuAnchor] = useState<{
+    id: string;
+    position: DOMRect;
+  } | null>(null);
 
   // Fetch waitlist entries with proper error handling
   useEffect(() => {
@@ -624,58 +612,24 @@ const WaitlistPanel: React.FC = () => {
                         >
                           <Eye className='h-4 w-4' />
                         </Button>
-                        <div className='relative' data-menu-container>
-                          <Button
-                            variant='ghost'
-                            size='sm'
-                            onClick={() =>
-                              setOpenMenuId(
-                                openMenuId === entry.id ? null : entry.id
-                              )
-                            }
-                          >
-                            <MoreVertical className='h-4 w-4' />
-                          </Button>
-                          {openMenuId === entry.id && (
-                            <div className='absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 border border-gray-200'>
-                              <div className='py-1'>
-                                <button
-                                  className='flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
-                                  onClick={() => {
-                                    handleInvite();
-                                    setOpenMenuId(null);
-                                  }}
-                                >
-                                  <UserPlus className='h-4 w-4 mr-3' />
-                                  Send Invite
-                                </button>
-                                <button
-                                  className='flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
-                                  onClick={() => {
-                                    handleReject();
-                                    setOpenMenuId(null);
-                                  }}
-                                >
-                                  <X className='h-4 w-4 mr-3' />
-                                  Reject Entry
-                                </button>
-                                {(user?.roles?.includes('superadmin') ||
-                                  false) && (
-                                  <button
-                                    className='flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50'
-                                    onClick={() => {
-                                      setDeleteConfirmOpen(entry.id);
-                                      setOpenMenuId(null);
-                                    }}
-                                  >
-                                    <Trash2 className='h-4 w-4 mr-3' />
-                                    Delete Entry
-                                  </button>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                        </div>
+                        <Button
+                          variant='ghost'
+                          size='sm'
+                          onClick={event => {
+                            const buttonRect =
+                              event.currentTarget.getBoundingClientRect();
+                            setMenuAnchor(prev =>
+                              prev?.id === entry.id
+                                ? null
+                                : {
+                                    id: entry.id,
+                                    position: buttonRect,
+                                  }
+                            );
+                          }}
+                        >
+                          <MoreVertical className='h-4 w-4' />
+                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -685,6 +639,72 @@ const WaitlistPanel: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {/* Floating action menu */}
+      {menuAnchor &&
+        createPortal(
+          <div className='fixed inset-0 z-[120] flex items-start justify-start'>
+            <div
+              className='absolute inset-0'
+              onClick={() => setMenuAnchor(null)}
+              aria-hidden='true'
+            />
+            <div
+              className='absolute z-[121] w-48 rounded-md border border-gray-200 bg-white shadow-lg'
+              style={{
+                top: menuAnchor.position.bottom + window.scrollY + 8,
+                left: Math.min(
+                  menuAnchor.position.left +
+                    window.scrollX -
+                    160 +
+                    menuAnchor.position.width,
+                  window.innerWidth - 208
+                ),
+              }}
+              role='menu'
+              aria-labelledby={`actions-${menuAnchor.id}`}
+            >
+              <div className='py-1'>
+                <button
+                  className='flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
+                  onClick={() => {
+                    handleInvite();
+                    setMenuAnchor(null);
+                  }}
+                  role='menuitem'
+                >
+                  <UserPlus className='mr-3 h-4 w-4' />
+                  Send Invite
+                </button>
+                <button
+                  className='flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
+                  onClick={() => {
+                    handleReject();
+                    setMenuAnchor(null);
+                  }}
+                  role='menuitem'
+                >
+                  <X className='mr-3 h-4 w-4' />
+                  Reject Entry
+                </button>
+                {(user?.roles?.includes('superadmin') || false) && (
+                  <button
+                    className='flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50'
+                    onClick={() => {
+                      setDeleteConfirmOpen(menuAnchor.id);
+                      setMenuAnchor(null);
+                    }}
+                    role='menuitem'
+                  >
+                    <Trash2 className='mr-3 h-4 w-4' />
+                    Delete Entry
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
 
       {/* Delete Confirmation Modal */}
       {deleteConfirmOpen && (
