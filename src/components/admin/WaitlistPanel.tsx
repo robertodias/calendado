@@ -253,7 +253,12 @@ const WaitlistPanel: React.FC = () => {
 
       // Check if user has platform admin role
       const hasPlatformAdmin = user?.roles?.includes('superadmin') || false;
-
+      
+      // Debug: Log user's custom claims
+      console.log('User object:', user);
+      console.log('User roles:', user?.roles);
+      console.log('Has platform admin:', hasPlatformAdmin);
+      
       if (!hasPlatformAdmin) {
         toast({
           title: 'Permission Denied',

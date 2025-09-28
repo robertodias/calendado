@@ -62,7 +62,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const tokenResult = await getIdTokenResult(firebaseUser);
       const customClaims = tokenResult.claims;
+      
+      // Debug: Log all custom claims
+      console.log('Custom claims:', customClaims);
+      console.log('Roles from claims:', customClaims.roles);
+      console.log('Platform admin from claims:', customClaims.platformAdmin);
+      
       const roles = customClaims.roles as UserRole[] | undefined;
+      const platformAdmin = customClaims.platformAdmin as boolean | undefined;
+      
+      // If user has platformAdmin: true, add superadmin role
+      if (platformAdmin === true && (!roles || !roles.includes('superadmin'))) {
+        const existingRoles = Array.isArray(roles) ? roles : [];
+        return [...existingRoles, 'superadmin'];
+      }
+      
       return Array.isArray(roles) ? roles : [];
     } catch (error) {
       console.error('Error extracting roles from token:', error);
