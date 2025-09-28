@@ -1,47 +1,39 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Button } from '../ui/Button';
+import { Badge } from '../ui/Badge';
+import { Input } from '../ui/Input';
+import { Checkbox } from '../ui/Checkbox';
+import {
+  Search,
+  Filter,
+  Download,
+  MoreVertical,
+  UserPlus,
+  X,
+  Trash2,
+  Eye,
+  RefreshCw,
+} from 'lucide-react';
+import { format } from 'date-fns';
+import { useAuth } from '../../contexts/AuthContext';
+import { useToastContext } from '../ToastProvider';
+import { db } from '../../firebase';
 import {
   collection,
   query,
   orderBy,
   onSnapshot,
-  where,
-  doc,
   deleteDoc,
+  doc,
 } from 'firebase/firestore';
-import { db } from '../../firebase';
-import { useAuth } from '../../contexts/AuthContext';
-import LoadingSpinner from '../LoadingSpinner';
-import { Button } from '../ui/Button';
-import { Input } from '../ui/Input';
-import { Badge } from '../ui/Badge';
-import { Checkbox } from '../ui/Checkbox';
 import WaitlistDrawer from './WaitlistDrawer';
-import { useToastContext } from '../ToastProvider';
-import {
-  Search,
-  Download,
-  UserPlus,
-  UserX,
-  RefreshCw,
-  MoreHorizontal,
-  Trash2,
-  Eye,
-  Mail,
-} from 'lucide-react';
-import { format } from 'date-fns';
 
 interface WaitlistEntry {
   id: string;
   email: string;
   name: string | null;
   source?: string;
-  status:
-    | 'pending'
-    | 'confirmed'
-    | 'invited'
-    | 'blocked'
-    | 'rejected'
-    | 'active';
+  status: 'pending' | 'confirmed' | 'invited' | 'blocked' | 'rejected' | 'active';
   createdAt: Date;
   notes?: string;
   locale?: string;
@@ -60,14 +52,7 @@ interface WaitlistEntry {
   };
 }
 
-type WaitlistStatus =
-  | 'all'
-  | 'pending'
-  | 'confirmed'
-  | 'invited'
-  | 'blocked'
-  | 'rejected'
-  | 'active';
+type WaitlistStatus = 'all' | 'pending' | 'confirmed' | 'invited' | 'blocked' | 'rejected' | 'active';
 
 const WaitlistPanel: React.FC = () => {
   const { user } = useAuth();
@@ -76,146 +61,104 @@ const WaitlistPanel: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<WaitlistStatus>('all');
-  const [selectedEntries, setSelectedEntries] = useState<Set<string>>(
-    new Set()
-  );
-  const [selectedEntry, setSelectedEntry] = useState<WaitlistEntry | null>(
-    null
-  );
+  const [selectedEntries, setSelectedEntries] = useState<string[]>([]);
+  const [selectedEntry, setSelectedEntry] = useState<WaitlistEntry | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [actionMenuOpen, setActionMenuOpen] = useState<string | null>(null);
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState<string | null>(
-    null
-  );
-  const [isExporting, setIsExporting] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState<string | null>(null);
 
-  // Debounced search
-  const [debouncedSearch, setDebouncedSearch] = useState('');
-
+  // Fetch waitlist entries
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchQuery);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  // Load waitlist entries from Firestore
-  useEffect(() => {
-    if (!db) return;
-
-    const waitlistRef = collection(db, 'waitlist');
-    let q = query(waitlistRef, orderBy('createdAt', 'desc'));
-
-    // Apply status filter if not 'all'
-    if (selectedStatus !== 'all') {
-      q = query(
-        waitlistRef,
-        where('status', '==', selectedStatus),
-        orderBy('createdAt', 'desc')
-      );
+    if (!db) {
+      setLoading(false);
+      return;
     }
+
+    const q = query(
+      collection(db, 'waitlist'),
+      orderBy('createdAt', 'desc')
+    );
 
     const unsubscribe = onSnapshot(
       q,
-      snapshot => {
-        const waitlistEntries: WaitlistEntry[] = [];
-        snapshot.forEach(doc => {
+      (snapshot) => {
+        const waitlistEntries: WaitlistEntry[] = snapshot.docs.map((doc) => {
           const data = doc.data();
-          waitlistEntries.push({
+          return {
             id: doc.id,
-            email: data.email,
-            name: data.name,
-            source: data.source,
+            email: data.email || '',
+            name: data.name || null,
+            source: data.source || 'Unknown',
             status: data.status || 'pending',
             createdAt: data.createdAt?.toDate() || new Date(),
-            notes: data.notes,
-            locale: data.locale || data.language,
-            utm: data.utm,
-            userAgent: data.userAgent,
-            ip: data.ip,
-            comms: data.comms
-              ? {
-                  ...data.comms,
-                  confirmation: data.comms.confirmation
-                    ? {
-                        ...data.comms.confirmation,
-                        sentAt:
-                          data.comms.confirmation.sentAt?.toDate() || null,
-                      }
-                    : undefined,
-                }
-              : undefined,
-          });
+            notes: data.notes || '',
+            locale: data.locale || 'en',
+            utm: data.utm || {},
+            userAgent: data.userAgent || '',
+            ip: data.ip || '',
+            comms: data.comms || {},
+          };
         });
         setEntries(waitlistEntries);
         setLoading(false);
       },
-      error => {
-        console.error('Error loading waitlist entries:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to load waitlist entries',
-          variant: 'destructive',
-        });
+      (error) => {
+        console.error('Error fetching waitlist entries:', error);
+        setEntries([]);
         setLoading(false);
       }
     );
 
     return () => unsubscribe();
-  }, [selectedStatus, toast]);
+  }, []);
 
-  // Filter entries based on search
-  const filteredEntries = entries.filter(
-    entry =>
-      entry.email.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-      (entry.name &&
-        entry.name.toLowerCase().includes(debouncedSearch.toLowerCase())) ||
-      (entry.source &&
-        entry.source.toLowerCase().includes(debouncedSearch.toLowerCase()))
-  );
+  // Filter entries based on search and status
+  const filteredEntries = useMemo(() => {
+    return entries.filter((entry) => {
+      const matchesSearch = 
+        entry.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (entry.name && entry.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (entry.source && entry.source.toLowerCase().includes(searchQuery.toLowerCase()));
+      
+      const matchesStatus = selectedStatus === 'all' || entry.status === selectedStatus;
+      
+      return matchesSearch && matchesStatus;
+    });
+  }, [entries, searchQuery, selectedStatus]);
 
-  // Handle search
   const handleSearch = (query: string) => {
     setSearchQuery(query);
   };
 
-  // Handle status filter
   const handleStatusFilter = (status: WaitlistStatus) => {
     setSelectedStatus(status);
   };
 
-  // Handle entry selection
-  const handleEntrySelect = (entryId: string, selected: boolean) => {
-    setSelectedEntries(prev => {
-      const newSet = new Set(prev);
-      if (selected) {
-        newSet.add(entryId);
-      } else {
-        newSet.delete(entryId);
-      }
-      return newSet;
-    });
-  };
-
-  // Handle select all
-  const handleSelectAll = (selected: boolean) => {
-    if (selected) {
-      setSelectedEntries(new Set(filteredEntries.map(entry => entry.id)));
+  const handleSelectEntry = (entryId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedEntries(prev => [...prev, entryId]);
     } else {
-      setSelectedEntries(new Set());
+      setSelectedEntries(prev => prev.filter(id => id !== entryId));
     }
   };
 
-  // Handle row actions
-  const handleInvite = async (_entryId: string) => {
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedEntries(filteredEntries.map(entry => entry.id));
+    } else {
+      setSelectedEntries([]);
+    }
+  };
+
+  const handleInvite = async () => {
     try {
-      // TODO: Implement invite logic with Cloud Functions
+      // TODO: Implement invite functionality
       toast({
-        title: 'Success',
+        title: 'Invite Sent',
         description: 'Invitation sent successfully',
+        variant: 'success',
       });
-    } catch {
+    } catch (error) {
+      console.error('Error sending invite:', error);
       toast({
         title: 'Error',
         description: 'Failed to send invitation',
@@ -224,14 +167,16 @@ const WaitlistPanel: React.FC = () => {
     }
   };
 
-  const handleReject = async (_entryId: string) => {
+  const handleReject = async () => {
     try {
-      // TODO: Implement reject logic with Cloud Functions
+      // TODO: Implement reject functionality
       toast({
-        title: 'Success',
-        description: 'Entry rejected successfully',
+        title: 'Entry Rejected',
+        description: 'Waitlist entry has been rejected',
+        variant: 'success',
       });
-    } catch {
+    } catch (error) {
+      console.error('Error rejecting entry:', error);
       toast({
         title: 'Error',
         description: 'Failed to reject entry',
@@ -253,11 +198,6 @@ const WaitlistPanel: React.FC = () => {
 
       // Check if user has platform admin role
       const hasPlatformAdmin = user?.roles?.includes('superadmin') || false;
-
-      // Debug: Log user's custom claims
-      console.log('User object:', user);
-      console.log('User roles:', user?.roles);
-      console.log('Has platform admin:', hasPlatformAdmin);
 
       if (!hasPlatformAdmin) {
         toast({
@@ -286,16 +226,17 @@ const WaitlistPanel: React.FC = () => {
     }
   };
 
-  // Handle bulk actions
   const handleBulkInvite = async () => {
     try {
-      // TODO: Implement bulk invite logic
+      // TODO: Implement bulk invite functionality
       toast({
-        title: 'Success',
-        description: `Invitations sent to ${selectedEntries.size} entries`,
+        title: 'Bulk Invite Sent',
+        description: `Invitations sent to ${selectedEntries.length} entries`,
+        variant: 'success',
       });
-      setSelectedEntries(new Set());
-    } catch {
+      setSelectedEntries([]);
+    } catch (error) {
+      console.error('Error sending bulk invites:', error);
       toast({
         title: 'Error',
         description: 'Failed to send bulk invitations',
@@ -306,13 +247,15 @@ const WaitlistPanel: React.FC = () => {
 
   const handleBulkReject = async () => {
     try {
-      // TODO: Implement bulk reject logic
+      // TODO: Implement bulk reject functionality
       toast({
-        title: 'Success',
-        description: `Rejected ${selectedEntries.size} entries`,
+        title: 'Bulk Reject Complete',
+        description: `${selectedEntries.length} entries have been rejected`,
+        variant: 'success',
       });
-      setSelectedEntries(new Set());
-    } catch {
+      setSelectedEntries([]);
+    } catch (error) {
+      console.error('Error rejecting bulk entries:', error);
       toast({
         title: 'Error',
         description: 'Failed to reject entries',
@@ -321,300 +264,151 @@ const WaitlistPanel: React.FC = () => {
     }
   };
 
-  // Handle entry details
-  const handleEntryClick = (entry: WaitlistEntry) => {
+  const handleExportCSV = () => {
+    const csvContent = [
+      ['Email', 'Name', 'Source', 'Status', 'Created At', 'Notes'],
+      ...filteredEntries.map(entry => [
+        entry.email,
+        entry.name || '',
+        entry.source || '',
+        entry.status,
+        format(entry.createdAt, 'yyyy-MM-dd HH:mm:ss'),
+        entry.notes || '',
+      ])
+    ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `waitlist-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleViewDetails = (entry: WaitlistEntry) => {
     setSelectedEntry(entry);
     setDrawerOpen(true);
   };
 
-  // Handle action menu toggle
-  const handleActionMenuToggle = (entryId: string) => {
-    setActionMenuOpen(actionMenuOpen === entryId ? null : entryId);
-  };
-
-  // Handle delete confirmation
-  const handleDeleteClick = (entryId: string) => {
-    setDeleteConfirmOpen(entryId);
-    setActionMenuOpen(null);
-  };
-
-  // Export to CSV
-  const exportToCSV = () => {
-    setIsExporting(true);
-
-    try {
-      const csvContent = [
-        // Header row
-        [
-          'Email',
-          'Name',
-          'Source',
-          'Status',
-          'Created At',
-          'Locale',
-          'Confirmation Sent',
-          'Notes',
-        ].join(','),
-        // Data rows
-        ...filteredEntries.map(entry =>
-          [
-            `"${entry.email}"`,
-            `"${entry.name || ''}"`,
-            `"${entry.source || ''}"`,
-            `"${entry.status}"`,
-            `"${entry.createdAt.toISOString()}"`,
-            `"${entry.locale || ''}"`,
-            `"${entry.comms?.confirmation?.sent ? 'Yes' : 'No'}"`,
-            `"${entry.notes || ''}"`,
-          ].join(',')
-        ),
-      ].join('\n');
-
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute(
-        'download',
-        `waitlist-export-${new Date().toISOString().split('T')[0]}.csv`
-      );
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error('Error exporting CSV:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to export CSV',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
-  // Get status badge variant
-  const getStatusBadgeVariant = (status: string) => {
+  const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case 'pending':
         return 'secondary';
       case 'confirmed':
-        return 'default';
+        return 'primary';
       case 'invited':
-        return 'default';
-      case 'blocked':
-        return 'error';
-      case 'rejected':
-        return 'error';
+        return 'success';
       case 'active':
         return 'success';
+      case 'rejected':
+        return 'error';
+      case 'blocked':
+        return 'error';
       default:
         return 'secondary';
     }
   };
 
-  // Get status color
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-      case 'confirmed':
-        return 'text-blue-600 bg-blue-50 border-blue-200';
-      case 'invited':
-        return 'text-purple-600 bg-purple-50 border-purple-200';
-      case 'blocked':
-        return 'text-red-600 bg-red-50 border-red-200';
-      case 'rejected':
-        return 'text-red-600 bg-red-50 border-red-200';
-      case 'active':
-        return 'text-green-600 bg-green-50 border-green-200';
-      default:
-        return 'text-neutral-600 bg-neutral-50 border-neutral-200';
-    }
-  };
-
-  // Format date
-  const formatDate = (date: Date) => {
-    return format(date, 'MMM dd, yyyy');
-  };
-
-  // Handle row click
-  const handleRowClick = (
-    entry: WaitlistEntry,
-    event: React.MouseEvent<HTMLTableRowElement>
-  ) => {
-    // Don't trigger if clicking on checkbox or action button
-    if (
-      (event.target as HTMLElement).closest('input[type="checkbox"]') ||
-      (event.target as HTMLElement).closest('button')
-    ) {
-      return;
-    }
-    handleEntryClick(entry);
-  };
-
-  // Status options
-  const statusOptions: {
-    value: WaitlistStatus;
-    label: string;
-    color: string;
-  }[] = [
-    { value: 'all', label: 'All', color: 'neutral' },
-    { value: 'pending', label: 'Pending', color: 'yellow' },
-    { value: 'confirmed', label: 'Confirmed', color: 'blue' },
-    { value: 'invited', label: 'Invited', color: 'purple' },
-    { value: 'blocked', label: 'Blocked', color: 'red' },
-    { value: 'rejected', label: 'Rejected', color: 'red' },
-    { value: 'active', label: 'Active', color: 'green' },
+  const statusOptions: { value: WaitlistStatus; label: string; count: number }[] = [
+    { value: 'all', label: 'All', count: entries.length },
+    { value: 'pending', label: 'Pending', count: entries.filter(e => e.status === 'pending').length },
+    { value: 'confirmed', label: 'Confirmed', count: entries.filter(e => e.status === 'confirmed').length },
+    { value: 'invited', label: 'Invited', count: entries.filter(e => e.status === 'invited').length },
+    { value: 'active', label: 'Active', count: entries.filter(e => e.status === 'active').length },
+    { value: 'rejected', label: 'Rejected', count: entries.filter(e => e.status === 'rejected').length },
+    { value: 'blocked', label: 'Blocked', count: entries.filter(e => e.status === 'blocked').length },
   ];
-
-  // Status counts
-  const statusCounts = entries.reduce(
-    (acc, entry) => {
-      acc[entry.status] = (acc[entry.status] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>
-  );
 
   if (loading) {
     return (
-      <div className='p-6 flex justify-center'>
-        <LoadingSpinner />
+      <div className="flex items-center justify-center h-64">
+        <RefreshCw className="h-8 w-8 animate-spin text-primary-600" />
+        <span className="ml-2 text-gray-600">Loading waitlist entries...</span>
       </div>
     );
   }
 
   return (
-    <div className='p-6'>
+    <div className="space-y-6">
       {/* Header */}
-      <div className='flex justify-between items-center mb-6'>
+      <div className="flex items-center justify-between">
         <div>
-          <h2 className='text-xl font-semibold text-gray-900'>
-            Waitlist Management
-          </h2>
-          <p className='text-sm text-gray-600 mt-1'>
-            View and manage waitlist entries. Total entries: {entries.length}
+          <h2 className="text-2xl font-bold text-gray-900">Waitlist Management</h2>
+          <p className="text-gray-600">
+            Manage waitlist entries and send invitations
           </p>
         </div>
-        <div className='flex items-center gap-3'>
-          <div className='text-sm text-gray-500'>
-            Last updated: {new Date().toLocaleTimeString()}
-          </div>
+        <div className="flex items-center space-x-3">
           <Button
-            variant='secondary'
-            size='sm'
-            onClick={() => window.location.reload()}
-            disabled={loading}
+            variant="secondary"
+            onClick={handleExportCSV}
+            disabled={filteredEntries.length === 0}
           >
-            <RefreshCw
-              className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`}
-            />
-            Refresh
+            <Download className="h-4 w-4 mr-2" />
+            Export CSV
           </Button>
-          <Button
-            variant='secondary'
-            size='sm'
-            onClick={exportToCSV}
-            disabled={isExporting || filteredEntries.length === 0}
-          >
-            <Download className='h-4 w-4 mr-2' />
-            {isExporting ? 'Exporting...' : 'Export'}
-          </Button>
-        </div>
-      </div>
-
-      {/* Status Overview */}
-      <div className='grid grid-cols-1 md:grid-cols-4 gap-4 mb-6'>
-        <div className='bg-gray-50 rounded-lg p-4'>
-          <div className='text-2xl font-bold text-gray-900'>
-            {entries.length}
-          </div>
-          <div className='text-sm text-gray-600'>Total</div>
-        </div>
-        <div className='bg-yellow-50 rounded-lg p-4'>
-          <div className='text-2xl font-bold text-yellow-800'>
-            {statusCounts.pending || 0}
-          </div>
-          <div className='text-sm text-yellow-600'>Pending</div>
-        </div>
-        <div className='bg-green-50 rounded-lg p-4'>
-          <div className='text-2xl font-bold text-green-800'>
-            {statusCounts.active || 0}
-          </div>
-          <div className='text-sm text-green-600'>Active</div>
-        </div>
-        <div className='bg-blue-50 rounded-lg p-4'>
-          <div className='text-2xl font-bold text-blue-800'>
-            {statusCounts.invited || 0}
-          </div>
-          <div className='text-sm text-blue-600'>Invited</div>
         </div>
       </div>
 
       {/* Filters and Search */}
-      <div className='bg-white rounded-lg shadow-sm border border-neutral-200 p-6 mb-6'>
-        <div className='flex flex-col lg:flex-row gap-4'>
-          {/* Search */}
-          <div className='flex-1'>
-            <div className='relative'>
-              <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 h-4 w-4' />
-              <Input
-                placeholder='Search by email, name, or source...'
-                value={searchQuery}
-                onChange={e => handleSearch(e.target.value)}
-                className='pl-10'
-              />
-            </div>
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex-1">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Search by email, name, or source..."
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
+              className="pl-10"
+            />
           </div>
-
-          {/* Status Filter */}
-          <div className='flex flex-wrap gap-2'>
-            {statusOptions.map(option => (
-              <Badge
-                key={option.value}
-                variant={
-                  selectedStatus === option.value ? 'default' : 'secondary'
-                }
-                className={`cursor-pointer transition-colors ${
-                  selectedStatus === option.value
-                    ? 'bg-primary-600 text-white'
-                    : 'hover:bg-neutral-100'
-                }`}
-                onClick={() => handleStatusFilter(option.value)}
-              >
-                {option.label}
-              </Badge>
-            ))}
-          </div>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Filter className="h-4 w-4 text-gray-400" />
+          <span className="text-sm text-gray-600">Filter:</span>
         </div>
       </div>
 
+      {/* Status Filter Chips */}
+      <div className="flex flex-wrap gap-2">
+        {statusOptions.map((option) => (
+          <button
+            key={option.value}
+            onClick={() => handleStatusFilter(option.value)}
+            className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+              selectedStatus === option.value
+                ? 'bg-primary-100 text-primary-800 border border-primary-200'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {option.label} ({option.count})
+          </button>
+        ))}
+      </div>
+
       {/* Bulk Actions */}
-      {selectedEntries.size > 0 && (
-        <div className='bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6'>
-          <div className='flex items-center justify-between'>
-            <span className='text-blue-800 font-medium'>
-              {selectedEntries.size} entries selected
+      {selectedEntries.length > 0 && (
+        <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-primary-800">
+              {selectedEntries.length} entries selected
             </span>
-            <div className='flex gap-2'>
+            <div className="flex items-center space-x-2">
               <Button
-                variant='secondary'
-                size='sm'
+                variant="secondary"
+                size="sm"
                 onClick={handleBulkInvite}
-                disabled={loading}
               >
-                <UserPlus className='h-4 w-4 mr-2' />
+                <UserPlus className="h-4 w-4 mr-1" />
                 Invite Selected
               </Button>
               <Button
-                variant='secondary'
-                size='sm'
+                variant="secondary"
+                size="sm"
                 onClick={handleBulkReject}
-                disabled={loading}
               >
-                <UserX className='h-4 w-4 mr-2' />
+                <X className="h-4 w-4 mr-1" />
                 Reject Selected
               </Button>
             </div>
@@ -622,250 +416,146 @@ const WaitlistPanel: React.FC = () => {
         </div>
       )}
 
-      {/* Waitlist Table */}
-      <div className='bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden'>
-        <div className='overflow-x-auto'>
-          <table className='w-full'>
-            <thead className='bg-neutral-50 border-b border-neutral-200'>
+      {/* Table */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
               <tr>
-                <th className='px-6 py-3 text-left'>
+                <th className="px-6 py-3 text-left">
                   <Checkbox
-                    checked={
-                      selectedEntries.size === filteredEntries.length &&
-                      filteredEntries.length > 0
-                    }
-                    indeterminate={
-                      selectedEntries.size > 0 &&
-                      selectedEntries.size < filteredEntries.length
-                    }
-                    onChange={e => handleSelectAll(e.target.checked)}
-                    className='h-4 w-4'
+                    checked={selectedEntries.length === filteredEntries.length && filteredEntries.length > 0}
+                    onChange={(e) => handleSelectAll(e.target.checked)}
                   />
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider'>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Contact
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider'>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Source
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider'>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider'>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Created
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider'>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Confirmation
                 </th>
-                <th className='px-6 py-3 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider'>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className='bg-white divide-y divide-neutral-200'>
+            <tbody className="bg-white divide-y divide-gray-200">
               {filteredEntries.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className='px-6 py-8 text-center'>
-                    <Mail className='h-12 w-12 text-neutral-400 mx-auto mb-4' />
-                    <h3 className='text-lg font-medium text-neutral-900 mb-2'>
-                      No entries found
-                    </h3>
-                    <p className='text-neutral-600'>
-                      {searchQuery || selectedStatus !== 'all'
-                        ? 'No entries match your current filters'
-                        : 'No waitlist entries have been submitted yet'}
-                    </p>
+                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                    {searchQuery || selectedStatus !== 'all' ? (
+                      'No entries match your filters'
+                    ) : (
+                      'No waitlist entries found'
+                    )}
                   </td>
                 </tr>
               ) : (
-                filteredEntries.map(entry => (
-                  <tr
-                    key={entry.id}
-                    className='hover:bg-neutral-50 cursor-pointer transition-colors'
-                    onClick={e => handleRowClick(entry, e)}
-                  >
-                    {/* Checkbox */}
-                    <td className='px-6 py-4'>
+                filteredEntries.map((entry) => (
+                  <tr key={entry.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4">
                       <Checkbox
-                        checked={selectedEntries.has(entry.id)}
-                        onChange={e =>
-                          handleEntrySelect(entry.id, e.target.checked)
-                        }
-                        className='h-4 w-4'
+                        checked={selectedEntries.includes(entry.id)}
+                        onChange={(e) => handleSelectEntry(entry.id, e.target.checked)}
                       />
                     </td>
-
-                    {/* Contact */}
-                    <td className='px-6 py-4'>
-                      <div className='flex items-center'>
-                        <div>
-                          <div className='text-sm font-medium text-neutral-900'>
-                            {entry.name || 'No name provided'}
-                          </div>
-                          <div className='text-sm text-neutral-500'>
-                            {entry.email}
-                          </div>
+                    <td className="px-6 py-4">
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {entry.email}
                         </div>
-                      </div>
-                    </td>
-
-                    {/* Source */}
-                    <td className='px-6 py-4'>
-                      <div className='flex items-center'>
-                        <span className='text-sm text-neutral-900'>
-                          {entry.source || 'Unknown'}
-                        </span>
-                        {entry.utm?.source && (
-                          <span className='ml-2 text-xs text-neutral-500'>
-                            ({entry.utm.source})
-                          </span>
+                        {entry.name && (
+                          <div className="text-sm text-gray-500">{entry.name}</div>
                         )}
                       </div>
                     </td>
-
-                    {/* Status */}
-                    <td className='px-6 py-4'>
-                      <Badge
-                        variant={getStatusBadgeVariant(entry.status)}
-                        className={`${getStatusColor(entry.status)} border`}
-                      >
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      {entry.source}
+                    </td>
+                    <td className="px-6 py-4">
+                      <Badge variant={getStatusBadgeColor(entry.status)}>
                         {entry.status}
                       </Badge>
                     </td>
-
-                    {/* Created */}
-                    <td className='px-6 py-4'>
-                      <div className='text-sm text-neutral-900'>
-                        {formatDate(entry.createdAt)}
-                      </div>
-                      <div className='text-xs text-neutral-500'>
-                        {entry.createdAt.toLocaleTimeString()}
-                      </div>
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      {format(entry.createdAt, 'MMM dd, yyyy')}
                     </td>
-
-                    {/* Confirmation */}
-                    <td className='px-6 py-4'>
+                    <td className="px-6 py-4 text-sm text-gray-900">
                       {entry.comms?.confirmation?.sent ? (
-                        <div className='text-green-600'>
-                          <div className='text-sm'>✓ Sent</div>
-                          {entry.comms.confirmation.sentAt && (
-                            <div className='text-xs text-neutral-500'>
-                              {formatDate(entry.comms.confirmation.sentAt)}
-                            </div>
-                          )}
-                        </div>
+                        <span className="text-green-600">
+                          Sent {entry.comms.confirmation.sentAt ? format(entry.comms.confirmation.sentAt, 'MMM dd') : ''}
+                        </span>
                       ) : (
-                        <div className='text-neutral-400 text-sm'>Not sent</div>
+                        <span className="text-gray-400">Not sent</span>
                       )}
                     </td>
-
-                    {/* Actions */}
-                    <td className='px-6 py-4 text-right'>
-                      <div className='flex items-center justify-end gap-2'>
-                        {/* Quick Actions */}
-                        {entry.status === 'pending' && (
-                          <>
-                            <Button
-                              variant='ghost'
-                              size='sm'
-                              onClick={(e: React.MouseEvent) => {
-                                e.stopPropagation();
-                                handleInvite(entry.id);
-                              }}
-                              className='h-8 w-8 p-0'
-                            >
-                              <UserPlus className='h-4 w-4' />
-                            </Button>
-                            <Button
-                              variant='ghost'
-                              size='sm'
-                              onClick={(e: React.MouseEvent) => {
-                                e.stopPropagation();
-                                handleReject(entry.id);
-                              }}
-                              className='h-8 w-8 p-0'
-                            >
-                              <UserX className='h-4 w-4' />
-                            </Button>
-                          </>
-                        )}
-
-                        {/* Action Menu */}
-                        <div className='relative'>
+                    <td className="px-6 py-4 text-right text-sm font-medium">
+                      <div className="flex items-center justify-end space-x-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleViewDetails(entry)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <div className="relative">
                           <Button
-                            variant='ghost'
-                            size='sm'
-                            onClick={e => {
-                              e.stopPropagation();
-                              handleActionMenuToggle(entry.id);
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              const menu = document.getElementById(`menu-${entry.id}`);
+                              if (menu) {
+                                menu.classList.toggle('hidden');
+                              }
                             }}
-                            className='h-8 w-8 p-0'
                           >
-                            <MoreHorizontal className='h-4 w-4' />
+                            <MoreVertical className="h-4 w-4" />
                           </Button>
-
-                          {/* Dropdown Menu */}
-                          {actionMenuOpen === entry.id && (
-                            <div className='absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-neutral-200 z-10'>
-                              <div className='py-1'>
+                          <div
+                            id={`menu-${entry.id}`}
+                            className="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200"
+                          >
+                            <div className="py-1">
+                              <button
+                                className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                onClick={() => handleInvite()}
+                              >
+                                <UserPlus className="h-4 w-4 mr-3" />
+                                Send Invite
+                              </button>
+                              <button
+                                className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                onClick={() => handleReject()}
+                              >
+                                <X className="h-4 w-4 mr-3" />
+                                Reject Entry
+                              </button>
+                              {(user?.roles?.includes('superadmin') || false) && (
                                 <button
-                                  className='flex items-center w-full px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100'
-                                  onClick={(e: React.MouseEvent) => {
-                                    e.stopPropagation();
-                                    handleEntryClick(entry);
-                                    setActionMenuOpen(null);
+                                  className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                                  onClick={() => {
+                                    setDeleteConfirmOpen(entry.id);
+                                    const menu = document.getElementById(`menu-${entry.id}`);
+                                    if (menu) {
+                                      menu.classList.add('hidden');
+                                    }
                                   }}
                                 >
-                                  <Eye className='h-4 w-4 mr-3' />
-                                  View Details
+                                  <Trash2 className="h-4 w-4 mr-3" />
+                                  Delete Entry
                                 </button>
-
-                                {entry.status === 'pending' && (
-                                  <button
-                                    className='flex items-center w-full px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100'
-                                    onClick={(e: React.MouseEvent) => {
-                                      e.stopPropagation();
-                                      handleInvite(entry.id);
-                                      setActionMenuOpen(null);
-                                    }}
-                                  >
-                                    <UserPlus className='h-4 w-4 mr-3' />
-                                    Send Invite
-                                  </button>
-                                )}
-
-                                {entry.status === 'pending' && (
-                                  <button
-                                    className='flex items-center w-full px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100'
-                                    onClick={(e: React.MouseEvent) => {
-                                      e.stopPropagation();
-                                      handleReject(entry.id);
-                                      setActionMenuOpen(null);
-                                    }}
-                                  >
-                                    <UserX className='h-4 w-4 mr-3' />
-                                    Reject Entry
-                                  </button>
-                                )}
-
-                                <div className='border-t border-neutral-200 my-1'></div>
-
-                                {(user?.roles?.includes('superadmin') ||
-                                  false) && (
-                                  <button
-                                    className='flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50'
-                                    onClick={e => {
-                                      e.stopPropagation();
-                                      handleDeleteClick(entry.id);
-                                    }}
-                                  >
-                                    <Trash2 className='h-4 w-4 mr-3' />
-                                    Delete Entry
-                                  </button>
-                                )}
-                              </div>
+                              )}
                             </div>
-                          )}
+                          </div>
                         </div>
                       </div>
                     </td>
@@ -877,33 +567,25 @@ const WaitlistPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* Results Summary */}
-      {filteredEntries.length > 0 && (
-        <div className='mt-4 text-sm text-neutral-600 text-center'>
-          Showing {filteredEntries.length} of {entries.length} entries
-        </div>
-      )}
-
       {/* Delete Confirmation Modal */}
       {deleteConfirmOpen && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
-          <div className='bg-white rounded-lg p-6 max-w-md w-full mx-4'>
-            <h3 className='text-lg font-medium text-neutral-900 mb-2'>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">
               Delete Waitlist Entry
             </h3>
-            <p className='text-neutral-600 mb-6'>
-              Are you sure you want to delete this waitlist entry? This action
-              cannot be undone.
+            <p className="text-sm text-gray-600 mb-6">
+              Are you sure you want to delete this waitlist entry? This action cannot be undone.
             </p>
-            <div className='flex justify-end gap-3'>
+            <div className="flex justify-end space-x-3">
               <Button
-                variant='secondary'
+                variant="secondary"
                 onClick={() => setDeleteConfirmOpen(null)}
               >
                 Cancel
               </Button>
               <Button
-                variant='destructive'
+                variant="destructive"
                 onClick={() => handleDelete(deleteConfirmOpen)}
               >
                 Delete
@@ -913,7 +595,7 @@ const WaitlistPanel: React.FC = () => {
         </div>
       )}
 
-      {/* Right Drawer */}
+      {/* Waitlist Drawer */}
       <WaitlistDrawer
         entry={selectedEntry}
         open={drawerOpen}

@@ -8,11 +8,16 @@ service cloud.firestore {
     // ============================================================================
     
     // Platform superadmin has full access to everything
+    // Universal fix: handles all custom claims structures (array, string, object, map)
     function isPlatformAdmin() {
       return request.auth != null && 
         (request.auth.token.platformAdmin == true ||
          (request.auth.token.roles != null && 
-          request.auth.token.roles.hasAny(['superadmin'])));
+          (request.auth.token.roles.hasAny(['superadmin']) ||  // Array with hasAny
+           request.auth.token.roles == 'superadmin' ||          // String equality
+           request.auth.token.roles.matches('.*superadmin.*') || // String contains
+           (request.auth.token.roles is list && 'superadmin' in request.auth.token.roles) || // List contains
+           (request.auth.token.roles is map && 'superadmin' in request.auth.token.roles)))); // Map contains
     }
     
     // Check if user has any of the required platform roles

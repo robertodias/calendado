@@ -63,11 +63,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const tokenResult = await getIdTokenResult(firebaseUser);
       const customClaims = tokenResult.claims;
 
-      // Debug: Log all custom claims
-      console.log('Custom claims:', customClaims);
-      console.log('Roles from claims:', customClaims.roles);
-      console.log('Platform admin from claims:', customClaims.platformAdmin);
-
       const roles = customClaims.roles as UserRole[] | undefined;
       const platformAdmin = customClaims.platformAdmin as boolean | undefined;
 
@@ -118,8 +113,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const refreshToken = async () => {
-    if (!auth?.currentUser) {
-      return;
+    if (!auth || !auth.currentUser) {
+      throw new Error('No authenticated user');
     }
 
     try {
