@@ -511,10 +511,10 @@ const WaitlistPanel: React.FC = () => {
       )}
 
       {/* Table */}
-      <div className='bg-white rounded-2xl border border-gray-200 shadow-sm'>
+      <div className='overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm'>
         <div className='overflow-x-auto'>
-          <table className='min-w-full divide-y divide-gray-200'>
-            <thead className='bg-gray-50'>
+          <table className='min-w-full divide-y divide-neutral-200'>
+            <thead className='bg-neutral-50'>
               <tr>
                 <th className='px-6 py-3 text-left'>
                   <Checkbox
@@ -525,32 +525,32 @@ const WaitlistPanel: React.FC = () => {
                     onChange={e => handleSelectAll(e.target.checked)}
                   />
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-neutral-500'>
                   Contact
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-neutral-500'>
                   Source
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-neutral-500'>
                   Status
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-neutral-500'>
                   Created
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-neutral-500'>
                   Confirmation
                 </th>
-                <th className='px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                <th className='px-6 py-3 text-right text-xs font-medium uppercase tracking-wide text-neutral-500'>
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className='bg-white divide-y divide-gray-200'>
+            <tbody className='bg-white divide-y divide-neutral-100'>
               {filteredEntries.length === 0 ? (
                 <tr>
                   <td
                     colSpan={7}
-                    className='px-6 py-12 text-center text-gray-500'
+                    className='px-6 py-12 text-center text-neutral-500'
                   >
                     {searchQuery || selectedStatus !== 'all'
                       ? 'No entries match your filters'
@@ -559,7 +559,7 @@ const WaitlistPanel: React.FC = () => {
                 </tr>
               ) : (
                 filteredEntries.map(entry => (
-                  <tr key={entry.id} className='hover:bg-gray-50'>
+                  <tr key={entry.id} className='transition hover:bg-neutral-50'>
                     <td className='px-6 py-4'>
                       <Checkbox
                         checked={selectedEntries.includes(entry.id)}
@@ -570,17 +570,17 @@ const WaitlistPanel: React.FC = () => {
                     </td>
                     <td className='px-6 py-4'>
                       <div>
-                        <div className='text-sm font-medium text-gray-900'>
+                        <div className='text-sm font-medium text-neutral-900'>
                           {entry.email}
                         </div>
                         {entry.name && (
-                          <div className='text-sm text-gray-500'>
+                          <div className='text-sm text-neutral-500'>
                             {entry.name}
                           </div>
                         )}
                       </div>
                     </td>
-                    <td className='px-6 py-4 text-sm text-gray-900'>
+                    <td className='px-6 py-4 text-sm text-neutral-900'>
                       {entry.source}
                     </td>
                     <td className='px-6 py-4'>
@@ -588,10 +588,10 @@ const WaitlistPanel: React.FC = () => {
                         {entry.status}
                       </Badge>
                     </td>
-                    <td className='px-6 py-4 text-sm text-gray-900'>
+                    <td className='px-6 py-4 text-sm text-neutral-900'>
                       {format(entry.createdAt, 'MMM dd, yyyy')}
                     </td>
-                    <td className='px-6 py-4 text-sm text-gray-900'>
+                    <td className='px-6 py-4 text-sm text-neutral-900'>
                       {entry.comms?.confirmation?.sent ? (
                         <span className='text-green-600'>
                           Sent{' '}
@@ -600,7 +600,7 @@ const WaitlistPanel: React.FC = () => {
                             : ''}
                         </span>
                       ) : (
-                        <span className='text-gray-400'>Not sent</span>
+                        <span className='text-neutral-400'>Not sent</span>
                       )}
                     </td>
                     <td className='px-6 py-4 text-right text-sm font-medium'>
