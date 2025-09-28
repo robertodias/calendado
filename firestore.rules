@@ -19,9 +19,7 @@ service cloud.firestore {
       return request.auth != null && request.auth.token.roles != null && (
         (request.auth.token.roles is string &&
           request.auth.token.roles.matches('.*' + fragment + '.*')) ||
-        (request.auth.token.roles is list && request.auth.token.roles.hasOnly([
-          fragment
-        ]) == false &&
+        (request.auth.token.roles is list && 
           request.auth.token.roles.size() > 0 &&
           fragment in request.auth.token.roles) ||
         (request.auth.token.roles is map && fragment in request.auth.token.roles)
@@ -31,16 +29,35 @@ service cloud.firestore {
     // Platform superadmin has full access to everything
     function isPlatformAdmin() {
       return request.auth != null && (
+        // Direct admin flags
         request.auth.token.platformAdmin == true ||
         request.auth.token.admin == true ||
         request.auth.token.isAdmin == true ||
         request.auth.token.isPlatformAdmin == true ||
-        hasRole('superadmin') ||
-        hasRole('platformAdmin') ||
-        hasRole('admin') ||
-        hasRoleContaining('superadmin') ||
-        hasRoleContaining('platformAdmin') ||
-        hasRoleContaining('admin')
+        
+        // Check roles array for admin roles
+        (request.auth.token.roles != null && 
+         request.auth.token.roles is list && 
+         ('superadmin' in request.auth.token.roles || 
+          'platformAdmin' in request.auth.token.roles ||
+          'admin' in request.auth.token.roles)) ||
+        
+        // Check roles string for admin roles
+        (request.auth.token.roles != null && 
+         request.auth.token.roles is string && 
+         (request.auth.token.roles == 'superadmin' ||
+          request.auth.token.roles == 'platformAdmin' ||
+          request.auth.token.roles == 'admin' ||
+          request.auth.token.roles.matches('.*superadmin.*') ||
+          request.auth.token.roles.matches('.*platformAdmin.*') ||
+          request.auth.token.roles.matches('.*admin.*'))) ||
+        
+        // Check roles map for admin roles
+        (request.auth.token.roles != null && 
+         request.auth.token.roles is map && 
+         ('superadmin' in request.auth.token.roles || 
+          'platformAdmin' in request.auth.token.roles ||
+          'admin' in request.auth.token.roles))
       );
     }
     
@@ -111,7 +128,12 @@ service cloud.firestore {
       allow read: if true;
       
       // Allow platform admins to update and delete waitlist entries
-      allow update, delete: if isPlatformAdmin();
+      // Debug: Also allow if user has superadmin role directly
+      allow update, delete: if isPlatformAdmin() || 
+        (request.auth != null && 
+         request.auth.token.roles != null && 
+         request.auth.token.roles is list && 
+         'superadmin' in request.auth.token.roles);
     }
     
     // ============================================================================
