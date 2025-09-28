@@ -61,31 +61,36 @@ interface WaitlistEntry {
 // Helper function to safely convert Firestore timestamps to Date
 const safeToDate = (timestamp: unknown): Date | null => {
   if (!timestamp) return null;
-  
+
   try {
     // If it's already a Date, return it
     if (timestamp instanceof Date) {
       return isValid(timestamp) ? timestamp : null;
     }
-    
+
     // If it's a Firestore Timestamp, convert it
-    if (timestamp && typeof timestamp === 'object' && 'toDate' in timestamp && typeof (timestamp as any).toDate === 'function') {
+    if (
+      timestamp &&
+      typeof timestamp === 'object' &&
+      'toDate' in timestamp &&
+      typeof (timestamp as any).toDate === 'function'
+    ) {
       const date = (timestamp as any).toDate();
       return isValid(date) ? date : null;
     }
-    
+
     // If it's a number (milliseconds), create Date
     if (typeof timestamp === 'number') {
       const date = new Date(timestamp);
       return isValid(date) ? date : null;
     }
-    
+
     // If it's a string, try to parse it
     if (typeof timestamp === 'string') {
       const date = new Date(timestamp);
       return isValid(date) ? date : null;
     }
-    
+
     return null;
   } catch (error) {
     console.warn('Error converting timestamp to date:', error);
@@ -144,13 +149,17 @@ const WaitlistPanel: React.FC = () => {
             utm: data.utm || {},
             userAgent: data.userAgent || '',
             ip: data.ip || '',
-            comms: data.comms ? {
-            ...data.comms,
-            confirmation: data.comms.confirmation ? {
-              sent: data.comms.confirmation.sent || false,
-              sentAt: safeToDate(data.comms.confirmation.sentAt)
-            } : undefined
-          } : {},
+            comms: data.comms
+              ? {
+                  ...data.comms,
+                  confirmation: data.comms.confirmation
+                    ? {
+                        sent: data.comms.confirmation.sent || false,
+                        sentAt: safeToDate(data.comms.confirmation.sentAt),
+                      }
+                    : undefined,
+                }
+              : {},
           };
         });
         setEntries(waitlistEntries);
@@ -705,7 +714,3 @@ const WaitlistPanel: React.FC = () => {
 };
 
 export default WaitlistPanel;
-
-
-
-
