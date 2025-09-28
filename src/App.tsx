@@ -10,6 +10,11 @@ import LoadingSpinner from './components/LoadingSpinner';
 const Landing = lazy(() => import('./pages/Landing'));
 const Admin = lazy(() => import('./pages/Admin'));
 
+// Lazy load public pages
+const BrandPage = lazy(() => import('./pages/public/BrandPage'));
+const StorePage = lazy(() => import('./pages/public/StorePage'));
+const ProPage = lazy(() => import('./pages/public/ProPage'));
+
 function App() {
   return (
     <ErrorBoundary>
@@ -29,6 +34,12 @@ function App() {
                 <Routes>
                   <Route path='/' element={<Landing />} />
                   <Route path='/admin' element={<Admin />} />
+                  
+                  {/* Public Routes */}
+                  <Route path='/:brandSlug' element={<BrandPage />} />
+                  <Route path='/:brandSlug/:storeSlug' element={<StorePage />} />
+                  <Route path='/:brandSlug/:storeSlug/:proSlug' element={<ProPage />} />
+                  <Route path='/u/:proSlug' element={<ProPage />} />
                 </Routes>
               </Suspense>
             </Router>
