@@ -7,49 +7,41 @@ service cloud.firestore {
     // PLATFORM-LEVEL RULES
     // ============================================================================
     
+    function hasRole(role) {
+      return request.auth != null && request.auth.token.roles != null && (
+        (request.auth.token.roles is string && request.auth.token.roles == role) ||
+        (request.auth.token.roles is list && role in request.auth.token.roles) ||
+        (request.auth.token.roles is map && role in request.auth.token.roles)
+      );
+    }
+
+    function hasRoleContaining(fragment) {
+      return request.auth != null && request.auth.token.roles != null && (
+        (request.auth.token.roles is string &&
+          request.auth.token.roles.matches('.*' + fragment + '.*')) ||
+        (request.auth.token.roles is list && request.auth.token.roles.hasOnly([
+          fragment
+        ]) == false &&
+          request.auth.token.roles.size() > 0 &&
+          fragment in request.auth.token.roles) ||
+        (request.auth.token.roles is map && fragment in request.auth.token.roles)
+      );
+    }
+
     // Platform superadmin has full access to everything
-    // Enhanced universal fix: handles all custom claims structures and patterns
     function isPlatformAdmin() {
-      return request.auth != null && 
-        (
-          // Direct platform admin flag
-          request.auth.token.platformAdmin == true ||
-          
-          // Check roles array with hasAny for multiple admin types
-          (request.auth.token.roles != null && 
-           request.auth.token.roles.hasAny(['superadmin', 'platformAdmin', 'admin'])) ||
-          
-          // Check roles string equality for multiple admin types
-          request.auth.token.roles == 'superadmin' ||
-          request.auth.token.roles == 'platformAdmin' ||
-          request.auth.token.roles == 'admin' ||
-          
-          // Check roles string contains for multiple admin types
-          request.auth.token.roles.matches('.*superadmin.*') ||
-          request.auth.token.roles.matches('.*platformAdmin.*') ||
-          request.auth.token.roles.matches('.*admin.*') ||
-          
-          // Check roles as list for multiple admin types
-          (request.auth.token.roles is list && 
-           ('superadmin' in request.auth.token.roles || 
-            'platformAdmin' in request.auth.token.roles ||
-            'admin' in request.auth.token.roles)) ||
-          
-          // Check roles as map for multiple admin types
-          (request.auth.token.roles is map && 
-           ('superadmin' in request.auth.token.roles || 
-            'platformAdmin' in request.auth.token.roles ||
-            'admin' in request.auth.token.roles)) ||
-          
-          // Check for custom admin field variations
-          request.auth.token.admin == true ||
-          request.auth.token.isAdmin == true ||
-          request.auth.token.isPlatformAdmin == true ||
-          
-          // Check for any role that contains 'admin' (catch-all)
-          (request.auth.token.roles != null && 
-           request.auth.token.roles.matches('.*admin.*'))
-        );
+      return request.auth != null && (
+        request.auth.token.platformAdmin == true ||
+        request.auth.token.admin == true ||
+        request.auth.token.isAdmin == true ||
+        request.auth.token.isPlatformAdmin == true ||
+        hasRole('superadmin') ||
+        hasRole('platformAdmin') ||
+        hasRole('admin') ||
+        hasRoleContaining('superadmin') ||
+        hasRoleContaining('platformAdmin') ||
+        hasRoleContaining('admin')
+      );
     }
     
     // Check if user has any of the required platform roles
