@@ -31,6 +31,7 @@ import {
   transformWaitlistEntries,
   filterValidWaitlistEntries,
 } from '../../lib/waitlistTransformers';
+import { checkPlatformAdmin } from '../../lib/permissions';
 import type { WaitlistEntry } from '../../types/shared';
 
 type WaitlistStatus =
@@ -184,10 +185,38 @@ const WaitlistPanel: React.FC = () => {
           return;
         }
 
-        // Check if user has platform admin role
-        const hasPlatformAdmin = user?.roles?.includes('superadmin') || false;
+        if (!user) {
+          toast({
+            title: 'Error',
+            description: 'User not authenticated',
+            variant: 'destructive',
+          });
+          setDeleteConfirmOpen(null);
+          return;
+        }
+
+        // Debug: Log user's custom claims and roles
+        console.log('🔍 Delete attempt for entry:', entryId);
+        console.log('👤 User object:', user);
+        console.log('🎭 User roles from context:', user.roles);
+        
+        // Get fresh token to check custom claims
+        try {
+          const tokenResult = await user.getIdTokenResult();
+          console.log('🔑 Custom claims from token:', tokenResult.claims);
+          console.log('🏷️ Platform admin flag:', tokenResult.claims.platformAdmin);
+          console.log('📋 Roles in claims:', tokenResult.claims.roles);
+          console.log('🔍 Admin flag:', tokenResult.claims.admin);
+          console.log('🔍 IsAdmin flag:', tokenResult.claims.isAdmin);
+        } catch (tokenError) {
+          console.error('🚨 Error getting fresh token:', tokenError);
+        }
+
+        // Check if user has platform admin role using the new utility
+        const hasPlatformAdmin = await checkPlatformAdmin(user);
 
         if (!hasPlatformAdmin) {
+          console.log('❌ User does not have platform admin privileges');
           toast({
             title: 'Permission Denied',
             description:
@@ -198,6 +227,7 @@ const WaitlistPanel: React.FC = () => {
           return;
         }
 
+        console.log('✅ User has platform admin privileges, proceeding with deletion');
         await deleteDoc(doc(db, 'waitlist', entryId));
         toast({
           title: 'Success',
@@ -205,7 +235,13 @@ const WaitlistPanel: React.FC = () => {
         });
         setDeleteConfirmOpen(null);
       } catch (error) {
-        console.error('Delete error:', error);
+        console.error('🚨 Delete error:', error);
+        console.error('📊 Error details:', {
+          code: (error as any).code,
+          message: (error as any).message,
+          details: (error as any).details,
+          stack: (error as any).stack
+        });
         toast({
           title: 'Error',
           description: 'Failed to delete entry. Please check your permissions.',

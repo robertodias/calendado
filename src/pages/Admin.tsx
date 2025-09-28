@@ -228,7 +228,7 @@ const AdminConsole: React.FC = () => {
 
           {/* Panel Content */}
           <div className='flex-1'>
-            <div className='bg-white rounded-3xl border border-neutral-200 shadow-lg overflow-hidden'>
+            <div className='bg-white rounded-3xl border border-neutral-200 shadow-lg'>
               {activePanel === 'users' && <UsersRolesPanel />}
               {activePanel === 'waitlist' && <WaitlistPanel />}
               {activePanel === 'flags' && <FeatureFlagsPanel />}
