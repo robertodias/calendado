@@ -19,9 +19,9 @@ const normalizeEmail = (email: string): string => {
   if (!email) return email;
   const trimmedEmail = email.trim().toLowerCase();
   const [localPart, domain] = trimmedEmail.split('@');
-  
+
   if (!localPart || !domain) return trimmedEmail;
-  
+
   // Gmail normalization rules
   if (domain === 'gmail.com' || domain === 'googlemail.com') {
     // Remove dots from local part
@@ -33,7 +33,7 @@ const normalizeEmail = (email: string): string => {
     }
     return `${normalizedLocal}@gmail.com`;
   }
-  
+
   return trimmedEmail;
 };
 import { generateDedupeKeySync } from './crypto';
