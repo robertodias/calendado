@@ -26,6 +26,7 @@ import {
   deleteDoc,
   doc,
 } from 'firebase/firestore';
+import { getIdTokenResult } from 'firebase/auth';
 import WaitlistDrawer from './WaitlistDrawer';
 import {
   transformWaitlistEntries,
@@ -202,7 +203,7 @@ const WaitlistPanel: React.FC = () => {
 
         // Get fresh token to check custom claims
         try {
-          const tokenResult = await user.getIdTokenResult();
+          const tokenResult = await getIdTokenResult(user);
           console.log('🔑 Custom claims from token:', tokenResult.claims);
           console.log(
             '🏷️ Platform admin flag:',
