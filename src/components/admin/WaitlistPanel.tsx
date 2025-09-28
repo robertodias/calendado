@@ -59,7 +59,7 @@ interface WaitlistEntry {
 }
 
 // Helper function to safely convert Firestore timestamps to Date
-const safeToDate = (timestamp: any): Date | null => {
+const safeToDate = (timestamp: unknown): Date | null => {
   if (!timestamp) return null;
   
   try {
@@ -69,8 +69,8 @@ const safeToDate = (timestamp: any): Date | null => {
     }
     
     // If it's a Firestore Timestamp, convert it
-    if (timestamp && typeof timestamp.toDate === 'function') {
-      const date = timestamp.toDate();
+    if (timestamp && typeof timestamp === 'object' && 'toDate' in timestamp && typeof (timestamp as any).toDate === 'function') {
+      const date = (timestamp as any).toDate();
       return isValid(date) ? date : null;
     }
     
@@ -705,5 +705,7 @@ const WaitlistPanel: React.FC = () => {
 };
 
 export default WaitlistPanel;
+
+
 
 
