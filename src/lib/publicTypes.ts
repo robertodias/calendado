@@ -30,10 +30,12 @@ export const ZDisplayModel = z.object({
   slug: z.string(),
   avatar: z.string().optional(),
   logo: z.string().optional(),
-  colors: z.object({
-    primary: z.string().optional(),
-    secondary: z.string().optional(),
-  }).optional(),
+  colors: z
+    .object({
+      primary: z.string().optional(),
+      secondary: z.string().optional(),
+    })
+    .optional(),
   description: z.string().optional(),
   status: z.enum(['active', 'disabled']),
 });
@@ -84,7 +86,11 @@ export interface ResolverResult {
 // ============================================================================
 
 export interface TelemetryEvent {
-  event: 'public_resolver_hit' | 'public_resolver_mismatch_corrected' | 'public_resolver_not_found' | 'public_redirect_applied';
+  event:
+    | 'public_resolver_hit'
+    | 'public_resolver_mismatch_corrected'
+    | 'public_resolver_not_found'
+    | 'public_redirect_applied';
   path: string;
   resolvedType?: string;
   brandId?: string;

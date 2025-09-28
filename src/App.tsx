@@ -34,11 +34,17 @@ function App() {
                 <Routes>
                   <Route path='/' element={<Landing />} />
                   <Route path='/admin' element={<Admin />} />
-                  
+
                   {/* Public Routes */}
                   <Route path='/:brandSlug' element={<BrandPage />} />
-                  <Route path='/:brandSlug/:storeSlug' element={<StorePage />} />
-                  <Route path='/:brandSlug/:storeSlug/:proSlug' element={<ProPage />} />
+                  <Route
+                    path='/:brandSlug/:storeSlug'
+                    element={<StorePage />}
+                  />
+                  <Route
+                    path='/:brandSlug/:storeSlug/:proSlug'
+                    element={<ProPage />}
+                  />
                   <Route path='/u/:proSlug' element={<ProPage />} />
                 </Routes>
               </Suspense>

@@ -37,7 +37,7 @@ export class LRUCache<T> {
    */
   get(key: string): T | null {
     const node = this.cache.get(key);
-    
+
     if (!node) {
       return null;
     }
@@ -50,7 +50,7 @@ export class LRUCache<T> {
 
     // Move to head (most recently used)
     this.moveToHead(node);
-    
+
     return node.value.data;
   }
 
@@ -59,7 +59,7 @@ export class LRUCache<T> {
    */
   set(key: string, value: T, ttl?: number): void {
     const existingNode = this.cache.get(key);
-    
+
     if (existingNode) {
       // Update existing node
       existingNode.value = {
@@ -98,14 +98,14 @@ export class LRUCache<T> {
    */
   delete(key: string): boolean {
     const node = this.cache.get(key);
-    
+
     if (!node) {
       return false;
     }
 
     this.cache.delete(key);
     this.removeNode(node);
-    
+
     return true;
   }
 
@@ -114,7 +114,7 @@ export class LRUCache<T> {
    */
   has(key: string): boolean {
     const node = this.cache.get(key);
-    
+
     if (!node) {
       return false;
     }
@@ -166,11 +166,11 @@ export class LRUCache<T> {
 
     for (const node of this.cache.values()) {
       const timestamp = node.value.timestamp;
-      
+
       if (oldestEntry === null || timestamp < oldestEntry) {
         oldestEntry = timestamp;
       }
-      
+
       if (newestEntry === null || timestamp > newestEntry) {
         newestEntry = timestamp;
       }
@@ -288,7 +288,10 @@ export class LRUCache<T> {
    * Get all entries in cache
    */
   entries(): [string, T][] {
-    return Array.from(this.cache.entries()).map(([key, node]) => [key, node.value.data]);
+    return Array.from(this.cache.entries()).map(([key, node]) => [
+      key,
+      node.value.data,
+    ]);
   }
 }
 
@@ -327,16 +330,16 @@ export function parseCacheKey(key: string): string[] {
 export function matchesCacheKey(key: string, pattern: string): boolean {
   const keySegments = parseCacheKey(key);
   const patternSegments = parseCacheKey(pattern);
-  
+
   if (keySegments.length !== patternSegments.length) {
     return false;
   }
-  
+
   for (let i = 0; i < keySegments.length; i++) {
     if (patternSegments[i] !== '*' && keySegments[i] !== patternSegments[i]) {
       return false;
     }
   }
-  
+
   return true;
 }

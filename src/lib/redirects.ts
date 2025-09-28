@@ -22,7 +22,7 @@ export const REDIRECT_RULES: RedirectRule[] = [
     type: '301',
     reason: 'Brand renamed from old-glow-brand to glow',
   },
-  
+
   // Legacy store redirects
   {
     from: '/glow/old-centro',
@@ -30,7 +30,7 @@ export const REDIRECT_RULES: RedirectRule[] = [
     type: '301',
     reason: 'Store renamed from old-centro to centro',
   },
-  
+
   // Legacy professional redirects
   {
     from: '/glow/centro/maria-silva-old',
@@ -38,7 +38,7 @@ export const REDIRECT_RULES: RedirectRule[] = [
     type: '301',
     reason: 'Professional slug updated',
   },
-  
+
   // Legacy solo professional redirects
   {
     from: '/u/maria-silva-old',
@@ -46,7 +46,7 @@ export const REDIRECT_RULES: RedirectRule[] = [
     type: '301',
     reason: 'Professional slug updated',
   },
-  
+
   // Common typos and variations
   {
     from: '/glow/centro/maria-silva/',
@@ -54,7 +54,7 @@ export const REDIRECT_RULES: RedirectRule[] = [
     type: '301',
     reason: 'Remove trailing slash',
   },
-  
+
   // Service redirects (if needed)
   {
     from: '/glow/centro/maria-silva/booking',
@@ -75,20 +75,20 @@ export const REDIRECT_RULES: RedirectRule[] = [
  */
 export function findRedirectRule(path: string): RedirectRule | null {
   const normalizedPath = normalizeUrl(path);
-  
+
   // Exact match first
   const exactMatch = REDIRECT_RULES.find(rule => rule.from === normalizedPath);
   if (exactMatch) {
     return exactMatch;
   }
-  
+
   // Pattern matching for more complex redirects
   for (const rule of REDIRECT_RULES) {
     if (matchesRedirectPattern(normalizedPath, rule.from)) {
       return rule;
     }
   }
-  
+
   return null;
 }
 
@@ -102,10 +102,10 @@ function matchesRedirectPattern(path: string, pattern: string): boolean {
   // Convert pattern to regex
   const regexPattern = pattern
     .replace(/\*/g, '.*') // Wildcard
-    .replace(/\?/g, '.')  // Single character
+    .replace(/\?/g, '.') // Single character
     .replace(/\[([^\]]+)\]/g, '($1)') // Character classes
     .replace(/\(([^)]+)\)/g, '($1)'); // Groups
-  
+
   const regex = new RegExp(`^${regexPattern}$`);
   return regex.test(path);
 }
@@ -130,10 +130,10 @@ export function applySPARedirect(
   if (!rule) {
     return false;
   }
-  
+
   // Apply redirect
   navigate(rule.to, { replace: true });
-  
+
   // Emit telemetry
   if (telemetry) {
     telemetry({
@@ -145,7 +145,7 @@ export function applySPARedirect(
       timestamp: Date.now(),
     });
   }
-  
+
   return true;
 }
 
@@ -165,13 +165,14 @@ export function applySSRRedirect(
   if (!rule) {
     return false;
   }
-  
+
   // Convert redirect type to HTTP status
-  const statusCode = rule.type === '301' ? 301 : rule.type === '302' ? 302 : 308;
-  
+  const statusCode =
+    rule.type === '301' ? 301 : rule.type === '302' ? 302 : 308;
+
   // Apply redirect
   res.redirect(statusCode, rule.to);
-  
+
   // Emit telemetry
   if (telemetry) {
     telemetry({
@@ -183,7 +184,7 @@ export function applySSRRedirect(
       timestamp: Date.now(),
     });
   }
-  
+
   return true;
 }
 
@@ -227,7 +228,7 @@ export function getRedirectType(path: string): '301' | '302' | '308' | null {
 export function addRedirectRule(rule: RedirectRule): void {
   // Check if rule already exists
   const existingIndex = REDIRECT_RULES.findIndex(r => r.from === rule.from);
-  
+
   if (existingIndex >= 0) {
     // Update existing rule
     REDIRECT_RULES[existingIndex] = rule;
@@ -272,25 +273,28 @@ export function clearRedirectRules(): void {
  * @param rule - Redirect rule to validate
  * @returns Validation result
  */
-export function validateRedirectRule(rule: RedirectRule): { valid: boolean; errors: string[] } {
+export function validateRedirectRule(rule: RedirectRule): {
+  valid: boolean;
+  errors: string[];
+} {
   const errors: string[] = [];
-  
+
   if (!rule.from || typeof rule.from !== 'string') {
     errors.push('From path is required and must be a string');
   }
-  
+
   if (!rule.to || typeof rule.to !== 'string') {
     errors.push('To path is required and must be a string');
   }
-  
+
   if (rule.from === rule.to) {
     errors.push('From and to paths cannot be the same');
   }
-  
+
   if (!['301', '302', '308'].includes(rule.type)) {
     errors.push('Type must be 301, 302, or 308');
   }
-  
+
   return {
     valid: errors.length === 0,
     errors,
@@ -301,16 +305,19 @@ export function validateRedirectRule(rule: RedirectRule): { valid: boolean; erro
  * Validate all redirect rules
  * @returns Validation result for all rules
  */
-export function validateAllRedirectRules(): { valid: boolean; errors: string[] } {
+export function validateAllRedirectRules(): {
+  valid: boolean;
+  errors: string[];
+} {
   const allErrors: string[] = [];
-  
+
   for (const rule of REDIRECT_RULES) {
     const validation = validateRedirectRule(rule);
     if (!validation.valid) {
       allErrors.push(`Rule "${rule.from}": ${validation.errors.join(', ')}`);
     }
   }
-  
+
   return {
     valid: allErrors.length === 0,
     errors: allErrors,

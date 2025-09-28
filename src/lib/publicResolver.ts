@@ -6,18 +6,18 @@
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { createLRUCache, createCacheKey } from './lruCache';
-import { 
-  validatePublicLink, 
-  type PublicLink, 
-  type DisplayModel, 
-  type ResolverSlugs, 
-  type ResolverResult 
+import {
+  validatePublicLink,
+  type PublicLink,
+  type DisplayModel,
+  type ResolverSlugs,
+  type ResolverResult,
 } from './publicTypes';
-import { 
-  trackResolverHit, 
-  trackMismatchCorrected, 
-  trackNotFound, 
-  trackError 
+import {
+  trackResolverHit,
+  trackMismatchCorrected,
+  trackNotFound,
+  trackError,
 } from './telemetry';
 import { findRedirectRule } from './redirects';
 
@@ -46,12 +46,14 @@ const displayModelsCache = createLRUCache<DisplayModel>(CACHE_OPTIONS);
  * @param slugs - Object containing brand, store, pro, and soloPro slugs
  * @returns Resolver result with context or error
  */
-export async function resolvePublicContext(slugs: ResolverSlugs): Promise<ResolverResult> {
+export async function resolvePublicContext(
+  slugs: ResolverSlugs
+): Promise<ResolverResult> {
   try {
     // Check for redirects first
     const path = buildPathFromSlugs(slugs);
     const redirectRule = findRedirectRule(path);
-    
+
     if (redirectRule) {
       return {
         success: false,
@@ -68,15 +70,15 @@ export async function resolvePublicContext(slugs: ResolverSlugs): Promise<Resolv
     if (slugs.pro) {
       return await resolveProfessional(slugs);
     }
-    
+
     if (slugs.soloPro) {
       return await resolveSoloProfessional(slugs.soloPro);
     }
-    
+
     if (slugs.store) {
       return await resolveStore(slugs);
     }
-    
+
     if (slugs.brand) {
       return await resolveBrand(slugs.brand);
     }
@@ -86,11 +88,13 @@ export async function resolvePublicContext(slugs: ResolverSlugs): Promise<Resolv
       success: false,
       error: 'invalid_slug',
     };
-
   } catch (error) {
     console.error('Public resolver error:', error);
-    trackError(buildPathFromSlugs(slugs), error instanceof Error ? error.message : 'Unknown error');
-    
+    trackError(
+      buildPathFromSlugs(slugs),
+      error instanceof Error ? error.message : 'Unknown error'
+    );
+
     return {
       success: false,
       error: 'not_found',
@@ -101,7 +105,9 @@ export async function resolvePublicContext(slugs: ResolverSlugs): Promise<Resolv
 /**
  * Resolve professional (under brand/store)
  */
-async function resolveProfessional(slugs: ResolverSlugs): Promise<ResolverResult> {
+async function resolveProfessional(
+  slugs: ResolverSlugs
+): Promise<ResolverResult> {
   if (!slugs.brand || !slugs.store || !slugs.pro) {
     return {
       success: false,
@@ -110,7 +116,7 @@ async function resolveProfessional(slugs: ResolverSlugs): Promise<ResolverResult
   }
 
   const cacheKey = createCacheKey([slugs.brand, slugs.store, slugs.pro]);
-  
+
   // Check cache first
   let proLink = publicLinksCache.get(cacheKey);
   if (!proLink) {
@@ -139,35 +145,36 @@ async function resolveProfessional(slugs: ResolverSlugs): Promise<ResolverResult
   }
 
   // Check for mismatch
-  const isMismatch = proLink.target.storeId !== storeLink.target.storeId || 
-                    proLink.target.orgId !== storeLink.target.orgId;
+  const isMismatch =
+    proLink.target.storeId !== storeLink.target.storeId ||
+    proLink.target.orgId !== storeLink.target.orgId;
 
   if (isMismatch) {
-      // Find correct store for this professional
-      const correctStore = await findCorrectStoreForProfessional(proLink);
-      if (correctStore) {
-        trackMismatchCorrected(
-          buildPathFromSlugs(slugs),
-          `${slugs.brand}/${slugs.store}`,
-          `${correctStore.slug}/${correctStore.slug}`,
-          proLink.target.orgId,
-          correctStore.target.storeId,
-          proLink.target.proId
-        );
+    // Find correct store for this professional
+    const correctStore = await findCorrectStoreForProfessional(proLink);
+    if (correctStore) {
+      trackMismatchCorrected(
+        buildPathFromSlugs(slugs),
+        `${slugs.brand}/${slugs.store}`,
+        `${correctStore.slug}/${correctStore.slug}`,
+        proLink.target.orgId,
+        correctStore.target.storeId,
+        proLink.target.proId
+      );
 
-        return {
-          success: true,
-          context: {
-            type: 'professional',
-            entity: proLink,
-            display: await getDisplayModel(proLink),
-            parent: {
-              brand: await resolveBrandLink(correctStore.slug) || undefined,
-              store: correctStore,
-            },
-            isMismatch: true,
+      return {
+        success: true,
+        context: {
+          type: 'professional',
+          entity: proLink,
+          display: await getDisplayModel(proLink),
+          parent: {
+            brand: (await resolveBrandLink(correctStore.slug)) || undefined,
+            store: correctStore,
           },
-        };
+          isMismatch: true,
+        },
+      };
     }
   }
 
@@ -201,9 +208,11 @@ async function resolveProfessional(slugs: ResolverSlugs): Promise<ResolverResult
 /**
  * Resolve solo professional (canonical personal link)
  */
-async function resolveSoloProfessional(proSlug: string): Promise<ResolverResult> {
+async function resolveSoloProfessional(
+  proSlug: string
+): Promise<ResolverResult> {
   const cacheKey = createCacheKey(['u', proSlug]);
-  
+
   // Check cache first
   let proLink = publicLinksCache.get(cacheKey);
   if (!proLink) {
@@ -302,11 +311,7 @@ async function resolveBrand(brandSlug: string): Promise<ResolverResult> {
   // Get display model
   const display = await getDisplayModel(brandLink);
 
-  trackResolverHit(
-    `/${brandSlug}`,
-    'brand',
-    brandLink.target.orgId
-  );
+  trackResolverHit(`/${brandSlug}`, 'brand', brandLink.target.orgId);
 
   return {
     success: true,
@@ -325,7 +330,10 @@ async function resolveBrand(brandSlug: string): Promise<ResolverResult> {
 /**
  * Fetch public link from Firestore
  */
-async function fetchPublicLink(type: string, slug: string): Promise<PublicLink | null> {
+async function fetchPublicLink(
+  type: string,
+  slug: string
+): Promise<PublicLink | null> {
   if (!db) {
     throw new Error('Firestore not initialized');
   }
@@ -338,14 +346,14 @@ async function fetchPublicLink(type: string, slug: string): Promise<PublicLink |
     );
 
     const snapshot = await getDocs(q);
-    
+
     if (snapshot.empty) {
       return null;
     }
 
     const doc = snapshot.docs[0];
     const data = doc.data();
-    
+
     return validatePublicLink({
       id: doc.id,
       ...data,
@@ -361,7 +369,7 @@ async function fetchPublicLink(type: string, slug: string): Promise<PublicLink |
  */
 async function resolveBrandLink(brandSlug: string): Promise<PublicLink | null> {
   const cacheKey = createCacheKey(['brand', brandSlug]);
-  
+
   let brandLink = publicLinksCache.get(cacheKey);
   if (!brandLink) {
     brandLink = await fetchPublicLink('brand', brandSlug);
@@ -376,9 +384,12 @@ async function resolveBrandLink(brandSlug: string): Promise<PublicLink | null> {
 /**
  * Resolve store link
  */
-async function resolveStoreLink(brandSlug: string, storeSlug: string): Promise<PublicLink | null> {
+async function resolveStoreLink(
+  brandSlug: string,
+  storeSlug: string
+): Promise<PublicLink | null> {
   const cacheKey = createCacheKey(['store', brandSlug, storeSlug]);
-  
+
   let storeLink = publicLinksCache.get(cacheKey);
   if (!storeLink) {
     storeLink = await fetchPublicLink('store', storeSlug);
@@ -393,7 +404,9 @@ async function resolveStoreLink(brandSlug: string, storeSlug: string): Promise<P
 /**
  * Find correct store for professional
  */
-async function findCorrectStoreForProfessional(proLink: PublicLink): Promise<PublicLink | null> {
+async function findCorrectStoreForProfessional(
+  proLink: PublicLink
+): Promise<PublicLink | null> {
   if (!proLink.target.storeId) {
     return null;
   }
@@ -408,18 +421,20 @@ async function findCorrectStoreForProfessional(proLink: PublicLink): Promise<Pub
  */
 async function getDisplayModel(entity: PublicLink): Promise<DisplayModel> {
   const cacheKey = createCacheKey(['display', entity.id]);
-  
+
   let display = displayModelsCache.get(cacheKey);
   if (!display) {
     // In a real implementation, this would fetch from Firestore
     // For now, create a basic display model
     display = {
       id: entity.id,
-      name: entity.slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      name: entity.slug
+        .replace(/-/g, ' ')
+        .replace(/\b\w/g, l => l.toUpperCase()),
       slug: entity.slug,
       status: entity.status,
     };
-    
+
     displayModelsCache.set(cacheKey, display);
   }
 
@@ -433,19 +448,19 @@ function buildPathFromSlugs(slugs: ResolverSlugs): string {
   if (slugs.pro && slugs.store && slugs.brand) {
     return `/${slugs.brand}/${slugs.store}/${slugs.pro}`;
   }
-  
+
   if (slugs.soloPro) {
     return `/u/${slugs.soloPro}`;
   }
-  
+
   if (slugs.store && slugs.brand) {
     return `/${slugs.brand}/${slugs.store}`;
   }
-  
+
   if (slugs.brand) {
     return `/${slugs.brand}`;
   }
-  
+
   return '/';
 }
 
@@ -480,6 +495,6 @@ export function getCacheStats(): {
 export function cleanExpiredCache(): number {
   const publicLinksCleaned = publicLinksCache.cleanExpired();
   const displayModelsCleaned = displayModelsCache.cleanExpired();
-  
+
   return publicLinksCleaned + displayModelsCleaned;
 }

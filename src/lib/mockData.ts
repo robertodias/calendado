@@ -3,7 +3,12 @@
  * Provides sample data for testing and development
  */
 
-import type { MockData, PublicLink, DisplayModel, RedirectRule } from './publicTypes';
+import type {
+  MockData,
+  PublicLink,
+  DisplayModel,
+  RedirectRule,
+} from './publicTypes';
 
 // ============================================================================
 // MOCK PUBLIC LINKS
@@ -144,7 +149,7 @@ export const mockDisplayModels: DisplayModel[] = [
     description: 'Premium beauty services in Porto Alegre',
     status: 'active',
   },
-  
+
   // Stores
   {
     id: 'store-porto-alegre',
@@ -170,7 +175,7 @@ export const mockDisplayModels: DisplayModel[] = [
     description: 'Southern district location',
     status: 'active',
   },
-  
+
   // Professionals
   {
     id: 'pro-maria-silva',
@@ -185,7 +190,7 @@ export const mockDisplayModels: DisplayModel[] = [
     name: 'João Pereira',
     slug: 'joao-pereira',
     avatar: 'https://via.placeholder.com/64x64/10b981/ffffff?text=JP',
-    description: 'Professional barber specializing in men\'s grooming',
+    description: "Professional barber specializing in men's grooming",
     status: 'active',
   },
   {
@@ -261,9 +266,19 @@ export const mockData: MockData = {
 /**
  * Get mock public link by type and slug
  */
-export function getMockPublicLink(type: string, slug: string): PublicLink | null {
-  const allLinks = [...mockBrands, ...mockStores, ...mockProfessionals, ...mockServices];
-  return allLinks.find(link => link.type === type && link.slug === slug) || null;
+export function getMockPublicLink(
+  type: string,
+  slug: string
+): PublicLink | null {
+  const allLinks = [
+    ...mockBrands,
+    ...mockStores,
+    ...mockProfessionals,
+    ...mockServices,
+  ];
+  return (
+    allLinks.find(link => link.type === type && link.slug === slug) || null
+  );
 }
 
 /**
@@ -313,13 +328,13 @@ export function validateMockData(): { valid: boolean; errors: string[] } {
 
   // Check for duplicate slugs within same type
   const typeSlugMap = new Map<string, Set<string>>();
-  
+
   for (const link of getAllMockPublicLinks()) {
     const key = link.type;
     if (!typeSlugMap.has(key)) {
       typeSlugMap.set(key, new Set());
     }
-    
+
     if (typeSlugMap.get(key)!.has(link.slug)) {
       errors.push(`Duplicate slug "${link.slug}" in type "${link.type}"`);
     } else {

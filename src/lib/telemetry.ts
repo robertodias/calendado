@@ -47,7 +47,8 @@ class TelemetryStore {
     const fullEvent: TelemetryEvent = {
       ...event,
       timestamp: Date.now(),
-      userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : undefined,
+      userAgent:
+        typeof window !== 'undefined' ? window.navigator.userAgent : undefined,
     };
 
     this.events.push(fullEvent);
@@ -80,7 +81,10 @@ class TelemetryStore {
         await this.sendToEndpoint(eventsToFlush);
       } else {
         // In development, just log to console
-        console.log('[Telemetry] Events (no endpoint configured):', eventsToFlush);
+        console.log(
+          '[Telemetry] Events (no endpoint configured):',
+          eventsToFlush
+        );
       }
     } catch (error) {
       console.error('[Telemetry] Failed to flush events:', error);
@@ -207,10 +211,7 @@ export function trackMismatchCorrected(
 /**
  * Track not found error
  */
-export function trackNotFound(
-  path: string,
-  attemptedType: string
-): void {
+export function trackNotFound(path: string, attemptedType: string): void {
   telemetryStore.addEvent({
     event: 'public_resolver_not_found',
     path,

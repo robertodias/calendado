@@ -5,13 +5,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '../ui/Button';
-import { 
-  X, 
-  AlertCircle, 
-  Info, 
-  ExternalLink,
-  ArrowRight
-} from 'lucide-react';
+import { X, AlertCircle, Info, ExternalLink, ArrowRight } from 'lucide-react';
 import type { BannerProps } from '../../lib/publicTypes';
 
 // ============================================================================
@@ -37,7 +31,7 @@ export const Banner: React.FC<BannerProps> = ({
       if (announceRef.current) {
         announceRef.current.textContent = message;
       }
-      
+
       // Focus the banner for keyboard users
       if (bannerRef.current) {
         bannerRef.current.focus();
@@ -79,7 +73,7 @@ export const Banner: React.FC<BannerProps> = ({
     switch (type) {
       case 'mismatch':
         return {
-          icon: <ArrowRight className="w-5 h-5" />,
+          icon: <ArrowRight className='w-5 h-5' />,
           bgColor: 'bg-blue-50',
           borderColor: 'border-blue-200',
           textColor: 'text-blue-800',
@@ -87,7 +81,7 @@ export const Banner: React.FC<BannerProps> = ({
         };
       case 'redirect':
         return {
-          icon: <ExternalLink className="w-5 h-5" />,
+          icon: <ExternalLink className='w-5 h-5' />,
           bgColor: 'bg-amber-50',
           borderColor: 'border-amber-200',
           textColor: 'text-amber-800',
@@ -95,7 +89,7 @@ export const Banner: React.FC<BannerProps> = ({
         };
       case 'error':
         return {
-          icon: <AlertCircle className="w-5 h-5" />,
+          icon: <AlertCircle className='w-5 h-5' />,
           bgColor: 'bg-red-50',
           borderColor: 'border-red-200',
           textColor: 'text-red-800',
@@ -103,7 +97,7 @@ export const Banner: React.FC<BannerProps> = ({
         };
       default:
         return {
-          icon: <Info className="w-5 h-5" />,
+          icon: <Info className='w-5 h-5' />,
           bgColor: 'bg-neutral-50',
           borderColor: 'border-neutral-200',
           textColor: 'text-neutral-800',
@@ -119,11 +113,11 @@ export const Banner: React.FC<BannerProps> = ({
       {/* Screen reader announcement */}
       <div
         ref={announceRef}
-        className="sr-only"
-        aria-live="polite"
-        aria-atomic="true"
+        className='sr-only'
+        aria-live='polite'
+        aria-atomic='true'
       />
-      
+
       {/* Banner */}
       <div
         ref={bannerRef}
@@ -134,21 +128,21 @@ export const Banner: React.FC<BannerProps> = ({
           transition-all duration-300 ease-in-out
           ${isVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}
         `}
-        role="alert"
-        aria-live="polite"
+        role='alert'
+        aria-live='polite'
         tabIndex={-1}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-3">
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+          <div className='flex items-center justify-between py-3'>
             {/* Content */}
-            <div className="flex items-center space-x-3 flex-1 min-w-0">
+            <div className='flex items-center space-x-3 flex-1 min-w-0'>
               {/* Icon */}
               <div className={`flex-shrink-0 ${config.iconColor}`}>
                 {config.icon}
               </div>
-              
+
               {/* Message */}
-              <div className="flex-1 min-w-0">
+              <div className='flex-1 min-w-0'>
                 <p className={`text-sm font-medium ${config.textColor}`}>
                   {message}
                 </p>
@@ -156,36 +150,36 @@ export const Banner: React.FC<BannerProps> = ({
             </div>
 
             {/* Actions */}
-            <div className="flex items-center space-x-2 flex-shrink-0 ml-4">
+            <div className='flex items-center space-x-2 flex-shrink-0 ml-4'>
               {/* Action Button */}
               {onAction && actionText && (
                 <Button
                   onClick={handleAction}
-                  size="sm"
-                  variant="ghost"
+                  size='sm'
+                  variant='ghost'
                   className={`${config.textColor} hover:bg-white/20`}
                 >
                   {actionText}
                 </Button>
               )}
-              
+
               {/* Dismiss Button */}
               <Button
                 onClick={handleDismiss}
-                size="sm"
-                variant="ghost"
+                size='sm'
+                variant='ghost'
                 className={`${config.textColor} hover:bg-white/20`}
-                aria-label="Dismiss notification"
+                aria-label='Dismiss notification'
               >
-                <X className="w-4 h-4" />
+                <X className='w-4 h-4' />
               </Button>
             </div>
           </div>
         </div>
       </div>
-      
+
       {/* Spacer to prevent content jump */}
-      <div className="h-16" />
+      <div className='h-16' />
     </>
   );
 };
@@ -215,11 +209,11 @@ export const MismatchBanner: React.FC<MismatchBannerProps> = ({
 
   return (
     <Banner
-      type="mismatch"
+      type='mismatch'
       message={message}
       onDismiss={onDismiss}
       onAction={onCorrect}
-      actionText="View Correct Location"
+      actionText='View Correct Location'
       isVisible={isVisible}
     />
   );
@@ -248,7 +242,7 @@ export const RedirectBanner: React.FC<RedirectBannerProps> = ({
 
   return (
     <Banner
-      type="redirect"
+      type='redirect'
       message={message}
       onDismiss={onDismiss}
       isVisible={isVisible}
@@ -275,11 +269,11 @@ export const ErrorBanner: React.FC<ErrorBannerProps> = ({
 }) => {
   return (
     <Banner
-      type="error"
+      type='error'
       message={message}
       onDismiss={onDismiss}
       onAction={onRetry}
-      actionText="Retry"
+      actionText='Retry'
       isVisible={isVisible}
     />
   );
@@ -316,7 +310,7 @@ export const SuccessBanner: React.FC<SuccessBannerProps> = ({
 
   return (
     <Banner
-      type="mismatch" // Using mismatch config for success
+      type='mismatch' // Using mismatch config for success
       message={message}
       onDismiss={onDismiss}
       isVisible={isVisible}
@@ -341,10 +335,10 @@ export const LoadingBanner: React.FC<LoadingBannerProps> = ({
 }) => {
   return (
     <Banner
-      type="mismatch" // Using mismatch config for loading
+      type='mismatch' // Using mismatch config for loading
       message={message}
       onDismiss={onCancel || (() => undefined)}
-      actionText={onCancel ? "Cancel" : undefined}
+      actionText={onCancel ? 'Cancel' : undefined}
       isVisible={isVisible}
     />
   );
@@ -359,9 +353,5 @@ interface BannerProviderProps {
 }
 
 export const BannerProvider: React.FC<BannerProviderProps> = ({ children }) => {
-  return (
-    <div className="relative">
-      {children}
-    </div>
-  );
+  return <div className='relative'>{children}</div>;
 };

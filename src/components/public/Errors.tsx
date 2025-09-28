@@ -6,13 +6,7 @@
 import React from 'react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
-import { 
-  Search, 
-  Home, 
-  AlertCircle, 
-  RefreshCw,
-  ArrowLeft
-} from 'lucide-react';
+import { Search, Home, AlertCircle, RefreshCw, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 // ============================================================================
@@ -64,66 +58,64 @@ const ErrorComponent: React.FC<ErrorComponentProps> = ({
   };
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100 flex items-center justify-center p-4 ${className}`}>
-      <div className="max-w-md w-full text-center">
+    <div
+      className={`min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100 flex items-center justify-center p-4 ${className}`}
+    >
+      <div className='max-w-md w-full text-center'>
         {/* Error Icon */}
-        <div className="mb-6">
-          <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-            <AlertCircle className="w-8 h-8 text-red-600" />
+        <div className='mb-6'>
+          <div className='mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center'>
+            <AlertCircle className='w-8 h-8 text-red-600' />
           </div>
         </div>
 
         {/* Error Content */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-neutral-900 mb-2">
-            {title}
-          </h1>
-          <p className="text-neutral-600 mb-6">
-            {message}
-          </p>
+        <div className='mb-8'>
+          <h1 className='text-2xl font-bold text-neutral-900 mb-2'>{title}</h1>
+          <p className='text-neutral-600 mb-6'>{message}</p>
 
           {/* Search Form */}
           {showSearch && (
-            <form onSubmit={handleSearch} className="mb-6">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400" />
+            <form onSubmit={handleSearch} className='mb-6'>
+              <div className='relative'>
+                <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400' />
                 <Input
-                  type="text"
-                  placeholder="Search for brands or professionals..."
+                  type='text'
+                  placeholder='Search for brands or professionals...'
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 pr-4 py-3 w-full"
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className='pl-10 pr-4 py-3 w-full'
                 />
               </div>
             </form>
           )}
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <div className='flex flex-col sm:flex-row gap-3 justify-center'>
             {actionText && onAction && (
-              <Button onClick={onAction} className="flex-1 sm:flex-none">
+              <Button onClick={onAction} className='flex-1 sm:flex-none'>
                 {actionText}
               </Button>
             )}
-            
+
             {showBack && (
-              <Button 
-                variant="secondary" 
+              <Button
+                variant='secondary'
                 onClick={handleGoBack}
-                className="flex-1 sm:flex-none"
+                className='flex-1 sm:flex-none'
               >
-                <ArrowLeft className="w-4 h-4 mr-2" />
+                <ArrowLeft className='w-4 h-4 mr-2' />
                 Go Back
               </Button>
             )}
-            
+
             {showHome && (
-              <Button 
-                variant="ghost" 
+              <Button
+                variant='ghost'
                 onClick={handleGoHome}
-                className="flex-1 sm:flex-none"
+                className='flex-1 sm:flex-none'
               >
-                <Home className="w-4 h-4 mr-2" />
+                <Home className='w-4 h-4 mr-2' />
                 Go Home
               </Button>
             )}
@@ -131,7 +123,7 @@ const ErrorComponent: React.FC<ErrorComponentProps> = ({
         </div>
 
         {/* Help Text */}
-        <div className="text-sm text-neutral-500">
+        <div className='text-sm text-neutral-500'>
           <p>Need help? Contact our support team.</p>
         </div>
       </div>
@@ -163,13 +155,13 @@ export const PublicNotFound: React.FC<NotFoundProps> = ({
 
   return (
     <ErrorComponent
-      title="Page Not Found"
+      title='Page Not Found'
       message={
-        path 
+        path
           ? `The page "${path}" could not be found.`
           : "The page you're looking for doesn't exist."
       }
-      actionText="Search Brands"
+      actionText='Search Brands'
       onAction={handleSearchBrand}
       showSearch={showSearch}
       showHome={true}
@@ -203,13 +195,13 @@ export const PublicDisabled: React.FC<GoneProps> = ({
 
   return (
     <ErrorComponent
-      title="Content No Longer Available"
+      title='Content No Longer Available'
       message={
         entityName
           ? `The ${entityType} "${entityName}" is no longer available.`
           : `This ${entityType} is no longer available.`
       }
-      actionText="Go to Brand Home"
+      actionText='Go to Brand Home'
       onAction={handleGoToBrand}
       showSearch={false}
       showHome={true}
@@ -233,7 +225,7 @@ interface GenericErrorProps {
 
 export const PublicError: React.FC<GenericErrorProps> = ({
   error,
-  title = "Something Went Wrong",
+  title = 'Something Went Wrong',
   message,
   onRetry,
   className,
@@ -248,13 +240,16 @@ export const PublicError: React.FC<GenericErrorProps> = ({
     }
   };
 
-  const errorMessage = message || error?.message || "An unexpected error occurred. Please try again.";
+  const errorMessage =
+    message ||
+    error?.message ||
+    'An unexpected error occurred. Please try again.';
 
   return (
     <ErrorComponent
       title={title}
       message={errorMessage}
-      actionText="Try Again"
+      actionText='Try Again'
       onAction={handleRetry}
       showSearch={false}
       showHome={true}
@@ -278,28 +273,30 @@ export const PublicLoadingError: React.FC<LoadingErrorProps> = ({
   className,
 }) => {
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100 flex items-center justify-center p-4 ${className}`}>
-      <div className="max-w-md w-full text-center">
+    <div
+      className={`min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100 flex items-center justify-center p-4 ${className}`}
+    >
+      <div className='max-w-md w-full text-center'>
         {/* Loading Icon */}
-        <div className="mb-6">
-          <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-            <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
+        <div className='mb-6'>
+          <div className='mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center'>
+            <RefreshCw className='w-8 h-8 text-blue-600 animate-spin' />
           </div>
         </div>
 
         {/* Loading Content */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-neutral-900 mb-2">
+        <div className='mb-8'>
+          <h1 className='text-2xl font-bold text-neutral-900 mb-2'>
             Loading...
           </h1>
-          <p className="text-neutral-600 mb-6">
+          <p className='text-neutral-600 mb-6'>
             Please wait while we load the content.
           </p>
 
           {/* Retry Button */}
           {onRetry && (
-            <Button onClick={onRetry} variant="secondary">
-              <RefreshCw className="w-4 h-4 mr-2" />
+            <Button onClick={onRetry} variant='secondary'>
+              <RefreshCw className='w-4 h-4 mr-2' />
               Retry
             </Button>
           )}
@@ -324,9 +321,9 @@ export const PublicNetworkError: React.FC<NetworkErrorProps> = ({
 }) => {
   return (
     <ErrorComponent
-      title="Connection Error"
-      message="Unable to connect to the server. Please check your internet connection and try again."
-      actionText="Retry"
+      title='Connection Error'
+      message='Unable to connect to the server. Please check your internet connection and try again.'
+      actionText='Retry'
       onAction={onRetry}
       showSearch={false}
       showHome={true}
@@ -351,7 +348,7 @@ export const PublicPermissionError: React.FC<PermissionErrorProps> = ({
 }) => {
   return (
     <ErrorComponent
-      title="Access Denied"
+      title='Access Denied'
       message={
         requiredRole
           ? `You need ${requiredRole} permissions to access this content.`

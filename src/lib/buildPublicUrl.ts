@@ -18,7 +18,7 @@ export function brandUrl(brandSlug: string): string {
   if (!brandSlug || typeof brandSlug !== 'string') {
     throw new Error('Brand slug is required and must be a string');
   }
-  
+
   const encodedSlug = encodeURIComponent(brandSlug);
   return `/${encodedSlug}`;
 }
@@ -36,7 +36,7 @@ export function storeUrl(brandSlug: string, storeSlug: string): string {
   if (!storeSlug || typeof storeSlug !== 'string') {
     throw new Error('Store slug is required and must be a string');
   }
-  
+
   const encodedBrandSlug = encodeURIComponent(brandSlug);
   const encodedStoreSlug = encodeURIComponent(storeSlug);
   return `/${encodedBrandSlug}/${encodedStoreSlug}`;
@@ -49,7 +49,11 @@ export function storeUrl(brandSlug: string, storeSlug: string): string {
  * @param proSlug - Professional slug
  * @returns Professional URL
  */
-export function proUrl(brandSlug: string, storeSlug: string, proSlug: string): string {
+export function proUrl(
+  brandSlug: string,
+  storeSlug: string,
+  proSlug: string
+): string {
   if (!brandSlug || typeof brandSlug !== 'string') {
     throw new Error('Brand slug is required and must be a string');
   }
@@ -59,7 +63,7 @@ export function proUrl(brandSlug: string, storeSlug: string, proSlug: string): s
   if (!proSlug || typeof proSlug !== 'string') {
     throw new Error('Professional slug is required and must be a string');
   }
-  
+
   const encodedBrandSlug = encodeURIComponent(brandSlug);
   const encodedStoreSlug = encodeURIComponent(storeSlug);
   const encodedProSlug = encodeURIComponent(proSlug);
@@ -75,7 +79,7 @@ export function soloProUrl(proSlug: string): string {
   if (!proSlug || typeof proSlug !== 'string') {
     throw new Error('Professional slug is required and must be a string');
   }
-  
+
   const encodedSlug = encodeURIComponent(proSlug);
   return `/u/${encodedSlug}`;
 }
@@ -87,11 +91,11 @@ export function soloProUrl(proSlug: string): string {
  */
 export function serviceQuery(query: ServiceQuery = {}): string {
   const params = new URLSearchParams();
-  
+
   if (query.service) {
     params.set('service', query.service);
   }
-  
+
   if (query.date) {
     // Validate ISO date format
     const date = new Date(query.date);
@@ -99,7 +103,7 @@ export function serviceQuery(query: ServiceQuery = {}): string {
       params.set('date', query.date);
     }
   }
-  
+
   const queryString = params.toString();
   return queryString ? `?${queryString}` : '';
 }
@@ -123,10 +127,12 @@ export function parseBrandUrl(url: string): string | null {
  * @param url - Store URL
  * @returns Object with brand and store slugs or null if invalid
  */
-export function parseStoreUrl(url: string): { brandSlug: string; storeSlug: string } | null {
+export function parseStoreUrl(
+  url: string
+): { brandSlug: string; storeSlug: string } | null {
   const match = url.match(/^\/([^/]+)\/([^/]+)$/);
   if (!match) return null;
-  
+
   return {
     brandSlug: decodeURIComponent(match[1]),
     storeSlug: decodeURIComponent(match[2]),
@@ -138,10 +144,12 @@ export function parseStoreUrl(url: string): { brandSlug: string; storeSlug: stri
  * @param url - Professional URL
  * @returns Object with brand, store, and pro slugs or null if invalid
  */
-export function parseProUrl(url: string): { brandSlug: string; storeSlug: string; proSlug: string } | null {
+export function parseProUrl(
+  url: string
+): { brandSlug: string; storeSlug: string; proSlug: string } | null {
   const match = url.match(/^\/([^/]+)\/([^/]+)\/([^/]+)$/);
   if (!match) return null;
-  
+
   return {
     brandSlug: decodeURIComponent(match[1]),
     storeSlug: decodeURIComponent(match[2]),
@@ -244,7 +252,8 @@ export function getCurrentSearchParams(): URLSearchParams {
  * @returns Full URL
  */
 export function buildFullUrl(path: string, baseUrl?: string): string {
-  const base = baseUrl || (typeof window !== 'undefined' ? window.location.origin : '');
+  const base =
+    baseUrl || (typeof window !== 'undefined' ? window.location.origin : '');
   return `${base}${path}`;
 }
 
@@ -255,16 +264,16 @@ export function buildFullUrl(path: string, baseUrl?: string): string {
  */
 export function normalizeUrl(url: string): string {
   if (!url) return '/';
-  
+
   // Ensure leading slash
   if (!url.startsWith('/')) {
     url = `/${url}`;
   }
-  
+
   // Remove trailing slash (except for root)
   if (url.length > 1 && url.endsWith('/')) {
     url = url.slice(0, -1);
   }
-  
+
   return url;
 }
