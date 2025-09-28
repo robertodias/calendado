@@ -73,7 +73,8 @@ const WaitlistPanel: React.FC = () => {
 
     if (openMenuId) {
       document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
+      return () =>
+        document.removeEventListener('mousedown', handleClickOutside);
     }
   }, [openMenuId]);
 
@@ -627,7 +628,11 @@ const WaitlistPanel: React.FC = () => {
                           <Button
                             variant='ghost'
                             size='sm'
-                            onClick={() => setOpenMenuId(openMenuId === entry.id ? null : entry.id)}
+                            onClick={() =>
+                              setOpenMenuId(
+                                openMenuId === entry.id ? null : entry.id
+                              )
+                            }
                           >
                             <MoreVertical className='h-4 w-4' />
                           </Button>
