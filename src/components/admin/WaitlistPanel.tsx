@@ -26,7 +26,7 @@ import {
   deleteDoc,
   doc,
 } from 'firebase/firestore';
-import { getIdTokenResult } from 'firebase/auth';
+import { getIdTokenResult, type IdTokenResult } from 'firebase/auth';
 import WaitlistDrawer from './WaitlistDrawer';
 import {
   transformWaitlistEntries,
@@ -202,22 +202,18 @@ const WaitlistPanel: React.FC = () => {
         console.log('🎭 User roles from context:', user.roles);
 
         // Get fresh token to check custom claims
-        try {
-          const tokenResult = await getIdTokenResult(user);
-          console.log('🔑 Custom claims from token:', tokenResult.claims);
-          console.log(
-            '🏷️ Platform admin flag:',
-            tokenResult.claims.platformAdmin
-          );
-          console.log('📋 Roles in claims:', tokenResult.claims.roles);
-          console.log('🔍 Admin flag:', tokenResult.claims.admin);
-          console.log('🔍 IsAdmin flag:', tokenResult.claims.isAdmin);
-        } catch (tokenError) {
-          console.error('🚨 Error getting fresh token:', tokenError);
-        }
+        const tokenResult: IdTokenResult = await getIdTokenResult(user);
+        console.log('🔑 Custom claims from token:', tokenResult.claims);
+        console.log(
+          '🏷️ Platform admin flag:',
+          tokenResult.claims.platformAdmin
+        );
+        console.log('📋 Roles in claims:', tokenResult.claims.roles);
+        console.log('🔍 Admin flag:', tokenResult.claims.admin);
+        console.log('🔍 IsAdmin flag:', tokenResult.claims.isAdmin);
 
         // Check if user has platform admin role using the new utility
-        const hasPlatformAdmin = await checkPlatformAdmin(user);
+        const hasPlatformAdmin = await checkPlatformAdmin(user, tokenResult);
 
         if (!hasPlatformAdmin) {
           console.log('❌ User does not have platform admin privileges');

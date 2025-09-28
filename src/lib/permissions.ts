@@ -1,4 +1,4 @@
-import { getIdTokenResult, type User } from 'firebase/auth';
+import { getIdTokenResult, type IdTokenResult, type User } from 'firebase/auth';
 
 export interface CustomClaims {
   roles?: string[] | string;
@@ -22,9 +22,12 @@ export interface CustomClaims {
  * }
  * ```
  */
-export async function checkPlatformAdmin(user: User): Promise<boolean> {
+export async function checkPlatformAdmin(
+  user: User,
+  existingTokenResult?: IdTokenResult
+): Promise<boolean> {
   try {
-    const tokenResult = await getIdTokenResult(user);
+    const tokenResult = existingTokenResult ?? (await getIdTokenResult(user));
     const claims = tokenResult.claims as CustomClaims;
 
     console.log('🔍 Checking platform admin status for user:', user.uid);
@@ -90,10 +93,11 @@ export async function checkPlatformAdmin(user: User): Promise<boolean> {
  */
 export async function checkUserRoles(
   user: User,
-  requiredRoles: string[]
+  requiredRoles: string[],
+  existingTokenResult?: IdTokenResult
 ): Promise<boolean> {
   try {
-    const tokenResult = await getIdTokenResult(user);
+    const tokenResult = existingTokenResult ?? (await getIdTokenResult(user));
     const claims = tokenResult.claims as CustomClaims;
 
     if (!claims.roles) {
@@ -121,9 +125,12 @@ export async function checkUserRoles(
  * @param user - The Firebase user object
  * @returns Promise<string[]> - Array of user roles
  */
-export async function getUserRoles(user: User): Promise<string[]> {
+export async function getUserRoles(
+  user: User,
+  existingTokenResult?: IdTokenResult
+): Promise<string[]> {
   try {
-    const tokenResult = await getIdTokenResult(user);
+    const tokenResult = existingTokenResult ?? (await getIdTokenResult(user));
     const claims = tokenResult.claims as CustomClaims;
 
     if (Array.isArray(claims.roles)) {
