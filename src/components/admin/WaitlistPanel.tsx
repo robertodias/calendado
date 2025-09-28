@@ -60,6 +60,22 @@ const WaitlistPanel: React.FC = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState<string | null>(
     null
   );
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest('[data-menu-container]')) {
+        setOpenMenuId(null);
+      }
+    };
+
+    if (openMenuId) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [openMenuId]);
 
   // Fetch waitlist entries with proper error handling
   useEffect(() => {
@@ -506,7 +522,7 @@ const WaitlistPanel: React.FC = () => {
       )}
 
       {/* Table */}
-      <div className='bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm'>
+      <div className='bg-white rounded-2xl border border-gray-200 shadow-sm'>
         <div className='overflow-x-auto'>
           <table className='min-w-full divide-y divide-gray-200'>
             <thead className='bg-gray-50'>
@@ -607,60 +623,53 @@ const WaitlistPanel: React.FC = () => {
                         >
                           <Eye className='h-4 w-4' />
                         </Button>
-                        <div className='relative'>
+                        <div className='relative' data-menu-container>
                           <Button
                             variant='ghost'
                             size='sm'
-                            onClick={() => {
-                              const menu = document.getElementById(
-                                `menu-${entry.id}`
-                              );
-                              if (menu) {
-                                menu.classList.toggle('hidden');
-                              }
-                            }}
+                            onClick={() => setOpenMenuId(openMenuId === entry.id ? null : entry.id)}
                           >
                             <MoreVertical className='h-4 w-4' />
                           </Button>
-                          <div
-                            id={`menu-${entry.id}`}
-                            className='hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200'
-                          >
-                            <div className='py-1'>
-                              <button
-                                className='flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
-                                onClick={() => handleInvite()}
-                              >
-                                <UserPlus className='h-4 w-4 mr-3' />
-                                Send Invite
-                              </button>
-                              <button
-                                className='flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
-                                onClick={() => handleReject()}
-                              >
-                                <X className='h-4 w-4 mr-3' />
-                                Reject Entry
-                              </button>
-                              {(user?.roles?.includes('superadmin') ||
-                                false) && (
+                          {openMenuId === entry.id && (
+                            <div className='absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 border border-gray-200'>
+                              <div className='py-1'>
                                 <button
-                                  className='flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50'
+                                  className='flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
                                   onClick={() => {
-                                    setDeleteConfirmOpen(entry.id);
-                                    const menu = document.getElementById(
-                                      `menu-${entry.id}`
-                                    );
-                                    if (menu) {
-                                      menu.classList.add('hidden');
-                                    }
+                                    handleInvite();
+                                    setOpenMenuId(null);
                                   }}
                                 >
-                                  <Trash2 className='h-4 w-4 mr-3' />
-                                  Delete Entry
+                                  <UserPlus className='h-4 w-4 mr-3' />
+                                  Send Invite
                                 </button>
-                              )}
+                                <button
+                                  className='flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
+                                  onClick={() => {
+                                    handleReject();
+                                    setOpenMenuId(null);
+                                  }}
+                                >
+                                  <X className='h-4 w-4 mr-3' />
+                                  Reject Entry
+                                </button>
+                                {(user?.roles?.includes('superadmin') ||
+                                  false) && (
+                                  <button
+                                    className='flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50'
+                                    onClick={() => {
+                                      setDeleteConfirmOpen(entry.id);
+                                      setOpenMenuId(null);
+                                    }}
+                                  >
+                                    <Trash2 className='h-4 w-4 mr-3' />
+                                    Delete Entry
+                                  </button>
+                                )}
+                              </div>
                             </div>
-                          </div>
+                          )}
                         </div>
                       </div>
                     </td>
@@ -674,8 +683,8 @@ const WaitlistPanel: React.FC = () => {
 
       {/* Delete Confirmation Modal */}
       {deleteConfirmOpen && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
-          <div className='bg-white rounded-lg p-6 max-w-md w-full mx-4'>
+        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]'>
+          <div className='bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl'>
             <h3 className='text-lg font-medium text-gray-900 mb-4'>
               Delete Waitlist Entry
             </h3>
