@@ -4,12 +4,12 @@ import type { Timestamp } from 'firebase/firestore';
 /**
  * Represents different types of timestamp values that can be converted to Date
  */
-export type TimestampValue = 
-  | Date 
-  | Timestamp 
-  | number 
-  | string 
-  | null 
+export type TimestampValue =
+  | Date
+  | Timestamp
+  | number
+  | string
+  | null
   | undefined;
 
 /**
@@ -61,11 +61,11 @@ function isValidDate(value: unknown): value is Date {
 
 /**
  * Converts various timestamp formats to a valid Date object
- * 
+ *
  * @param value - The timestamp value to convert
  * @param options - Configuration options for the conversion
  * @returns DateConversionResult with the converted date and metadata
- * 
+ *
  * @example
  * ```typescript
  * // Convert Firestore Timestamp
@@ -73,7 +73,7 @@ function isValidDate(value: unknown): value is Date {
  * if (result.success) {
  *   console.log('Converted date:', result.date);
  * }
- * 
+ *
  * // Convert with fallback
  * const result = convertToDate(undefined, { fallback: new Date() });
  * console.log('Date:', result.date); // Will be fallback date
@@ -84,14 +84,17 @@ export function convertToDate(
   options: DateConversionOptions = {}
 ): DateConversionResult {
   const { fallback = null, logErrors = false, onError } = options;
-  
+
   // Handle null/undefined
   if (value === null || value === undefined) {
     return {
       date: fallback,
       success: fallback !== null,
       originalValue: value,
-      error: fallback === null ? 'No value provided and no fallback specified' : undefined
+      error:
+        fallback === null
+          ? 'No value provided and no fallback specified'
+          : undefined,
     };
   }
 
@@ -101,7 +104,7 @@ export function convertToDate(
       return {
         date: value,
         success: true,
-        originalValue: value
+        originalValue: value,
       };
     }
 
@@ -112,7 +115,7 @@ export function convertToDate(
         return {
           date,
           success: true,
-          originalValue: value
+          originalValue: value,
         };
       }
       throw new Error('Invalid Firestore Timestamp');
@@ -125,7 +128,7 @@ export function convertToDate(
         return {
           date,
           success: true,
-          originalValue: value
+          originalValue: value,
         };
       }
       throw new Error('Invalid number timestamp');
@@ -138,21 +141,21 @@ export function convertToDate(
         return {
           date,
           success: true,
-          originalValue: value
+          originalValue: value,
         };
       }
       throw new Error('Invalid string timestamp');
     }
 
     throw new Error(`Unsupported timestamp type: ${typeof value}`);
-
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown conversion error';
-    
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown conversion error';
+
     if (logErrors) {
       console.warn('Date conversion failed:', errorMessage, 'Value:', value);
     }
-    
+
     if (onError) {
       onError(error instanceof Error ? error : new Error(errorMessage), value);
     }
@@ -161,26 +164,29 @@ export function convertToDate(
       date: fallback,
       success: fallback !== null,
       originalValue: value,
-      error: errorMessage
+      error: errorMessage,
     };
   }
 }
 
 /**
  * Convenience function for simple date conversion with fallback
- * 
+ *
  * @param value - The timestamp value to convert
  * @param fallback - Fallback date if conversion fails
  * @returns The converted date or fallback
  */
-export function toDate(value: TimestampValue, fallback: Date = new Date()): Date {
+export function toDate(
+  value: TimestampValue,
+  fallback: Date = new Date()
+): Date {
   const result = convertToDate(value, { fallback });
   return result.date || new Date();
 }
 
 /**
  * Convenience function for safe date conversion that returns null on failure
- * 
+ *
  * @param value - The timestamp value to convert
  * @returns The converted date or null
  */
@@ -191,7 +197,7 @@ export function toDateOrNull(value: TimestampValue): Date | null {
 
 /**
  * Batch convert multiple timestamp values
- * 
+ *
  * @param values - Array of timestamp values to convert
  * @param options - Configuration options
  * @returns Array of conversion results
@@ -205,13 +211,16 @@ export function convertToDates(
 
 /**
  * Validate that a date conversion was successful
- * 
+ *
  * @param result - The conversion result to validate
  * @throws Error if conversion was not successful
  */
-export function validateDateConversion(result: DateConversionResult): asserts result is DateConversionResult & { date: Date; success: true } {
+export function validateDateConversion(
+  result: DateConversionResult
+): asserts result is DateConversionResult & { date: Date; success: true } {
   if (!result.success || result.date === null) {
-    throw new Error(`Date conversion failed: ${result.error || 'Unknown error'}`);
+    throw new Error(
+      `Date conversion failed: ${result.error || 'Unknown error'}`
+    );
   }
 }
-

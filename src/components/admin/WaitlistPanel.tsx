@@ -27,7 +27,10 @@ import {
   doc,
 } from 'firebase/firestore';
 import WaitlistDrawer from './WaitlistDrawer';
-import { transformWaitlistEntries, filterValidWaitlistEntries } from '../../lib/waitlistTransformers';
+import {
+  transformWaitlistEntries,
+  filterValidWaitlistEntries,
+} from '../../lib/waitlistTransformers';
 import type { WaitlistEntry } from '../../types/shared';
 
 type WaitlistStatus =
@@ -48,9 +51,13 @@ const WaitlistPanel: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<WaitlistStatus>('all');
   const [selectedEntries, setSelectedEntries] = useState<string[]>([]);
-  const [selectedEntry, setSelectedEntry] = useState<WaitlistEntry | null>(null);
+  const [selectedEntry, setSelectedEntry] = useState<WaitlistEntry | null>(
+    null
+  );
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState<string | null>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState<string | null>(
+    null
+  );
 
   // Fetch waitlist entries with proper error handling
   useEffect(() => {
@@ -68,7 +75,7 @@ const WaitlistPanel: React.FC = () => {
         try {
           const transformedEntries = transformWaitlistEntries(snapshot.docs);
           const validEntries = filterValidWaitlistEntries(transformedEntries);
-          
+
           setEntries(validEntries);
           setError(null);
         } catch (err) {
@@ -117,16 +124,17 @@ const WaitlistPanel: React.FC = () => {
   }, []);
 
   const handleSelectEntry = useCallback((entryId: string, checked: boolean) => {
-    setSelectedEntries(prev => 
-      checked 
-        ? [...prev, entryId]
-        : prev.filter(id => id !== entryId)
+    setSelectedEntries(prev =>
+      checked ? [...prev, entryId] : prev.filter(id => id !== entryId)
     );
   }, []);
 
-  const handleSelectAll = useCallback((checked: boolean) => {
-    setSelectedEntries(checked ? filteredEntries.map(entry => entry.id) : []);
-  }, [filteredEntries]);
+  const handleSelectAll = useCallback(
+    (checked: boolean) => {
+      setSelectedEntries(checked ? filteredEntries.map(entry => entry.id) : []);
+    },
+    [filteredEntries]
+  );
 
   const handleInvite = useCallback(async () => {
     try {
@@ -164,46 +172,49 @@ const WaitlistPanel: React.FC = () => {
     }
   }, [toast]);
 
-  const handleDelete = useCallback(async (entryId: string) => {
-    try {
-      if (!db) {
-        toast({
-          title: 'Error',
-          description: 'Database not initialized',
-          variant: 'destructive',
-        });
-        return;
-      }
+  const handleDelete = useCallback(
+    async (entryId: string) => {
+      try {
+        if (!db) {
+          toast({
+            title: 'Error',
+            description: 'Database not initialized',
+            variant: 'destructive',
+          });
+          return;
+        }
 
-      // Check if user has platform admin role
-      const hasPlatformAdmin = user?.roles?.includes('superadmin') || false;
+        // Check if user has platform admin role
+        const hasPlatformAdmin = user?.roles?.includes('superadmin') || false;
 
-      if (!hasPlatformAdmin) {
+        if (!hasPlatformAdmin) {
+          toast({
+            title: 'Permission Denied',
+            description:
+              'You need superadmin privileges to delete waitlist entries',
+            variant: 'destructive',
+          });
+          setDeleteConfirmOpen(null);
+          return;
+        }
+
+        await deleteDoc(doc(db, 'waitlist', entryId));
         toast({
-          title: 'Permission Denied',
-          description:
-            'You need superadmin privileges to delete waitlist entries',
-          variant: 'destructive',
+          title: 'Success',
+          description: 'Entry deleted successfully',
         });
         setDeleteConfirmOpen(null);
-        return;
+      } catch (error) {
+        console.error('Delete error:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to delete entry. Please check your permissions.',
+          variant: 'destructive',
+        });
       }
-
-      await deleteDoc(doc(db, 'waitlist', entryId));
-      toast({
-        title: 'Success',
-        description: 'Entry deleted successfully',
-      });
-      setDeleteConfirmOpen(null);
-    } catch (error) {
-      console.error('Delete error:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete entry. Please check your permissions.',
-        variant: 'destructive',
-      });
-    }
-  }, [user, toast]);
+    },
+    [user, toast]
+  );
 
   const handleBulkInvite = useCallback(async () => {
     try {
@@ -304,50 +315,52 @@ const WaitlistPanel: React.FC = () => {
     value: WaitlistStatus;
     label: string;
     count: number;
-  }[] = useMemo(() => [
-    { value: 'all', label: 'All', count: entries.length },
-    {
-      value: 'pending',
-      label: 'Pending',
-      count: entries.filter(e => e.status === 'pending').length,
-    },
-    {
-      value: 'confirmed',
-      label: 'Confirmed',
-      count: entries.filter(e => e.status === 'confirmed').length,
-    },
-    {
-      value: 'invited',
-      label: 'Invited',
-      count: entries.filter(e => e.status === 'invited').length,
-    },
-    {
-      value: 'active',
-      label: 'Active',
-      count: entries.filter(e => e.status === 'active').length,
-    },
-    {
-      value: 'rejected',
-      label: 'Rejected',
-      count: entries.filter(e => e.status === 'rejected').length,
-    },
-    {
-      value: 'blocked',
-      label: 'Blocked',
-      count: entries.filter(e => e.status === 'blocked').length,
-    },
-  ], [entries]);
+  }[] = useMemo(
+    () => [
+      { value: 'all', label: 'All', count: entries.length },
+      {
+        value: 'pending',
+        label: 'Pending',
+        count: entries.filter(e => e.status === 'pending').length,
+      },
+      {
+        value: 'confirmed',
+        label: 'Confirmed',
+        count: entries.filter(e => e.status === 'confirmed').length,
+      },
+      {
+        value: 'invited',
+        label: 'Invited',
+        count: entries.filter(e => e.status === 'invited').length,
+      },
+      {
+        value: 'active',
+        label: 'Active',
+        count: entries.filter(e => e.status === 'active').length,
+      },
+      {
+        value: 'rejected',
+        label: 'Rejected',
+        count: entries.filter(e => e.status === 'rejected').length,
+      },
+      {
+        value: 'blocked',
+        label: 'Blocked',
+        count: entries.filter(e => e.status === 'blocked').length,
+      },
+    ],
+    [entries]
+  );
 
   // Error state
   if (error) {
     return (
       <div className='flex flex-col items-center justify-center h-64 space-y-4'>
-        <div className='text-red-600 text-lg font-medium'>Error Loading Waitlist</div>
+        <div className='text-red-600 text-lg font-medium'>
+          Error Loading Waitlist
+        </div>
         <div className='text-gray-600 text-center max-w-md'>{error}</div>
-        <Button 
-          variant='secondary' 
-          onClick={() => window.location.reload()}
-        >
+        <Button variant='secondary' onClick={() => window.location.reload()}>
           <RefreshCw className='h-4 w-4 mr-2' />
           Retry
         </Button>

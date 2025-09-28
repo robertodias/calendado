@@ -15,8 +15,8 @@ export interface TransformOptions {
  * Safely extracts a string value from Firestore document data
  */
 export function extractString(
-  data: DocumentData, 
-  field: string, 
+  data: DocumentData,
+  field: string,
   defaultValue = ''
 ): string {
   const value = data[field];
@@ -27,7 +27,7 @@ export function extractString(
  * Safely extracts a nullable string value from Firestore document data
  */
 export function extractNullableString(
-  data: DocumentData, 
+  data: DocumentData,
   field: string
 ): string | null {
   const value = data[field];
@@ -38,8 +38,8 @@ export function extractNullableString(
  * Safely extracts a number value from Firestore document data
  */
 export function extractNumber(
-  data: DocumentData, 
-  field: string, 
+  data: DocumentData,
+  field: string,
   defaultValue = 0
 ): number {
   const value = data[field];
@@ -50,8 +50,8 @@ export function extractNumber(
  * Safely extracts a boolean value from Firestore document data
  */
 export function extractBoolean(
-  data: DocumentData, 
-  field: string, 
+  data: DocumentData,
+  field: string,
   defaultValue = false
 ): boolean {
   const value = data[field];
@@ -62,20 +62,22 @@ export function extractBoolean(
  * Safely extracts an object value from Firestore document data
  */
 export function extractObject<T = Record<string, unknown>>(
-  data: DocumentData, 
-  field: string, 
+  data: DocumentData,
+  field: string,
   defaultValue: T = {} as T
 ): T {
   const value = data[field];
-  return value && typeof value === 'object' && !Array.isArray(value) ? value as T : defaultValue;
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? (value as T)
+    : defaultValue;
 }
 
 /**
  * Safely extracts a date value from Firestore document data
  */
 export function extractDate(
-  data: DocumentData, 
-  field: string, 
+  data: DocumentData,
+  field: string,
   fallback: Date = new Date()
 ): Date {
   return toDateOrNull(data[field]) || fallback;
@@ -85,7 +87,7 @@ export function extractDate(
  * Safely extracts a nullable date value from Firestore document data
  */
 export function extractNullableDate(
-  data: DocumentData, 
+  data: DocumentData,
   field: string
 ): Date | null {
   return toDateOrNull(data[field]);
@@ -95,25 +97,25 @@ export function extractNullableDate(
  * Safely extracts an array value from Firestore document data
  */
 export function extractArray<T = unknown>(
-  data: DocumentData, 
-  field: string, 
+  data: DocumentData,
+  field: string,
   defaultValue: T[] = []
 ): T[] {
   const value = data[field];
-  return Array.isArray(value) ? value as T[] : defaultValue;
+  return Array.isArray(value) ? (value as T[]) : defaultValue;
 }
 
 /**
  * Safely extracts a value from a nested object path
  */
 export function extractNestedValue<T = unknown>(
-  data: DocumentData, 
-  path: string, 
+  data: DocumentData,
+  path: string,
   defaultValue: T
 ): T {
   const keys = path.split('.');
   let current: unknown = data;
-  
+
   for (const key of keys) {
     if (current && typeof current === 'object' && key in current) {
       current = (current as Record<string, unknown>)[key];
@@ -121,7 +123,7 @@ export function extractNestedValue<T = unknown>(
       return defaultValue;
     }
   }
-  
+
   return current as T;
 }
 
@@ -136,12 +138,16 @@ export function transformDocument<T>(
   try {
     return transformer(doc.data(), doc.id);
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown transformation error';
-    
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown transformation error';
+
     if (options.logErrors) {
-      console.error(`Document transformation failed for ${doc.id}:`, errorMessage);
+      console.error(
+        `Document transformation failed for ${doc.id}:`,
+        errorMessage
+      );
     }
-    
+
     if (options.onError) {
       options.onError(
         error instanceof Error ? error : new Error(errorMessage),
@@ -149,7 +155,7 @@ export function transformDocument<T>(
         'document'
       );
     }
-    
+
     return null;
   }
 }
@@ -166,4 +172,3 @@ export function transformDocuments<T>(
     .map(doc => transformDocument(doc, transformer, options))
     .filter((item): item is T => item !== null);
 }
-
