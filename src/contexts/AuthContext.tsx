@@ -46,16 +46,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     firebaseUser: User,
     roles: UserRole[] = []
   ): AuthUser => {
-    return {
-      ...firebaseUser,
-      roles,
-      hasRole: (requiredRoles: UserRole | UserRole[]) => {
-        const rolesArray = Array.isArray(requiredRoles)
-          ? requiredRoles
-          : [requiredRoles];
-        return rolesArray.some(role => roles.includes(role));
-      },
-    } as AuthUser;
+    const enhancedUser = firebaseUser as AuthUser;
+    enhancedUser.roles = roles;
+    enhancedUser.hasRole = (requiredRoles: UserRole | UserRole[]) => {
+      const rolesArray = Array.isArray(requiredRoles)
+        ? requiredRoles
+        : [requiredRoles];
+      return rolesArray.some(role => enhancedUser.roles.includes(role));
+    };
+    return enhancedUser;
   };
 
   const extractRolesFromToken = async (

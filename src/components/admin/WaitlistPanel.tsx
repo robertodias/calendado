@@ -26,7 +26,7 @@ import {
   deleteDoc,
   doc,
 } from 'firebase/firestore';
-import { getIdTokenResult, type IdTokenResult } from 'firebase/auth';
+import type { IdTokenResult } from 'firebase/auth';
 import WaitlistDrawer from './WaitlistDrawer';
 import {
   transformWaitlistEntries,
@@ -200,9 +200,11 @@ const WaitlistPanel: React.FC = () => {
         console.log('🔍 Delete attempt for entry:', entryId);
         console.log('👤 User object:', user);
         console.log('🎭 User roles from context:', user.roles);
+        console.log('🧪 has getIdTokenResult:', typeof user.getIdTokenResult);
+        console.log('🧪 has getIdToken:', typeof (user as any).getIdToken);
 
         // Get fresh token to check custom claims
-        const tokenResult: IdTokenResult = await getIdTokenResult(user);
+        const tokenResult: IdTokenResult = await user.getIdTokenResult();
         console.log('🔑 Custom claims from token:', tokenResult.claims);
         console.log(
           '🏷️ Platform admin flag:',
