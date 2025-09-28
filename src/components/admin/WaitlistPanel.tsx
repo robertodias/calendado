@@ -199,12 +199,15 @@ const WaitlistPanel: React.FC = () => {
         console.log('🔍 Delete attempt for entry:', entryId);
         console.log('👤 User object:', user);
         console.log('🎭 User roles from context:', user.roles);
-        
+
         // Get fresh token to check custom claims
         try {
           const tokenResult = await user.getIdTokenResult();
           console.log('🔑 Custom claims from token:', tokenResult.claims);
-          console.log('🏷️ Platform admin flag:', tokenResult.claims.platformAdmin);
+          console.log(
+            '🏷️ Platform admin flag:',
+            tokenResult.claims.platformAdmin
+          );
           console.log('📋 Roles in claims:', tokenResult.claims.roles);
           console.log('🔍 Admin flag:', tokenResult.claims.admin);
           console.log('🔍 IsAdmin flag:', tokenResult.claims.isAdmin);
@@ -227,7 +230,9 @@ const WaitlistPanel: React.FC = () => {
           return;
         }
 
-        console.log('✅ User has platform admin privileges, proceeding with deletion');
+        console.log(
+          '✅ User has platform admin privileges, proceeding with deletion'
+        );
         await deleteDoc(doc(db, 'waitlist', entryId));
         toast({
           title: 'Success',
@@ -240,7 +245,7 @@ const WaitlistPanel: React.FC = () => {
           code: (error as any).code,
           message: (error as any).message,
           details: (error as any).details,
-          stack: (error as any).stack
+          stack: (error as any).stack,
         });
         toast({
           title: 'Error',
