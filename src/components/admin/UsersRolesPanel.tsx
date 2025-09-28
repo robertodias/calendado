@@ -142,16 +142,18 @@ const UsersRolesPanel: React.FC = () => {
   }
 
   return (
-    <div className='p-6'>
-      <div className='flex justify-between items-center mb-6'>
-        <div>
-          <h2 className='text-xl font-semibold text-gray-900'>Users & Roles</h2>
-          <p className='text-sm text-gray-600 mt-1'>
-            Manage user roles and permissions. Only superadmins can change
-            roles.
+    <div className='p-6 sm:p-8 lg:p-10 space-y-8'>
+      <div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
+        <div className='space-y-2'>
+          <h2 className='text-2xl font-semibold text-neutral-900'>
+            Users & Roles
+          </h2>
+          <p className='text-sm sm:text-base text-neutral-600 max-w-2xl'>
+            Manage access levels for every teammate. Only superadmins can modify
+            roles, but everyone can review the current assignments.
           </p>
         </div>
-        <div className='text-sm text-gray-500'>
+        <div className='text-sm text-neutral-500'>
           Last updated: {new Date().toLocaleTimeString()}
         </div>
       </div>
@@ -161,8 +163,8 @@ const UsersRolesPanel: React.FC = () => {
         <div
           className={`mb-4 p-3 rounded-md ${
             updateMessage.type === 'success'
-              ? 'bg-green-50 text-green-800 border border-green-200'
-              : 'bg-red-50 text-red-800 border border-red-200'
+              ? 'border border-green-200 bg-green-50 text-green-800'
+              : 'border border-red-200 bg-red-50 text-red-800'
           }`}
         >
           {updateMessage.text}
@@ -176,39 +178,42 @@ const UsersRolesPanel: React.FC = () => {
           placeholder='Search users by email or name...'
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
-          className='w-full max-w-md px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+          className='w-full max-w-md rounded-xl border border-neutral-300 px-4 py-2 text-sm text-neutral-700 shadow-sm transition focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200'
         />
       </div>
 
       {/* Users Table */}
-      <div className='overflow-hidden shadow ring-1 ring-black ring-opacity-5 rounded-lg'>
-        <table className='min-w-full divide-y divide-gray-300'>
-          <thead className='bg-gray-50'>
+      <div className='overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm'>
+        <table className='min-w-full divide-y divide-neutral-200'>
+          <thead className='bg-neutral-50'>
             <tr>
-              <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide'>
+              <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-neutral-500'>
                 User
               </th>
-              <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide'>
+              <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-neutral-500'>
                 Roles
               </th>
-              <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide'>
+              <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-neutral-500'>
                 Created
               </th>
-              <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide'>
+              <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-neutral-500'>
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className='bg-white divide-y divide-gray-200'>
+          <tbody className='bg-white divide-y divide-neutral-100'>
             {filteredUsers.length === 0 ? (
               <tr>
-                <td colSpan={4} className='px-6 py-8 text-center text-gray-500'>
+                <td
+                  colSpan={4}
+                  className='px-6 py-8 text-center text-neutral-500'
+                >
                   {searchTerm ? (
                     'No users found matching your search.'
                   ) : (
                     <div className='space-y-2'>
                       <div>No users found in the system yet.</div>
-                      <div className='text-sm text-gray-400'>
+                      <div className='text-sm text-neutral-400'>
                         Users will appear here when roles are assigned to them.
                       </div>
                     </div>
@@ -217,14 +222,17 @@ const UsersRolesPanel: React.FC = () => {
               </tr>
             ) : (
               filteredUsers.map(userRecord => (
-                <tr key={userRecord.uid} className='hover:bg-gray-50'>
+                <tr
+                  key={userRecord.uid}
+                  className='transition hover:bg-neutral-50'
+                >
                   <td className='px-6 py-4 whitespace-nowrap'>
                     <div className='flex items-center'>
                       <div>
-                        <div className='text-sm font-medium text-gray-900'>
+                        <div className='text-sm font-medium text-neutral-900'>
                           {userRecord.displayName || 'No name'}
                         </div>
-                        <div className='text-sm text-gray-500'>
+                        <div className='text-sm text-neutral-500'>
                           {userRecord.email}
                         </div>
                       </div>
@@ -236,24 +244,26 @@ const UsersRolesPanel: React.FC = () => {
                         userRecord.roles.map(role => (
                           <span
                             key={role}
-                            className='inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800'
+                            className='inline-flex items-center rounded-full bg-primary-50 px-2.5 py-0.5 text-xs font-medium text-primary-700'
                           >
                             {role}
                           </span>
                         ))
                       ) : (
-                        <span className='text-sm text-gray-500'>No roles</span>
+                        <span className='text-sm text-neutral-500'>
+                          No roles
+                        </span>
                       )}
                     </div>
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
+                  <td className='px-6 py-4 whitespace-nowrap text-sm text-neutral-500'>
                     {userRecord.createdAt.toLocaleDateString()}
                   </td>
                   <td className='px-6 py-4 whitespace-nowrap text-sm font-medium'>
                     <button
                       onClick={() => setSelectedUser(userRecord)}
                       disabled={!isSuperAdmin}
-                      className={`text-blue-600 hover:text-blue-900 ${
+                      className={`text-primary-600 transition hover:text-primary-800 ${
                         !isSuperAdmin ? 'opacity-50 cursor-not-allowed' : ''
                       }`}
                     >
@@ -309,47 +319,54 @@ const RoleEditModal: React.FC<RoleEditModalProps> = ({
   };
 
   return (
-    <div className='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50'>
-      <div className='relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white'>
-        <div className='mt-3'>
-          <h3 className='text-lg font-medium text-gray-900 mb-4'>
-            Edit Roles for {user.displayName || user.email}
-          </h3>
+    <div className='fixed inset-0 z-[130] flex items-center justify-center bg-black/40 backdrop-blur-sm'>
+      <div className='w-full max-w-lg rounded-2xl border border-neutral-200 bg-white p-6 shadow-xl'>
+        <div className='mb-6'>
+          <h3 className='text-xl font-semibold text-neutral-900'>Edit Roles</h3>
+          <p className='mt-1 text-sm text-neutral-600'>
+            {user.displayName || user.email}
+          </p>
+        </div>
 
-          <div className='space-y-3'>
-            {availableRoles.map(role => (
-              <label key={role} className='flex items-center'>
+        <div className='space-y-3'>
+          {availableRoles.map(role => (
+            <label
+              key={role}
+              className='flex items-center justify-between rounded-xl border border-neutral-200 p-3 transition hover:border-primary-300'
+            >
+              <div className='flex items-center gap-3'>
                 <input
                   type='checkbox'
                   checked={selectedRoles.includes(role)}
                   onChange={() => handleRoleToggle(role)}
                   disabled={isUpdating}
-                  className='h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded disabled:opacity-50'
+                  className='h-4 w-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500 disabled:opacity-50'
                 />
-                <span className='ml-2 text-sm text-gray-700 capitalize'>
+                <span className='text-sm font-medium text-neutral-700 capitalize'>
                   {role}
                 </span>
-              </label>
-            ))}
-          </div>
+              </div>
+              <span className='text-xs text-neutral-400'>Role</span>
+            </label>
+          ))}
+        </div>
 
-          <div className='flex justify-end space-x-3 mt-6'>
-            <button
-              onClick={onCancel}
-              disabled={isUpdating}
-              className='px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed'
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={isUpdating}
-              className='px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center'
-            >
-              {isUpdating && <LoadingSpinner size='sm' />}
-              {isUpdating ? 'Updating...' : 'Save Changes'}
-            </button>
-          </div>
+        <div className='mt-8 flex items-center justify-end gap-3'>
+          <button
+            onClick={onCancel}
+            disabled={isUpdating}
+            className='rounded-xl border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-600 transition hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-primary-200 disabled:opacity-50'
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={isUpdating}
+            className='flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-200 disabled:opacity-50'
+          >
+            {isUpdating && <LoadingSpinner size='sm' />}
+            {isUpdating ? 'Saving...' : 'Save Changes'}
+          </button>
         </div>
       </div>
     </div>

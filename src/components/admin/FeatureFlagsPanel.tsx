@@ -139,21 +139,26 @@ const FeatureFlagsPanel: React.FC = () => {
   }
 
   return (
-    <div className='p-6'>
-      <div className='flex justify-between items-center mb-6'>
-        <div>
-          <h2 className='text-xl font-semibold text-gray-900'>Feature Flags</h2>
-          <p className='text-sm text-gray-600 mt-1'>
-            Control application features and experimental functionality.
+    <div className='p-6 sm:p-8 lg:p-10 space-y-8'>
+      <div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
+        <div className='space-y-2'>
+          <h2 className='text-2xl font-semibold text-neutral-900'>
+            Feature Flags
+          </h2>
+          <p className='text-sm sm:text-base text-neutral-600 max-w-2xl'>
+            Control experimental functionality and phased rollouts. Toggle
+            features on for internal teams before exposing them to everyone.
             {!canEdit && ' (Read-only access)'}
           </p>
         </div>
-        <div className='text-sm text-gray-500'>
+        <div className='text-sm text-neutral-500'>
           {flags.lastUpdated && (
-            <div>
+            <div className='text-right'>
               <div>Last updated: {flags.lastUpdated.toLocaleString()}</div>
               {flags.lastUpdatedBy && (
-                <div className='text-xs'>by {flags.lastUpdatedBy}</div>
+                <div className='text-xs text-neutral-400'>
+                  by {flags.lastUpdatedBy}
+                </div>
               )}
             </div>
           )}
@@ -163,10 +168,10 @@ const FeatureFlagsPanel: React.FC = () => {
       {/* Save Message */}
       {saveMessage && (
         <div
-          className={`mb-4 p-3 rounded-md ${
+          className={`rounded-xl border p-3 ${
             saveMessage.type === 'success'
-              ? 'bg-green-50 text-green-800 border border-green-200'
-              : 'bg-red-50 text-red-800 border border-red-200'
+              ? 'border-green-200 bg-green-50 text-green-800'
+              : 'border-red-200 bg-red-50 text-red-800'
           }`}
         >
           {saveMessage.text}
@@ -174,7 +179,7 @@ const FeatureFlagsPanel: React.FC = () => {
       )}
 
       {/* Feature Flags Grid */}
-      <div className='space-y-4'>
+      <div className='grid gap-4'>
         {Object.entries(flagDescriptions).map(([flagName, description]) => {
           const flagKey = flagName as keyof FeatureFlags;
           const isEnabled = flags[flagKey] as boolean;
@@ -183,25 +188,25 @@ const FeatureFlagsPanel: React.FC = () => {
           return (
             <div
               key={flagName}
-              className='bg-white border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors'
+              className='rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:border-primary-200'
             >
               <div className='flex items-center justify-between'>
                 <div className='flex-1'>
                   <div className='flex items-center space-x-3'>
-                    <h3 className='text-lg font-medium text-gray-900 capitalize'>
+                    <h3 className='text-lg font-semibold text-neutral-900 capitalize'>
                       {flagName.replace(/([A-Z])/g, ' $1').trim()}
                     </h3>
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         isEnabled
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-neutral-100 text-neutral-600'
                       }`}
                     >
-                      {isEnabled ? 'Enabled' : 'Disabled'}
+                      {isEnabled ? 'Active' : 'Inactive'}
                     </span>
                   </div>
-                  <p className='text-sm text-gray-600 mt-1'>{description}</p>
+                  <p className='mt-2 text-sm text-neutral-600'>{description}</p>
                 </div>
 
                 <div className='flex items-center space-x-3'>
@@ -216,19 +221,27 @@ const FeatureFlagsPanel: React.FC = () => {
                       className='sr-only peer'
                     />
                     <div
-                      className={`relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 ${
+                      className={`relative h-6 w-11 rounded-full bg-neutral-300 transition ${
+                        isEnabled ? 'bg-primary-600' : ''
+                      } ${
                         !canEdit || isSaving
-                          ? 'opacity-50 cursor-not-allowed'
+                          ? 'cursor-not-allowed opacity-50'
                           : ''
                       }`}
-                    ></div>
+                    >
+                      <span
+                        className={`absolute left-1 top-1 h-4 w-4 rounded-full bg-white shadow transition-transform ${
+                          isEnabled ? 'translate-x-5' : ''
+                        }`}
+                      ></span>
+                    </div>
                   </label>
                 </div>
               </div>
 
               {/* Additional info for specific flags */}
               {flagName === 'bookingAlpha' && isEnabled && (
-                <div className='mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md'>
+                <div className='mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3'>
                   <div className='flex'>
                     <div className='flex-shrink-0'>
                       <svg
@@ -244,7 +257,7 @@ const FeatureFlagsPanel: React.FC = () => {
                       </svg>
                     </div>
                     <div className='ml-3'>
-                      <p className='text-sm text-yellow-700'>
+                      <p className='text-sm text-amber-700'>
                         Alpha feature: Only enable for testing environments or
                         selected users.
                       </p>
@@ -254,7 +267,7 @@ const FeatureFlagsPanel: React.FC = () => {
               )}
 
               {flagName === 'paymentsAlpha' && isEnabled && (
-                <div className='mt-3 p-3 bg-red-50 border border-red-200 rounded-md'>
+                <div className='mt-3 rounded-xl border border-red-200 bg-red-50 p-3'>
                   <div className='flex'>
                     <div className='flex-shrink-0'>
                       <svg
@@ -284,11 +297,11 @@ const FeatureFlagsPanel: React.FC = () => {
       </div>
 
       {/* Usage Instructions */}
-      <div className='mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg'>
-        <h3 className='text-sm font-medium text-blue-900 mb-2'>
+      <div className='rounded-2xl border border-primary-200 bg-primary-50 p-5 shadow-sm'>
+        <h3 className='mb-2 text-sm font-semibold text-primary-800'>
           Usage Instructions
         </h3>
-        <ul className='text-sm text-blue-800 space-y-1'>
+        <ul className='space-y-1 text-sm text-primary-700'>
           <li>
             • Feature flags are applied in real-time across the application
           </li>

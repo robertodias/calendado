@@ -197,46 +197,52 @@ const AuditLogsPanel: React.FC = () => {
   }
 
   return (
-    <div className='p-6'>
-      <div className='flex justify-between items-center mb-6'>
-        <div>
-          <h2 className='text-xl font-semibold text-gray-900'>Audit Logs</h2>
-          <p className='text-sm text-gray-600 mt-1'>
-            View all administrative actions and system events. Read-only access.
+    <div className='p-6 sm:p-8 lg:p-10 space-y-8'>
+      <div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
+        <div className='space-y-2'>
+          <h2 className='text-2xl font-semibold text-neutral-900'>
+            Audit Logs
+          </h2>
+          <p className='text-sm sm:text-base text-neutral-600 max-w-2xl'>
+            Review every administrative action and systemic event. Entries
+            update in real time and always remain read-only.
           </p>
         </div>
-        <div className='text-sm text-gray-500'>
+        <div className='text-sm text-neutral-500'>
           Total entries: {logs.length}
           {hasMore && '+'}
         </div>
       </div>
 
       {/* Audit Logs Table */}
-      <div className='overflow-hidden shadow ring-1 ring-black ring-opacity-5 rounded-lg'>
-        <table className='min-w-full divide-y divide-gray-300'>
-          <thead className='bg-gray-50'>
+      <div className='overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm'>
+        <table className='min-w-full divide-y divide-neutral-200'>
+          <thead className='bg-neutral-50'>
             <tr>
-              <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide'>
+              <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-neutral-500'>
                 Time
               </th>
-              <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide'>
+              <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-neutral-500'>
                 Actor
               </th>
-              <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide'>
+              <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-neutral-500'>
                 Action
               </th>
-              <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide'>
+              <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-neutral-500'>
                 Target
               </th>
-              <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide'>
+              <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-neutral-500'>
                 Changes
               </th>
             </tr>
           </thead>
-          <tbody className='bg-white divide-y divide-gray-200'>
+          <tbody className='bg-white divide-y divide-neutral-100'>
             {logs.length === 0 ? (
               <tr>
-                <td colSpan={5} className='px-6 py-8 text-center text-gray-500'>
+                <td
+                  colSpan={5}
+                  className='px-6 py-8 text-center text-neutral-500'
+                >
                   No audit logs found.
                 </td>
               </tr>
@@ -244,19 +250,19 @@ const AuditLogsPanel: React.FC = () => {
               logs.map(log => (
                 <tr
                   key={log.id}
-                  className='hover:bg-gray-50 cursor-pointer'
+                  className='cursor-pointer transition hover:bg-neutral-50'
                   onClick={() => setSelectedLog(log)}
                 >
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
+                  <td className='whitespace-nowrap px-6 py-4 text-sm text-neutral-900'>
                     <div>{log.timestamp.toLocaleDateString()}</div>
-                    <div className='text-xs text-gray-500'>
+                    <div className='text-xs text-neutral-500'>
                       {log.timestamp.toLocaleTimeString()}
                     </div>
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
+                  <td className='whitespace-nowrap px-6 py-4 text-sm text-neutral-900'>
                     <div>{log.actorEmail || 'System'}</div>
                     {log.actorUid && (
-                      <div className='text-xs text-gray-500 font-mono'>
+                      <div className='font-mono text-xs text-neutral-400'>
                         {log.actorUid.substring(0, 8)}...
                       </div>
                     )}
@@ -264,30 +270,30 @@ const AuditLogsPanel: React.FC = () => {
                   <td className='px-6 py-4 whitespace-nowrap'>
                     <div className='flex items-center space-x-2'>
                       <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getActionBadgeColor(log.action)}`}
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getActionBadgeColor(log.action)}`}
                       >
                         {log.action}
                       </span>
-                      <span className='text-xs text-gray-500'>
+                      <span className='text-xs text-neutral-500'>
                         {log.resource}
                       </span>
                     </div>
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
+                  <td className='whitespace-nowrap px-6 py-4 text-sm text-neutral-500'>
                     {log.targetEmail || log.targetUid ? (
                       <div>
                         <div>{log.targetEmail || 'N/A'}</div>
                         {log.targetUid && (
-                          <div className='text-xs font-mono'>
+                          <div className='font-mono text-xs text-neutral-400'>
                             {log.targetUid.substring(0, 8)}...
                           </div>
                         )}
                       </div>
                     ) : (
-                      <span className='text-gray-400'>N/A</span>
+                      <span className='text-neutral-400'>N/A</span>
                     )}
                   </td>
-                  <td className='px-6 py-4 text-sm text-gray-500'>
+                  <td className='px-6 py-4 text-sm text-neutral-500'>
                     <div className='max-w-xs truncate'>
                       {formatDiff(log.before, log.after) ||
                         'No changes recorded'}
@@ -302,14 +308,14 @@ const AuditLogsPanel: React.FC = () => {
 
       {/* Load More Button */}
       {hasMore && (
-        <div className='mt-4 flex justify-center'>
+        <div className='flex justify-center'>
           <button
             onClick={loadMoreLogs}
             disabled={loadingMore}
-            className='px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center'
+            className='flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-200 disabled:cursor-not-allowed disabled:opacity-50'
           >
             {loadingMore && <LoadingSpinner size='sm' />}
-            {loadingMore ? 'Loading...' : 'Load More'}
+            {loadingMore ? 'Loading…' : 'Load More'}
           </button>
         </div>
       )}
@@ -335,144 +341,117 @@ const AuditLogDetailModal: React.FC<AuditLogDetailModalProps> = ({
   onClose,
 }) => {
   return (
-    <div className='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50'>
-      <div className='relative top-20 mx-auto p-5 border w-11/12 max-w-2xl shadow-lg rounded-md bg-white'>
-        <div className='mt-3'>
-          <div className='flex justify-between items-center mb-4'>
-            <h3 className='text-lg font-medium text-gray-900'>
+    <div className='fixed inset-0 z-[130] flex items-center justify-center bg-black/40 backdrop-blur-sm'>
+      <div className='w-full max-w-2xl rounded-2xl border border-neutral-200 bg-white p-6 shadow-xl'>
+        <div className='mb-6 flex items-center justify-between'>
+          <div>
+            <h3 className='text-xl font-semibold text-neutral-900'>
               Audit Log Details
             </h3>
-            <button
-              onClick={onClose}
-              className='text-gray-400 hover:text-gray-600'
+            <p className='text-sm text-neutral-500'>
+              {log.timestamp.toLocaleString()}
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className='rounded-full border border-neutral-200 p-2 text-neutral-400 transition hover:text-neutral-600'
+          >
+            <svg
+              className='h-5 w-5'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
             >
-              <svg
-                className='w-6 h-6'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={2}
-                  d='M6 18L18 6M6 6l12 12'
-                />
-              </svg>
-            </button>
-          </div>
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M6 18L18 6M6 6l12 12'
+              />
+            </svg>
+          </button>
+        </div>
 
-          <div className='space-y-4'>
-            <div className='grid grid-cols-2 gap-4'>
-              <div>
-                <label className='block text-sm font-medium text-gray-700'>
-                  Timestamp
-                </label>
-                <div className='mt-1 text-sm text-gray-900'>
-                  {log.timestamp.toLocaleString()}
-                </div>
-              </div>
-              <div>
-                <label className='block text-sm font-medium text-gray-700'>
-                  Action
-                </label>
-                <div className='mt-1'>
-                  <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getActionBadgeColor(log.action)}`}
-                  >
-                    {log.action}
-                  </span>
-                </div>
-              </div>
+        <div className='grid gap-4 sm:grid-cols-2'>
+          <div className='rounded-xl border border-neutral-100 p-4'>
+            <div className='text-xs font-medium uppercase tracking-wide text-neutral-400'>
+              Actor
             </div>
+            <div className='mt-2 text-sm text-neutral-900'>
+              {log.actorEmail || 'System'}
+            </div>
+            {log.actorUid && (
+              <div className='mt-1 font-mono text-xs text-neutral-400'>
+                UID: {log.actorUid}
+              </div>
+            )}
+          </div>
+          <div className='rounded-xl border border-neutral-100 p-4'>
+            <div className='text-xs font-medium uppercase tracking-wide text-neutral-400'>
+              Target
+            </div>
+            <div className='mt-2 text-sm text-neutral-900'>
+              {log.targetEmail || log.targetUid || 'N/A'}
+            </div>
+            {log.targetUid && (
+              <div className='mt-1 font-mono text-xs text-neutral-400'>
+                UID: {log.targetUid}
+              </div>
+            )}
+          </div>
+          <div className='rounded-xl border border-neutral-100 p-4'>
+            <div className='text-xs font-medium uppercase tracking-wide text-neutral-400'>
+              Action
+            </div>
+            <div className='mt-2 text-sm text-neutral-900'>{log.action}</div>
+          </div>
+          <div className='rounded-xl border border-neutral-100 p-4'>
+            <div className='text-xs font-medium uppercase tracking-wide text-neutral-400'>
+              Resource
+            </div>
+            <div className='mt-2 text-sm text-neutral-900'>{log.resource}</div>
+          </div>
+        </div>
 
+        {(log.before || log.after) && (
+          <div className='mt-6 grid gap-4 sm:grid-cols-2'>
             <div>
-              <label className='block text-sm font-medium text-gray-700'>
-                Actor
-              </label>
-              <div className='mt-1 text-sm text-gray-900'>
-                <div>{log.actorEmail || 'System'}</div>
-                {log.actorUid && (
-                  <div className='text-xs text-gray-500 font-mono'>
-                    {log.actorUid}
-                  </div>
-                )}
-              </div>
+              <h4 className='mb-2 text-sm font-semibold text-neutral-700'>
+                Before
+              </h4>
+              <pre className='max-h-48 overflow-auto rounded-xl border border-neutral-100 bg-neutral-50 p-3 text-sm text-neutral-700'>
+                {JSON.stringify(log.before || {}, null, 2)}
+              </pre>
             </div>
-
-            {(log.targetEmail || log.targetUid) && (
-              <div>
-                <label className='block text-sm font-medium text-gray-700'>
-                  Target
-                </label>
-                <div className='mt-1 text-sm text-gray-900'>
-                  <div>{log.targetEmail || 'N/A'}</div>
-                  {log.targetUid && (
-                    <div className='text-xs text-gray-500 font-mono'>
-                      {log.targetUid}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
             <div>
-              <label className='block text-sm font-medium text-gray-700'>
-                Resource
-              </label>
-              <div className='mt-1 text-sm text-gray-900'>{log.resource}</div>
+              <h4 className='mb-2 text-sm font-semibold text-neutral-700'>
+                After
+              </h4>
+              <pre className='max-h-48 overflow-auto rounded-xl border border-neutral-100 bg-neutral-50 p-3 text-sm text-neutral-700'>
+                {JSON.stringify(log.after || {}, null, 2)}
+              </pre>
             </div>
-
-            {(log.before || log.after) && (
-              <div className='space-y-2'>
-                <label className='block text-sm font-medium text-gray-700'>
-                  Changes
-                </label>
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                  {log.before && (
-                    <div>
-                      <div className='text-xs font-medium text-gray-500 mb-1'>
-                        Before
-                      </div>
-                      <pre className='text-xs bg-red-50 p-2 rounded border overflow-auto max-h-32'>
-                        {JSON.stringify(log.before, null, 2)}
-                      </pre>
-                    </div>
-                  )}
-                  {log.after && (
-                    <div>
-                      <div className='text-xs font-medium text-gray-500 mb-1'>
-                        After
-                      </div>
-                      <pre className='text-xs bg-green-50 p-2 rounded border overflow-auto max-h-32'>
-                        {JSON.stringify(log.after, null, 2)}
-                      </pre>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {log.metadata && (
-              <div>
-                <label className='block text-sm font-medium text-gray-700'>
-                  Metadata
-                </label>
-                <pre className='mt-1 text-xs bg-gray-50 p-2 rounded border overflow-auto max-h-32'>
-                  {JSON.stringify(log.metadata, null, 2)}
-                </pre>
-              </div>
-            )}
           </div>
+        )}
 
-          <div className='flex justify-end mt-6'>
-            <button
-              onClick={onClose}
-              className='px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500'
-            >
-              Close
-            </button>
+        {log.metadata && (
+          <div className='mt-6'>
+            <h4 className='mb-2 text-sm font-semibold text-neutral-700'>
+              Metadata
+            </h4>
+            <pre className='max-h-48 overflow-auto rounded-xl border border-neutral-100 bg-neutral-50 p-3 text-sm text-neutral-700'>
+              {JSON.stringify(log.metadata, null, 2)}
+            </pre>
           </div>
+        )}
+
+        <div className='mt-8 flex justify-end'>
+          <button
+            onClick={onClose}
+            className='rounded-xl border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-600 transition hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-primary-200'
+          >
+            Close
+          </button>
         </div>
       </div>
     </div>
