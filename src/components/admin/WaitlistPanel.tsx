@@ -396,15 +396,17 @@ const WaitlistPanel: React.FC = () => {
   // Error state
   if (error) {
     return (
-      <div className='flex flex-col items-center justify-center h-64 space-y-4'>
-        <div className='text-red-600 text-lg font-medium'>
-          Error Loading Waitlist
+      <div className='p-6 sm:p-8 lg:p-10'>
+        <div className='flex flex-col items-center justify-center h-64 rounded-2xl border border-red-100 bg-red-50/60 space-y-4 shadow-inner'>
+          <div className='text-red-600 text-lg font-semibold'>
+            Error Loading Waitlist
+          </div>
+          <div className='text-gray-600 text-center max-w-md'>{error}</div>
+          <Button variant='secondary' onClick={() => window.location.reload()}>
+            <RefreshCw className='h-4 w-4 mr-2' />
+            Retry
+          </Button>
         </div>
-        <div className='text-gray-600 text-center max-w-md'>{error}</div>
-        <Button variant='secondary' onClick={() => window.location.reload()}>
-          <RefreshCw className='h-4 w-4 mr-2' />
-          Retry
-        </Button>
       </div>
     );
   }
@@ -412,15 +414,19 @@ const WaitlistPanel: React.FC = () => {
   // Loading state
   if (loading) {
     return (
-      <div className='flex items-center justify-center h-64'>
-        <RefreshCw className='h-8 w-8 animate-spin text-primary-600' />
-        <span className='ml-2 text-gray-600'>Loading waitlist entries...</span>
+      <div className='p-6 sm:p-8 lg:p-10'>
+        <div className='flex items-center justify-center h-64 rounded-2xl border border-primary-100 bg-primary-50/60 shadow-inner'>
+          <RefreshCw className='h-8 w-8 animate-spin text-primary-600' />
+          <span className='ml-3 text-gray-600 text-base font-medium'>
+            Loading waitlist entries...
+          </span>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className='space-y-6'>
+    <div className='p-6 sm:p-8 lg:p-10 space-y-8 sm:space-y-10'>
       {/* Header */}
       <div className='flex items-center justify-between'>
         <div>
@@ -481,7 +487,7 @@ const WaitlistPanel: React.FC = () => {
 
       {/* Bulk Actions */}
       {selectedEntries.length > 0 && (
-        <div className='bg-primary-50 border border-primary-200 rounded-lg p-4'>
+        <div className='bg-primary-50 border border-primary-200 rounded-xl p-4 shadow-sm'>
           <div className='flex items-center justify-between'>
             <span className='text-sm text-primary-800'>
               {selectedEntries.length} entries selected
@@ -501,7 +507,7 @@ const WaitlistPanel: React.FC = () => {
       )}
 
       {/* Table */}
-      <div className='bg-white rounded-lg border border-gray-200 overflow-hidden'>
+      <div className='bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm'>
         <div className='overflow-x-auto'>
           <table className='min-w-full divide-y divide-gray-200'>
             <thead className='bg-gray-50'>
