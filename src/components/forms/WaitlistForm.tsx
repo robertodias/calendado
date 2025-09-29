@@ -84,7 +84,7 @@ const WaitlistForm: React.FC<WaitlistFormProps> = ({ onSuccess, onError }) => {
   // Execute reCAPTCHA v3
   const executeRecaptcha = async (): Promise<string | null> => {
     if (!recaptchaRef.current) return null;
-    
+
     try {
       const token = await recaptchaRef.current.executeAsync();
       return token;
@@ -255,9 +255,10 @@ const WaitlistForm: React.FC<WaitlistFormProps> = ({ onSuccess, onError }) => {
                 <ReCAPTCHA
                   ref={recaptchaRef}
                   sitekey={
-                    import.meta.env.VITE_RECAPTCHA_SITE_KEY || '6Le6nNArAAAAANxArJSBlIZ1kGrtQ03N8Z1BkI2K'
+                    import.meta.env.VITE_RECAPTCHA_SITE_KEY ||
+                    '6Le6nNArAAAAANxArJSBlIZ1kGrtQ03N8Z1BkI2K'
                   }
-                  size="invisible"
+                  size='invisible'
                   onChange={handleCaptchaChange}
                   onExpired={() => setCaptchaValue(null)}
                   onError={() => setErrors({ general: t('form.captchaError') })}
