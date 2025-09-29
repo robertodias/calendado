@@ -241,7 +241,9 @@ const WaitlistForm: React.FC<WaitlistFormProps> = ({ onSuccess, onError }) => {
                 <div className='transform scale-90'>
                   <ReCAPTCHA
                     ref={recaptchaRef}
-                    sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || 'demo-key'}
+                    sitekey={
+                      import.meta.env.VITE_RECAPTCHA_SITE_KEY || 'demo-key'
+                    }
                     onChange={handleCaptchaChange}
                     onExpired={() => setCaptchaValue(null)}
                     onError={() => setCaptchaError(true)}
