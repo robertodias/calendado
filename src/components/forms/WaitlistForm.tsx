@@ -45,14 +45,9 @@ const WaitlistForm: React.FC<WaitlistFormProps> = ({ onSuccess, onError }) => {
   const [captchaValue, setCaptchaValue] = useState<string | null>(null);
   const [captchaError, setCaptchaError] = useState(false);
 
-  // Disable CAPTCHA for local development or if no valid key
+  // Disable CAPTCHA for local development
   const isLocalDevelopment =
     import.meta.env.DEV || window.location.hostname === 'localhost';
-
-  const hasValidRecaptchaKey =
-    import.meta.env.VITE_RECAPTCHA_SITE_KEY &&
-    import.meta.env.VITE_RECAPTCHA_SITE_KEY !== 'demo-key' &&
-    import.meta.env.VITE_RECAPTCHA_SITE_KEY.length > 10;
 
   // Debounced email validation
   const debouncedEmailValidator = createDebouncedValidator((email: string) => {
@@ -113,8 +108,8 @@ const WaitlistForm: React.FC<WaitlistFormProps> = ({ onSuccess, onError }) => {
         return;
       }
 
-      // Skip CAPTCHA validation in local development or if no valid key
-      if (!isLocalDevelopment && hasValidRecaptchaKey && !captchaValue) {
+      // Skip CAPTCHA validation in local development
+      if (!isLocalDevelopment && !captchaValue) {
         setCaptchaError(true);
         return;
       }
@@ -240,13 +235,13 @@ const WaitlistForm: React.FC<WaitlistFormProps> = ({ onSuccess, onError }) => {
               </div>
             </div>
 
-            {/* CAPTCHA - Only show if we have a valid key */}
-            {!isLocalDevelopment && hasValidRecaptchaKey && (
+            {/* CAPTCHA */}
+            {!isLocalDevelopment && (
               <div className='flex justify-center'>
                 <div className='transform scale-90'>
                   <ReCAPTCHA
                     ref={recaptchaRef}
-                    sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                    sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || 'demo-key'}
                     onChange={handleCaptchaChange}
                     onExpired={() => setCaptchaValue(null)}
                     onError={() => setCaptchaError(true)}
@@ -292,10 +287,7 @@ const WaitlistForm: React.FC<WaitlistFormProps> = ({ onSuccess, onError }) => {
             {/* Modern submit button */}
             <button
               type='submit'
-              disabled={
-                isSubmitting ||
-                (!isLocalDevelopment && hasValidRecaptchaKey && !captchaValue)
-              }
+              disabled={isSubmitting || (!isLocalDevelopment && !captchaValue)}
               className='group relative w-full h-16 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-slate-600 disabled:to-slate-600 text-white font-semibold text-lg rounded-2xl transition-all duration-300 shadow-2xl shadow-purple-600/25 hover:shadow-3xl hover:shadow-purple-600/40 hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 overflow-hidden'
             >
               <span className='relative z-10 flex items-center justify-center'>
