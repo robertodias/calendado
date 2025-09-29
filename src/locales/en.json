@@ -1,8 +1,11 @@
 {
   "hero": {
-    "title": "Get in, get booked.",
-    "subtitle": "Your booking link + WhatsApp reminders. Free to start.",
-    "cta": "Join waitlist"
+    "title": "Easy scheduling ahead",
+    "subtitle": "Join thousands of professionals who easily book meetings with the #1 WhatsApp scheduling tool.",
+    "cta": "Get started free",
+    "secondaryCta": "Watch demo",
+    "socialProof": "Trusted by 10,000+ businesses",
+    "noCreditCard": "No credit card required"
   },
   "waitlist": {
     "title": "Join the waitlist",
@@ -63,6 +66,101 @@
   "valueProposition": {
     "title": "Why choose Calendado?",
     "description": "Everything you need to streamline your booking process and grow your business."
+  },
+  "demo": {
+    "title": "See how it works",
+    "subtitle": "Share your booking page directly with clients, or embed your availability in WhatsApp messages.",
+    "steps": [
+      {
+        "title": "Share your booking link",
+        "description": "Send your personalized booking link via WhatsApp or email"
+      },
+      {
+        "title": "Clients book instantly",
+        "description": "Clients see your real-time availability and book their preferred time"
+      },
+      {
+        "title": "Get automatic reminders",
+        "description": "WhatsApp reminders reduce no-shows and keep everyone on track"
+      }
+    ]
+  },
+  "trust": {
+    "title": "Trusted by more than 10,000 businesses",
+    "subtitle": "From solo entrepreneurs to growing teams, Calendado makes scheduling simple for everyone.",
+    "stats": [
+      {
+        "number": "95%",
+        "label": "Reduction in scheduling errors"
+      },
+      {
+        "number": "3x",
+        "label": "Faster booking process"
+      },
+      {
+        "number": "40%",
+        "label": "Fewer no-shows"
+      }
+    ]
+  },
+  "integrations": {
+    "title": "Connect Calendado to the tools you already use",
+    "subtitle": "Boost productivity with seamless integrations",
+    "tools": [
+      "WhatsApp Business",
+      "Google Calendar",
+      "Outlook",
+      "Zoom",
+      "Teams",
+      "Slack"
+    ]
+  },
+  "pricing": {
+    "title": "Pick the perfect plan for your business",
+    "subtitle": "Start free, upgrade when you're ready",
+    "plans": [
+      {
+        "name": "Free",
+        "price": "Always free",
+        "description": "Perfect for individuals and small businesses",
+        "features": [
+          "Unlimited bookings",
+          "WhatsApp integration",
+          "Basic calendar sync",
+          "Email reminders"
+        ],
+        "cta": "Get started"
+      },
+      {
+        "name": "Pro",
+        "price": "$9",
+        "period": "/month",
+        "description": "For growing businesses",
+        "features": [
+          "Everything in Free",
+          "Team collaboration",
+          "Advanced analytics",
+          "Custom branding",
+          "Priority support"
+        ],
+        "cta": "Start free trial",
+        "popular": true
+      },
+      {
+        "name": "Business",
+        "price": "$19",
+        "period": "/month",
+        "description": "For larger teams",
+        "features": [
+          "Everything in Pro",
+          "Multiple team members",
+          "Advanced integrations",
+          "API access",
+          "Dedicated support"
+        ],
+        "cta": "Contact sales"
+      }
+    ]
   },
   "footer": {
     "about": "About",

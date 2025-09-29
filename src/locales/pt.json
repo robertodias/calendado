@@ -1,8 +1,11 @@
 {
   "hero": {
-    "title": "Entrou no Calendado, compromisso agendado.",
-    "subtitle": "Seu link de agendamento + WhatsApp. Grátis para começar.",
-    "cta": "Quero meu link"
+    "title": "Agendamento simplificado",
+    "subtitle": "Junte-se a milhares de profissionais que agendam reuniões facilmente com a ferramenta #1 de agendamento via WhatsApp.",
+    "cta": "Começar grátis",
+    "secondaryCta": "Ver demonstração",
+    "socialProof": "Confiado por mais de 10.000 empresas",
+    "noCreditCard": "Sem cartão de crédito necessário"
   },
   "waitlist": {
     "title": "Junte-se à lista de espera",
@@ -63,6 +66,101 @@
   "valueProposition": {
     "title": "Por que escolher o Calendado?",
     "description": "Tudo que você precisa para simplificar seu processo de agendamento e fazer seu negócio crescer."
+  },
+  "demo": {
+    "title": "Veja como funciona",
+    "subtitle": "Compartilhe sua página de agendamento diretamente com clientes, ou incorpore sua disponibilidade em mensagens do WhatsApp.",
+    "steps": [
+      {
+        "title": "Compartilhe seu link",
+        "description": "Envie seu link personalizado via WhatsApp ou email"
+      },
+      {
+        "title": "Clientes agendam instantaneamente",
+        "description": "Clientes veem sua disponibilidade em tempo real e agendam o horário preferido"
+      },
+      {
+        "title": "Receba lembretes automáticos",
+        "description": "Lembretes via WhatsApp reduzem faltas e mantêm todos organizados"
+      }
+    ]
+  },
+  "trust": {
+    "title": "Confiado por mais de 10.000 empresas",
+    "subtitle": "De empreendedores individuais a equipes em crescimento, o Calendado torna o agendamento simples para todos.",
+    "stats": [
+      {
+        "number": "95%",
+        "label": "Redução em erros de agendamento"
+      },
+      {
+        "number": "3x",
+        "label": "Processo de agendamento mais rápido"
+      },
+      {
+        "number": "40%",
+        "label": "Menos faltas"
+      }
+    ]
+  },
+  "integrations": {
+    "title": "Conecte o Calendado às ferramentas que você já usa",
+    "subtitle": "Aumente a produtividade com integrações perfeitas",
+    "tools": [
+      "WhatsApp Business",
+      "Google Calendar",
+      "Outlook",
+      "Zoom",
+      "Teams",
+      "Slack"
+    ]
+  },
+  "pricing": {
+    "title": "Escolha o plano perfeito para seu negócio",
+    "subtitle": "Comece grátis, atualize quando estiver pronto",
+    "plans": [
+      {
+        "name": "Grátis",
+        "price": "Sempre grátis",
+        "description": "Perfeito para indivíduos e pequenas empresas",
+        "features": [
+          "Agendamentos ilimitados",
+          "Integração WhatsApp",
+          "Sincronização básica de calendário",
+          "Lembretes por email"
+        ],
+        "cta": "Começar"
+      },
+      {
+        "name": "Pro",
+        "price": "R$ 45",
+        "period": "/mês",
+        "description": "Para empresas em crescimento",
+        "features": [
+          "Tudo do Grátis",
+          "Colaboração em equipe",
+          "Analytics avançados",
+          "Marca personalizada",
+          "Suporte prioritário"
+        ],
+        "cta": "Teste grátis",
+        "popular": true
+      },
+      {
+        "name": "Business",
+        "price": "R$ 95",
+        "period": "/mês",
+        "description": "Para equipes maiores",
+        "features": [
+          "Tudo do Pro",
+          "Múltiplos membros da equipe",
+          "Integrações avançadas",
+          "Acesso à API",
+          "Suporte dedicado"
+        ],
+        "cta": "Falar com vendas"
+      }
+    ]
   },
   "footer": {
     "about": "Sobre",
