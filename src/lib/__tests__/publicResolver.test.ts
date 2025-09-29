@@ -9,6 +9,7 @@ import { mockData } from '../mockData';
 import type { ResolverSlugs } from '../publicTypes';
 import * as firestore from 'firebase/firestore';
 import * as redirects from '../redirects';
+import type { QueryDocumentSnapshot, QuerySnapshot, DocumentData } from 'firebase/firestore';
 
 // Mock Firebase
 vi.mock('../../firebase', () => ({
@@ -39,6 +40,49 @@ vi.mock('../redirects', () => ({
   findRedirectRule: vi.fn(),
 }));
 
+// Helper function to create a mock QueryDocumentSnapshot
+function createMockQueryDocumentSnapshot<T = DocumentData>(
+  id: string,
+  data: T
+): QueryDocumentSnapshot<T> {
+  return {
+    id,
+    data: () => data,
+    exists: () => true,
+    metadata: {
+      fromCache: false,
+      hasPendingWrites: false,
+      isEqual: vi.fn(),
+    },
+    get: vi.fn(),
+    toJSON: vi.fn(),
+    ref: {} as any,
+  } as unknown as QueryDocumentSnapshot<T>;
+}
+
+// Helper function to create a mock QuerySnapshot
+function createMockQuerySnapshot<T = DocumentData>(
+  docs: QueryDocumentSnapshot<T>[]
+): QuerySnapshot<T> {
+  return {
+    empty: docs.length === 0,
+    size: docs.length,
+    docs,
+    forEach: vi.fn((callback) => {
+      docs.forEach(callback);
+    }),
+    docChanges: vi.fn(),
+    isEqual: vi.fn(),
+    query: {} as any,
+    toJSON: vi.fn(),
+    metadata: {
+      fromCache: false,
+      hasPendingWrites: false,
+      isEqual: vi.fn(),
+    },
+  } as unknown as QuerySnapshot<T>;
+}
+
 describe('Public Resolver', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -50,16 +94,10 @@ describe('Public Resolver', () => {
 
       // Mock Firestore response
       const mockBrand = mockData.brands[0];
+      const mockDoc = createMockQueryDocumentSnapshot(mockBrand.id, mockBrand);
+      const mockSnapshot = createMockQuerySnapshot([mockDoc]);
 
-      vi.mocked(firestore.getDocs).mockResolvedValue({
-        empty: false,
-        docs: [
-          {
-            id: mockBrand.id,
-            data: () => mockBrand,
-          },
-        ],
-      });
+      vi.mocked(firestore.getDocs).mockResolvedValue(mockSnapshot);
 
       const result = await resolvePublicContext(slugs);
 
@@ -71,10 +109,8 @@ describe('Public Resolver', () => {
     it('should return 404 for non-existent brand', async () => {
       const slugs: ResolverSlugs = { brand: 'non-existent' };
 
-      vi.mocked(firestore.getDocs).mockResolvedValue({
-        empty: true,
-        docs: [],
-      });
+      const mockSnapshot = createMockQuerySnapshot([]);
+      vi.mocked(firestore.getDocs).mockResolvedValue(mockSnapshot);
 
       const result = await resolvePublicContext(slugs);
 
@@ -86,16 +122,10 @@ describe('Public Resolver', () => {
       const slugs: ResolverSlugs = { brand: 'disabled-brand' };
 
       const disabledBrand = { ...mockData.brands[0], status: 'disabled' };
+      const mockDoc = createMockQueryDocumentSnapshot(disabledBrand.id, disabledBrand);
+      const mockSnapshot = createMockQuerySnapshot([mockDoc]);
 
-      vi.mocked(firestore.getDocs).mockResolvedValue({
-        empty: false,
-        docs: [
-          {
-            id: disabledBrand.id,
-            data: () => disabledBrand,
-          },
-        ],
-      });
+      vi.mocked(firestore.getDocs).mockResolvedValue(mockSnapshot);
 
       const result = await resolvePublicContext(slugs);
 
@@ -109,16 +139,10 @@ describe('Public Resolver', () => {
       const slugs: ResolverSlugs = { brand: 'glow', store: 'porto-alegre' };
 
       const mockStore = mockData.stores[0];
+      const mockDoc = createMockQueryDocumentSnapshot(mockStore.id, mockStore);
+      const mockSnapshot = createMockQuerySnapshot([mockDoc]);
 
-      vi.mocked(firestore.getDocs).mockResolvedValue({
-        empty: false,
-        docs: [
-          {
-            id: mockStore.id,
-            data: () => mockStore,
-          },
-        ],
-      });
+      vi.mocked(firestore.getDocs).mockResolvedValue(mockSnapshot);
 
       const result = await resolvePublicContext(slugs);
 
@@ -130,10 +154,8 @@ describe('Public Resolver', () => {
     it('should return 404 for non-existent store', async () => {
       const slugs: ResolverSlugs = { brand: 'glow', store: 'non-existent' };
 
-      vi.mocked(firestore.getDocs).mockResolvedValue({
-        empty: true,
-        docs: [],
-      });
+      const mockSnapshot = createMockQuerySnapshot([]);
+      vi.mocked(firestore.getDocs).mockResolvedValue(mockSnapshot);
 
       const result = await resolvePublicContext(slugs);
 
@@ -151,16 +173,10 @@ describe('Public Resolver', () => {
       };
 
       const mockPro = mockData.professionals[0];
+      const mockDoc = createMockQueryDocumentSnapshot(mockPro.id, mockPro);
+      const mockSnapshot = createMockQuerySnapshot([mockDoc]);
 
-      vi.mocked(firestore.getDocs).mockResolvedValue({
-        empty: false,
-        docs: [
-          {
-            id: mockPro.id,
-            data: () => mockPro,
-          },
-        ],
-      });
+      vi.mocked(firestore.getDocs).mockResolvedValue(mockSnapshot);
 
       const result = await resolvePublicContext(slugs);
 
@@ -178,16 +194,10 @@ describe('Public Resolver', () => {
 
       // Maria belongs to porto-alegre, not centro
       const mockPro = { ...mockData.professionals[0] };
+      const mockDoc = createMockQueryDocumentSnapshot(mockPro.id, mockPro);
+      const mockSnapshot = createMockQuerySnapshot([mockDoc]);
 
-      vi.mocked(firestore.getDocs).mockResolvedValue({
-        empty: false,
-        docs: [
-          {
-            id: mockPro.id,
-            data: () => mockPro,
-          },
-        ],
-      });
+      vi.mocked(firestore.getDocs).mockResolvedValue(mockSnapshot);
 
       const result = await resolvePublicContext(slugs);
 
@@ -201,16 +211,10 @@ describe('Public Resolver', () => {
       const slugs: ResolverSlugs = { soloPro: 'maria-silva' };
 
       const mockPro = mockData.professionals[0];
+      const mockDoc = createMockQueryDocumentSnapshot(mockPro.id, mockPro);
+      const mockSnapshot = createMockQuerySnapshot([mockDoc]);
 
-      vi.mocked(firestore.getDocs).mockResolvedValue({
-        empty: false,
-        docs: [
-          {
-            id: mockPro.id,
-            data: () => mockPro,
-          },
-        ],
-      });
+      vi.mocked(firestore.getDocs).mockResolvedValue(mockSnapshot);
 
       const result = await resolvePublicContext(slugs);
 
@@ -223,16 +227,10 @@ describe('Public Resolver', () => {
       const slugs: ResolverSlugs = { soloPro: 'maria-silva' };
 
       const mockPro = mockData.professionals[0];
+      const mockDoc = createMockQueryDocumentSnapshot(mockPro.id, mockPro);
+      const mockSnapshot = createMockQuerySnapshot([mockDoc]);
 
-      vi.mocked(firestore.getDocs).mockResolvedValue({
-        empty: false,
-        docs: [
-          {
-            id: mockPro.id,
-            data: () => mockPro,
-          },
-        ],
-      });
+      vi.mocked(firestore.getDocs).mockResolvedValue(mockSnapshot);
 
       const result = await resolvePublicContext(slugs);
 
@@ -296,16 +294,10 @@ describe('Public Resolver', () => {
       };
 
       const mockPro = mockData.professionals[0];
+      const mockDoc = createMockQueryDocumentSnapshot(mockPro.id, mockPro);
+      const mockSnapshot = createMockQuerySnapshot([mockDoc]);
 
-      vi.mocked(firestore.getDocs).mockResolvedValue({
-        empty: false,
-        docs: [
-          {
-            id: mockPro.id,
-            data: () => mockPro,
-          },
-        ],
-      });
+      vi.mocked(firestore.getDocs).mockResolvedValue(mockSnapshot);
 
       const result = await resolvePublicContext(slugs);
 
