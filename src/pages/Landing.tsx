@@ -59,23 +59,23 @@ const Landing: React.FC = () => {
         <div className='absolute -bottom-40 -left-40 w-[1300px] h-[1300px] bg-gradient-to-tr from-pink-500/40 to-blue-500/40 rounded-full blur-3xl animate-pulse delay-1000' />
         <div className='absolute top-1/4 left-1/4 w-[800px] h-[800px] bg-gradient-to-r from-purple-400/50 to-pink-400/50 rounded-full blur-2xl animate-pulse delay-500' />
         <div className='absolute bottom-1/3 right-1/3 w-[900px] h-[900px] bg-gradient-to-l from-blue-400/45 to-purple-400/45 rounded-full blur-3xl animate-pulse delay-700' />
-        
+
         {/* Secondary accent elements */}
         <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-pink-300/60 to-purple-300/60 rounded-full blur-2xl animate-pulse delay-300' />
         <div className='absolute top-1/6 right-1/6 w-[500px] h-[500px] bg-gradient-to-br from-blue-300/50 to-pink-300/50 rounded-full blur-xl animate-pulse delay-900' />
-        
+
         {/* Header area elements */}
         <div className='absolute top-0 left-1/4 w-[400px] h-[400px] bg-gradient-to-br from-purple-400/35 to-pink-400/35 rounded-full blur-2xl animate-pulse delay-200' />
         <div className='absolute top-0 right-1/3 w-[350px] h-[350px] bg-gradient-to-bl from-blue-400/30 to-purple-400/30 rounded-full blur-xl animate-pulse delay-600' />
-        
+
         {/* Middle section elements */}
         <div className='absolute top-1/3 left-1/6 w-[300px] h-[300px] bg-gradient-to-br from-purple-300/40 to-pink-300/40 rounded-full blur-2xl animate-pulse delay-400' />
         <div className='absolute top-2/3 right-1/6 w-[350px] h-[350px] bg-gradient-to-bl from-pink-300/35 to-blue-300/35 rounded-full blur-2xl animate-pulse delay-800' />
-        
+
         {/* Bottom section elements */}
         <div className='absolute bottom-1/4 left-1/3 w-[400px] h-[400px] bg-gradient-to-tr from-blue-300/45 to-purple-300/45 rounded-full blur-2xl animate-pulse delay-100' />
         <div className='absolute bottom-1/6 right-1/4 w-[300px] h-[300px] bg-gradient-to-br from-purple-300/40 to-pink-300/40 rounded-full blur-xl animate-pulse delay-500' />
-        
+
         {/* Subtle overlay for depth and consistency */}
         <div className='absolute inset-0 bg-gradient-to-br from-slate-900/30 via-transparent to-purple-900/20' />
       </div>
@@ -135,7 +135,6 @@ const Landing: React.FC = () => {
 
       {/* Hero Section */}
       <section className='relative overflow-hidden pt-8 pb-32'>
-
         <div className='relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <div className='text-center'>
             <div className='max-w-4xl mx-auto'>
@@ -147,7 +146,7 @@ const Landing: React.FC = () => {
               <p className='text-xl md:text-2xl text-slate-300 mb-12 max-w-3xl mx-auto leading-relaxed'>
                 {t('hero.subtitle')}
               </p>
-              
+
               <div className='flex flex-col sm:flex-row gap-6 justify-center items-center'>
                 <button
                   onClick={scrollToWaitlist}
@@ -157,10 +156,20 @@ const Landing: React.FC = () => {
                   <div className='absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300' />
                 </button>
                 <div className='flex items-center space-x-3 text-neutral-600 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full border border-white/50'>
-                  <svg className='w-5 h-5 text-green-500' fill='currentColor' viewBox='0 0 20 20'>
-                    <path fillRule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z' clipRule='evenodd' />
+                  <svg
+                    className='w-5 h-5 text-green-500'
+                    fill='currentColor'
+                    viewBox='0 0 20 20'
+                  >
+                    <path
+                      fillRule='evenodd'
+                      d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z'
+                      clipRule='evenodd'
+                    />
                   </svg>
-                  <span className='text-sm font-medium'>{t('footer.freeToStart')}</span>
+                  <span className='text-sm font-medium'>
+                    {t('footer.freeToStart')}
+                  </span>
                 </div>
               </div>
             </div>
@@ -185,10 +194,7 @@ const Landing: React.FC = () => {
               <WaitlistSuccess onReset={handleReset} />
             ) : (
               <Card variant='elevated' className='p-8'>
-                <WaitlistForm
-                  onSuccess={handleSuccess}
-                  onError={handleError}
-                />
+                <WaitlistForm onSuccess={handleSuccess} onError={handleError} />
 
                 {submitStatus === 'error' && errorMessage && (
                   <div className='mt-6 p-4 bg-error-50 border border-error-200 rounded-lg'>
@@ -215,7 +221,10 @@ const Landing: React.FC = () => {
 
           <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
             {/* Feature 1 */}
-            <Card variant='elevated' className='text-center p-8 hover:scale-105 transition-transform duration-300 bg-slate-800/50 backdrop-blur-sm border-slate-700/50'>
+            <Card
+              variant='elevated'
+              className='text-center p-8 hover:scale-105 transition-transform duration-300 bg-slate-800/50 backdrop-blur-sm border-slate-700/50'
+            >
               <CardContent className='pt-0'>
                 <div className='w-16 h-16 mx-auto bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center mb-6'>
                   <svg
@@ -242,7 +251,10 @@ const Landing: React.FC = () => {
             </Card>
 
             {/* Feature 2 */}
-            <Card variant='elevated' className='text-center p-8 hover:scale-105 transition-transform duration-300 bg-slate-800/50 backdrop-blur-sm border-slate-700/50'>
+            <Card
+              variant='elevated'
+              className='text-center p-8 hover:scale-105 transition-transform duration-300 bg-slate-800/50 backdrop-blur-sm border-slate-700/50'
+            >
               <CardContent className='pt-0'>
                 <div className='w-16 h-16 mx-auto bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-2xl flex items-center justify-center mb-6'>
                   <svg
@@ -269,7 +281,10 @@ const Landing: React.FC = () => {
             </Card>
 
             {/* Feature 3 */}
-            <Card variant='elevated' className='text-center p-8 hover:scale-105 transition-transform duration-300 bg-slate-800/50 backdrop-blur-sm border-slate-700/50'>
+            <Card
+              variant='elevated'
+              className='text-center p-8 hover:scale-105 transition-transform duration-300 bg-slate-800/50 backdrop-blur-sm border-slate-700/50'
+            >
               <CardContent className='pt-0'>
                 <div className='w-16 h-16 mx-auto bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mb-6'>
                   <svg
@@ -297,7 +312,6 @@ const Landing: React.FC = () => {
           </div>
         </div>
       </section>
-
 
       {/* Footer */}
       <footer className='bg-gradient-to-br from-slate-900 via-neutral-900 to-purple-900 text-white relative overflow-hidden'>
@@ -331,20 +345,31 @@ const Landing: React.FC = () => {
 
             {/* Quick Links */}
             <div>
-              <h4 className='text-lg font-semibold mb-4'>{t('footer.quickLinks')}</h4>
+              <h4 className='text-lg font-semibold mb-4'>
+                {t('footer.quickLinks')}
+              </h4>
               <ul className='space-y-2'>
                 <li>
-                  <a href='#' className='text-neutral-400 hover:text-white transition-colors'>
+                  <a
+                    href='#'
+                    className='text-neutral-400 hover:text-white transition-colors'
+                  >
                     {t('footer.about')}
                   </a>
                 </li>
                 <li>
-                  <a href='#' className='text-neutral-400 hover:text-white transition-colors'>
+                  <a
+                    href='#'
+                    className='text-neutral-400 hover:text-white transition-colors'
+                  >
                     {t('footer.contact')}
                   </a>
                 </li>
                 <li>
-                  <a href='#' className='text-neutral-400 hover:text-white transition-colors'>
+                  <a
+                    href='#'
+                    className='text-neutral-400 hover:text-white transition-colors'
+                  >
                     {t('footer.privacy')}
                   </a>
                 </li>
@@ -353,7 +378,9 @@ const Landing: React.FC = () => {
 
             {/* Newsletter */}
             <div>
-              <h4 className='text-lg font-semibold mb-4'>{t('footer.stayUpdated')}</h4>
+              <h4 className='text-lg font-semibold mb-4'>
+                {t('footer.stayUpdated')}
+              </h4>
               <p className='text-neutral-400 text-sm mb-4'>
                 {t('footer.stayUpdatedDescription')}
               </p>
