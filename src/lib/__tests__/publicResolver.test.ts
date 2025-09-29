@@ -9,7 +9,11 @@ import { mockData } from '../mockData';
 import type { ResolverSlugs } from '../publicTypes';
 import * as firestore from 'firebase/firestore';
 import * as redirects from '../redirects';
-import type { QueryDocumentSnapshot, QuerySnapshot, DocumentData } from 'firebase/firestore';
+import type {
+  QueryDocumentSnapshot,
+  QuerySnapshot,
+  DocumentData,
+} from 'firebase/firestore';
 
 // Mock Firebase
 vi.mock('../../firebase', () => ({
@@ -68,7 +72,7 @@ function createMockQuerySnapshot<T = DocumentData>(
     empty: docs.length === 0,
     size: docs.length,
     docs,
-    forEach: vi.fn((callback) => {
+    forEach: vi.fn(callback => {
       docs.forEach(callback);
     }),
     docChanges: vi.fn(),
@@ -122,7 +126,10 @@ describe('Public Resolver', () => {
       const slugs: ResolverSlugs = { brand: 'disabled-brand' };
 
       const disabledBrand = { ...mockData.brands[0], status: 'disabled' };
-      const mockDoc = createMockQueryDocumentSnapshot(disabledBrand.id, disabledBrand);
+      const mockDoc = createMockQueryDocumentSnapshot(
+        disabledBrand.id,
+        disabledBrand
+      );
       const mockSnapshot = createMockQuerySnapshot([mockDoc]);
 
       vi.mocked(firestore.getDocs).mockResolvedValue(mockSnapshot);
