@@ -162,7 +162,9 @@ const Landing: React.FC = () => {
 
               {/* Social Proof */}
               <div className='text-center mb-8'>
-                <p className='text-slate-300 text-lg mb-6'>{t('hero.socialProof')}</p>
+                <p className='text-slate-300 text-lg mb-6'>
+                  {t('hero.socialProof')}
+                </p>
                 <div className='flex items-center justify-center space-x-3 text-neutral-600 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full border border-white/50 inline-flex'>
                   <svg
                     className='w-5 h-5 text-green-500'
@@ -199,25 +201,27 @@ const Landing: React.FC = () => {
 
           {/* Demo Steps */}
           <div className='grid grid-cols-1 md:grid-cols-3 gap-8 mb-16'>
-            {(translations.demo?.steps || []).map((step: any, index: number) => (
-              <Card
-                key={index}
-                variant='elevated'
-                className='text-center p-8 hover:scale-105 transition-transform duration-300 bg-slate-800/50 backdrop-blur-sm border-slate-700/50'
-              >
-                <CardContent className='pt-0'>
-                  <div className='w-16 h-16 mx-auto bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl flex items-center justify-center mb-6 text-white text-2xl font-bold'>
-                    {index + 1}
-                  </div>
-                  <h3 className='text-xl font-semibold text-white mb-4'>
-                    {step.title}
-                  </h3>
-                  <p className='text-slate-300 leading-relaxed'>
-                    {step.description}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
+            {(translations.demo?.steps || []).map(
+              (step: any, index: number) => (
+                <Card
+                  key={index}
+                  variant='elevated'
+                  className='text-center p-8 hover:scale-105 transition-transform duration-300 bg-slate-800/50 backdrop-blur-sm border-slate-700/50'
+                >
+                  <CardContent className='pt-0'>
+                    <div className='w-16 h-16 mx-auto bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl flex items-center justify-center mb-6 text-white text-2xl font-bold'>
+                      {index + 1}
+                    </div>
+                    <h3 className='text-xl font-semibold text-white mb-4'>
+                      {step.title}
+                    </h3>
+                    <p className='text-slate-300 leading-relaxed'>
+                      {step.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              )
+            )}
           </div>
 
           {/* Visual Demo Mockup */}
@@ -232,7 +236,7 @@ const Landing: React.FC = () => {
                   calendado.com/your-link
                 </div>
               </div>
-              
+
               {/* Mockup Content */}
               <div className='p-8'>
                 <div className='text-center mb-6'>
@@ -243,14 +247,19 @@ const Landing: React.FC = () => {
                     Choose a time that works for you
                   </p>
                 </div>
-                
+
                 {/* Calendar Mockup */}
                 <div className='grid grid-cols-7 gap-2 mb-6'>
-                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
-                    <div key={day} className='text-center text-sm font-medium text-slate-500 py-2'>
-                      {day}
-                    </div>
-                  ))}
+                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(
+                    day => (
+                      <div
+                        key={day}
+                        className='text-center text-sm font-medium text-slate-500 py-2'
+                      >
+                        {day}
+                      </div>
+                    )
+                  )}
                   {Array.from({ length: 35 }, (_, i) => (
                     <div
                       key={i}
@@ -258,25 +267,29 @@ const Landing: React.FC = () => {
                         i >= 15 && i <= 20
                           ? 'bg-primary-100 text-primary-700 font-medium cursor-pointer hover:bg-primary-200'
                           : i < 15
-                          ? 'text-slate-300'
-                          : 'text-slate-300'
+                            ? 'text-slate-300'
+                            : 'text-slate-300'
                       }`}
                     >
                       {i < 15 ? '' : i - 14}
                     </div>
                   ))}
                 </div>
-                
+
                 {/* Time Slots */}
                 <div className='space-y-2'>
-                  <h4 className='font-medium text-slate-900 mb-3'>Available times</h4>
-                  {['9:00 AM', '10:30 AM', '2:00 PM', '3:30 PM'].map((time) => (
+                  <h4 className='font-medium text-slate-900 mb-3'>
+                    Available times
+                  </h4>
+                  {['9:00 AM', '10:30 AM', '2:00 PM', '3:30 PM'].map(time => (
                     <div
                       key={time}
                       className='p-3 border border-slate-200 rounded-lg hover:border-primary-300 hover:bg-primary-50 cursor-pointer transition-colors'
                     >
                       <span className='text-slate-700 font-medium'>{time}</span>
-                      <span className='text-slate-500 text-sm ml-2'>- 30 min</span>
+                      <span className='text-slate-500 text-sm ml-2'>
+                        - 30 min
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -330,35 +343,47 @@ const Landing: React.FC = () => {
 
           {/* Stats Grid */}
           <div className='grid grid-cols-1 md:grid-cols-3 gap-8 mb-16'>
-            {(translations.trust?.stats || []).map((stat: any, index: number) => (
-              <div key={index} className='text-center'>
-                <div className='text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary-400 to-secondary-400 bg-clip-text text-transparent mb-2'>
-                  {stat.number}
+            {(translations.trust?.stats || []).map(
+              (stat: any, index: number) => (
+                <div key={index} className='text-center'>
+                  <div className='text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary-400 to-secondary-400 bg-clip-text text-transparent mb-2'>
+                    {stat.number}
+                  </div>
+                  <div className='text-lg text-slate-300'>{stat.label}</div>
                 </div>
-                <div className='text-lg text-slate-300'>
-                  {stat.label}
-                </div>
-              </div>
-            ))}
+              )
+            )}
           </div>
 
           {/* Trust Badges */}
           <div className='flex flex-wrap justify-center items-center gap-8 opacity-60'>
             <div className='flex items-center space-x-2 text-slate-400'>
               <svg className='w-5 h-5' fill='currentColor' viewBox='0 0 20 20'>
-                <path fillRule='evenodd' d='M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z' clipRule='evenodd' />
+                <path
+                  fillRule='evenodd'
+                  d='M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z'
+                  clipRule='evenodd'
+                />
               </svg>
               <span className='text-sm font-medium'>SOC 2 Compliant</span>
             </div>
             <div className='flex items-center space-x-2 text-slate-400'>
               <svg className='w-5 h-5' fill='currentColor' viewBox='0 0 20 20'>
-                <path fillRule='evenodd' d='M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z' clipRule='evenodd' />
+                <path
+                  fillRule='evenodd'
+                  d='M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z'
+                  clipRule='evenodd'
+                />
               </svg>
               <span className='text-sm font-medium'>GDPR Ready</span>
             </div>
             <div className='flex items-center space-x-2 text-slate-400'>
               <svg className='w-5 h-5' fill='currentColor' viewBox='0 0 20 20'>
-                <path fillRule='evenodd' d='M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z' clipRule='evenodd' />
+                <path
+                  fillRule='evenodd'
+                  d='M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z'
+                  clipRule='evenodd'
+                />
               </svg>
               <span className='text-sm font-medium'>SSL Encrypted</span>
             </div>
@@ -486,19 +511,29 @@ const Landing: React.FC = () => {
 
           {/* Integration Tools Grid */}
           <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6'>
-            {(translations.integrations?.tools || []).map((tool: string, index: number) => (
-              <div
-                key={index}
-                className='bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6 text-center hover:bg-slate-700/50 transition-colors duration-300'
-              >
-                <div className='w-12 h-12 mx-auto bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center mb-3'>
-                  <svg className='w-6 h-6 text-white' fill='currentColor' viewBox='0 0 20 20'>
-                    <path fillRule='evenodd' d='M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z' clipRule='evenodd' />
-                  </svg>
+            {(translations.integrations?.tools || []).map(
+              (tool: string, index: number) => (
+                <div
+                  key={index}
+                  className='bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6 text-center hover:bg-slate-700/50 transition-colors duration-300'
+                >
+                  <div className='w-12 h-12 mx-auto bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center mb-3'>
+                    <svg
+                      className='w-6 h-6 text-white'
+                      fill='currentColor'
+                      viewBox='0 0 20 20'
+                    >
+                      <path
+                        fillRule='evenodd'
+                        d='M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z'
+                        clipRule='evenodd'
+                      />
+                    </svg>
+                  </div>
+                  <div className='text-sm font-medium text-white'>{tool}</div>
                 </div>
-                <div className='text-sm font-medium text-white'>{tool}</div>
-              </div>
-            ))}
+              )
+            )}
           </div>
         </div>
       </section>
@@ -517,66 +552,77 @@ const Landing: React.FC = () => {
 
           {/* Pricing Cards */}
           <div className='grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto'>
-            {(translations.pricing?.plans || []).map((plan: any, index: number) => (
-              <Card
-                key={index}
-                variant='elevated'
-                className={`relative p-8 hover:scale-105 transition-transform duration-300 ${
-                  plan.popular
-                    ? 'bg-gradient-to-br from-primary-500/10 to-secondary-500/10 border-primary-500/50'
-                    : 'bg-slate-800/50 backdrop-blur-sm border-slate-700/50'
-                }`}
-              >
-                {plan.popular && (
-                  <div className='absolute -top-4 left-1/2 transform -translate-x-1/2'>
-                    <span className='bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-4 py-1 rounded-full text-sm font-medium'>
-                      Most Popular
-                    </span>
-                  </div>
-                )}
-                <CardContent className='pt-0'>
-                  <div className='text-center mb-6'>
-                    <h3 className='text-2xl font-bold text-white mb-2'>{plan.name}</h3>
-                    <div className='text-4xl font-bold text-white mb-2'>
-                      {plan.price}
-                      {plan.period && (
-                        <span className='text-lg text-slate-400'>{plan.period}</span>
-                      )}
+            {(translations.pricing?.plans || []).map(
+              (plan: any, index: number) => (
+                <Card
+                  key={index}
+                  variant='elevated'
+                  className={`relative p-8 hover:scale-105 transition-transform duration-300 ${
+                    plan.popular
+                      ? 'bg-gradient-to-br from-primary-500/10 to-secondary-500/10 border-primary-500/50'
+                      : 'bg-slate-800/50 backdrop-blur-sm border-slate-700/50'
+                  }`}
+                >
+                  {plan.popular && (
+                    <div className='absolute -top-4 left-1/2 transform -translate-x-1/2'>
+                      <span className='bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-4 py-1 rounded-full text-sm font-medium'>
+                        Most Popular
+                      </span>
                     </div>
-                    <p className='text-slate-300'>{plan.description}</p>
-                  </div>
+                  )}
+                  <CardContent className='pt-0'>
+                    <div className='text-center mb-6'>
+                      <h3 className='text-2xl font-bold text-white mb-2'>
+                        {plan.name}
+                      </h3>
+                      <div className='text-4xl font-bold text-white mb-2'>
+                        {plan.price}
+                        {plan.period && (
+                          <span className='text-lg text-slate-400'>
+                            {plan.period}
+                          </span>
+                        )}
+                      </div>
+                      <p className='text-slate-300'>{plan.description}</p>
+                    </div>
 
-                  <ul className='space-y-3 mb-8'>
-                    {(plan.features as string[] || []).map((feature: string, featureIndex: number) => (
-                      <li key={featureIndex} className='flex items-center space-x-3'>
-                        <svg
-                          className='w-5 h-5 text-green-400 flex-shrink-0'
-                          fill='currentColor'
-                          viewBox='0 0 20 20'
-                        >
-                          <path
-                            fillRule='evenodd'
-                            d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
-                            clipRule='evenodd'
-                          />
-                        </svg>
-                        <span className='text-slate-300'>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
+                    <ul className='space-y-3 mb-8'>
+                      {((plan.features as string[]) || []).map(
+                        (feature: string, featureIndex: number) => (
+                          <li
+                            key={featureIndex}
+                            className='flex items-center space-x-3'
+                          >
+                            <svg
+                              className='w-5 h-5 text-green-400 flex-shrink-0'
+                              fill='currentColor'
+                              viewBox='0 0 20 20'
+                            >
+                              <path
+                                fillRule='evenodd'
+                                d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
+                                clipRule='evenodd'
+                              />
+                            </svg>
+                            <span className='text-slate-300'>{feature}</span>
+                          </li>
+                        )
+                      )}
+                    </ul>
 
-                  <button
-                    className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-300 ${
-                      plan.popular
-                        ? 'bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white shadow-lg shadow-primary-600/25 hover:shadow-xl hover:shadow-primary-600/40'
-                        : 'bg-slate-700 hover:bg-slate-600 text-white border border-slate-600 hover:border-slate-500'
-                    }`}
-                  >
-                    {plan.cta}
-                  </button>
-                </CardContent>
-              </Card>
-            ))}
+                    <button
+                      className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-300 ${
+                        plan.popular
+                          ? 'bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white shadow-lg shadow-primary-600/25 hover:shadow-xl hover:shadow-primary-600/40'
+                          : 'bg-slate-700 hover:bg-slate-600 text-white border border-slate-600 hover:border-slate-500'
+                      }`}
+                    >
+                      {plan.cta}
+                    </button>
+                  </CardContent>
+                </Card>
+              )
+            )}
           </div>
         </div>
       </section>
