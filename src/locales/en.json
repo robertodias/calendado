@@ -1,17 +1,24 @@
 {
-  "hero": "Calendado: get in, get booked.",
-  "subtext": "Your booking link + WhatsApp reminders. Free to start.",
-  "cta": "Join waitlist",
-  "form": {
+  "hero": {
+    "title": "Get in, get booked.",
+    "subtitle": "Your booking link + WhatsApp reminders. Free to start.",
+    "cta": "Join waitlist"
+  },
+  "waitlist": {
     "title": "Join the waitlist",
-    "name": "Full name",
-    "email": "Email",
+    "description": "Be the first to know when we launch. Get early access and exclusive updates."
+  },
+  "form": {
+    "nameLabel": "Full Name",
+    "emailLabel": "Email Address",
+    "namePlaceholder": "Your full name",
     "emailPlaceholder": "your@email.com",
     "emailError": "Please enter a valid email address",
     "duplicateEmailError": "This email is already registered in our waitlist",
     "captcha": "Security verification",
     "captchaError": "Please complete the security verification.",
     "submit": "Join waitlist",
+    "submitting": "Joining...",
     "success": "Thank you! You've been added to the waitlist.",
     "error": "Oops! Something went wrong. Please try again.",
     "alreadyJoined": "You've already joined the waitlist. Thanks for signing up!",
@@ -19,7 +26,54 @@
     "sending": "Sending...",
     "waitlistUpdate": "Keep an eye on your email for Calendado updates!"
   },
+  "features": {
+    "scheduling": {
+      "title": "Book faster",
+      "description": "Streamline your booking process with smart scheduling that works around your availability."
+    },
+    "team": {
+      "title": "Organize better",
+      "description": "Keep your team in sync with shared calendars and automated reminders."
+    },
+    "automation": {
+      "title": "Share easily",
+      "description": "Send booking links via WhatsApp and let clients book themselves without the back-and-forth."
+    }
+  },
+  "testimonials": {
+    "title": "What our early users say",
+    "items": [
+      {
+        "text": "Finally, a booking system that actually works with WhatsApp!",
+        "author": "Maria Silva",
+        "role": "Freelance Designer"
+      },
+      {
+        "text": "This saved me hours every week. My clients love how easy it is.",
+        "author": "João Santos",
+        "role": "Consultant"
+      },
+      {
+        "text": "The best part? No more double bookings or missed appointments.",
+        "author": "Ana Costa",
+        "role": "Beauty Professional"
+      }
+    ]
+  },
+  "valueProposition": {
+    "title": "Why choose Calendado?",
+    "description": "Everything you need to streamline your booking process and grow your business."
+  },
   "footer": {
-    "copyright": "© 2025 Calendado. All rights reserved."
+    "about": "About",
+    "contact": "Contact",
+    "privacy": "Privacy",
+    "rights": "All rights reserved.",
+    "description": "The smartest way to manage your bookings and grow your business with WhatsApp integration.",
+    "quickLinks": "Quick Links",
+    "stayUpdated": "Stay Updated",
+    "stayUpdatedDescription": "Get notified when we launch new features.",
+    "joinWaitlist": "Join Waitlist",
+    "freeToStart": "Free to start"
   }
 }

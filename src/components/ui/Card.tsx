@@ -10,12 +10,12 @@ const Card = React.forwardRef<
   }
 >(({ className, variant = 'default', interactive = false, ...props }, ref) => {
   const baseClasses =
-    'rounded-2xl bg-white transition-all duration-normal ease-standard';
+    'rounded-2xl bg-white dark:bg-slate-800 transition-all duration-normal ease-standard';
 
   const variantClasses = {
-    default: 'border border-neutral-200 shadow-sm',
-    elevated: 'shadow-lg border-0',
-    outlined: 'border-2 border-neutral-300 shadow-none',
+    default: 'border border-neutral-200 dark:border-slate-700 shadow-sm',
+    elevated: 'shadow-lg border-0 dark:shadow-purple-500/10',
+    outlined: 'border-2 border-neutral-300 dark:border-slate-600 shadow-none',
   };
 
   const interactiveClasses = interactive
@@ -58,7 +58,7 @@ const CardTitle = React.forwardRef<
   <h3
     ref={ref}
     className={cn(
-      'text-title-large font-semibold leading-none tracking-tight text-neutral-900',
+      'text-title-large font-semibold leading-none tracking-tight text-neutral-900 dark:text-white',
       className
     )}
     {...props}
@@ -73,7 +73,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn('text-body-medium text-neutral-600', className)}
+    className={cn('text-body-medium text-neutral-600 dark:text-slate-300', className)}
     {...props}
   />
 ));

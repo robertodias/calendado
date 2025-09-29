@@ -14,8 +14,6 @@ import {
 import { createValidationError, logError } from '../../lib/errorHandler';
 import { signupForWaitlist } from '../../lib/waitlistUtils';
 import { markWaitlistJoined } from '../../lib/cookieUtils';
-import { Button } from '../ui/Button';
-import { Input } from '../ui/Input';
 
 interface WaitlistFormProps {
   onSuccess: (waitlistId: string) => void;
@@ -155,66 +153,135 @@ const WaitlistForm: React.FC<WaitlistFormProps> = ({ onSuccess, onError }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className='space-y-6'>
-      <div className='space-y-4'>
-        <div>
-          <Input
-            type='text'
-            name='name'
-            placeholder={t('form.namePlaceholder')}
-            value={formData.name}
-            onChange={handleInputChange}
-            error={errors.name}
-            disabled={isSubmitting}
-            required
-          />
-        </div>
+    <div className='relative'>
+      {/* Clean minimal glassmorphism card */}
+      <div className='relative bg-slate-800/40 backdrop-blur-2xl rounded-3xl p-8 border border-slate-600/40 shadow-2xl shadow-purple-500/10'>
+        {/* Subtle gradient overlay */}
+        <div className='absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-pink-500/5 rounded-3xl' />
+        
+        {/* Form content */}
+        <div className='relative z-10'>
+            <form onSubmit={handleSubmit} className='space-y-8'>
+            {/* Modern input fields */}
+            <div className='space-y-6'>
+              <div className='group'>
+                <label className='block text-sm font-medium text-slate-300 mb-3 transition-colors group-focus-within:text-white'>
+                  {t('form.nameLabel') || 'Full Name'}
+                </label>
+                <div className='relative'>
+                  <input
+                    type='text'
+                    name='name'
+                    placeholder={t('form.namePlaceholder')}
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    disabled={isSubmitting}
+                    required
+                    className='w-full h-14 px-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed'
+                  />
+                  <div className='absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-500/10 to-pink-500/10 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none' />
+                </div>
+                {errors.name && (
+                  <p className='mt-2 text-sm text-red-400 flex items-center'>
+                    <svg className='w-4 h-4 mr-1' fill='currentColor' viewBox='0 0 20 20'>
+                      <path fillRule='evenodd' d='M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z' clipRule='evenodd' />
+                    </svg>
+                    {errors.name}
+                  </p>
+                )}
+              </div>
 
-        <div>
-          <Input
-            type='email'
-            name='email'
-            placeholder={t('form.emailPlaceholder')}
-            value={formData.email}
-            onChange={handleInputChange}
-            error={errors.email}
-            disabled={isSubmitting}
-            required
-          />
+              <div className='group'>
+                <label className='block text-sm font-medium text-slate-300 mb-3 transition-colors group-focus-within:text-white'>
+                  {t('form.emailLabel') || 'Email Address'}
+                </label>
+                <div className='relative'>
+                  <input
+                    type='email'
+                    name='email'
+                    placeholder={t('form.emailPlaceholder')}
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    disabled={isSubmitting}
+                    required
+                    className='w-full h-14 px-6 bg-slate-700/50 border border-slate-600/50 rounded-2xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed'
+                  />
+                  <div className='absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-500/10 to-pink-500/10 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none' />
+                </div>
+                {errors.email && (
+                  <p className='mt-2 text-sm text-red-400 flex items-center'>
+                    <svg className='w-4 h-4 mr-1' fill='currentColor' viewBox='0 0 20 20'>
+                      <path fillRule='evenodd' d='M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z' clipRule='evenodd' />
+                    </svg>
+                    {errors.email}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* CAPTCHA */}
+            {!isLocalDevelopment && (
+              <div className='flex justify-center'>
+                <div className='transform scale-90'>
+                  <ReCAPTCHA
+                    ref={recaptchaRef}
+                    sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || 'demo-key'}
+                    onChange={handleCaptchaChange}
+                    onExpired={() => setCaptchaValue(null)}
+                    onError={() => setCaptchaError(true)}
+                  />
+                </div>
+                {captchaError && (
+                  <p className='text-red-400 text-sm mt-2 flex items-center'>
+                    <svg className='w-4 h-4 mr-1' fill='currentColor' viewBox='0 0 20 20'>
+                      <path fillRule='evenodd' d='M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z' clipRule='evenodd' />
+                    </svg>
+                    {t('form.captchaError')}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* General errors */}
+            {errors.general && (
+              <div className='text-red-400 text-sm text-center flex items-center justify-center'>
+                <svg className='w-4 h-4 mr-2' fill='currentColor' viewBox='0 0 20 20'>
+                  <path fillRule='evenodd' d='M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z' clipRule='evenodd' />
+                </svg>
+                {errors.general}
+              </div>
+            )}
+
+            {/* Modern submit button */}
+            <button
+              type='submit'
+              disabled={isSubmitting || (!isLocalDevelopment && !captchaValue)}
+              className='group relative w-full h-16 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-slate-600 disabled:to-slate-600 text-white font-semibold text-lg rounded-2xl transition-all duration-300 shadow-2xl shadow-purple-600/25 hover:shadow-3xl hover:shadow-purple-600/40 hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 overflow-hidden'
+            >
+              <span className='relative z-10 flex items-center justify-center'>
+                {isSubmitting ? (
+                  <>
+                    <svg className='animate-spin -ml-1 mr-3 h-5 w-5 text-white' fill='none' viewBox='0 0 24 24'>
+                      <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
+                      <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z' />
+                    </svg>
+                    {t('form.submitting')}
+                  </>
+                ) : (
+                  <>
+                    {t('form.submit')}
+                    <svg className='ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M13 7l5 5m0 0l-5 5m5-5H6' />
+                    </svg>
+                  </>
+                )}
+              </span>
+              <div className='absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300' />
+            </button>
+          </form>
         </div>
       </div>
-
-      {!isLocalDevelopment && (
-        <div className='flex justify-center'>
-          <ReCAPTCHA
-            ref={recaptchaRef}
-            sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || 'demo-key'}
-            onChange={handleCaptchaChange}
-            onExpired={() => setCaptchaValue(null)}
-            onError={() => setCaptchaError(true)}
-          />
-          {captchaError && (
-            <p className='text-red-500 text-sm mt-2'>
-              {t('form.captchaError')}
-            </p>
-          )}
-        </div>
-      )}
-
-      {errors.general && (
-        <div className='text-red-500 text-sm text-center'>{errors.general}</div>
-      )}
-
-      <Button
-        type='submit'
-        variant='primary'
-        size='lg'
-        disabled={isSubmitting || (!isLocalDevelopment && !captchaValue)}
-        className='w-full'
-      >
-        {isSubmitting ? t('form.submitting') : t('form.submit')}
-      </Button>
-    </form>
+    </div>
   );
 };
 

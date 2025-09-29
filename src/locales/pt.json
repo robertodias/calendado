@@ -1,17 +1,24 @@
 {
-  "hero": "Entrou no Calendado, compromisso agendado.",
-  "subtext": "Seu link de agendamento + WhatsApp. Grátis para começar.",
-  "cta": "Quero meu link",
-  "form": {
+  "hero": {
+    "title": "Entrou no Calendado, compromisso agendado.",
+    "subtitle": "Seu link de agendamento + WhatsApp. Grátis para começar.",
+    "cta": "Quero meu link"
+  },
+  "waitlist": {
     "title": "Junte-se à lista de espera",
-    "name": "Nome completo",
-    "email": "Email",
+    "description": "Seja o primeiro a saber quando lançarmos. Tenha acesso antecipado e atualizações exclusivas."
+  },
+  "form": {
+    "nameLabel": "Nome Completo",
+    "emailLabel": "Endereço de Email",
+    "namePlaceholder": "Seu nome completo",
     "emailPlaceholder": "seu@email.com",
     "emailError": "Por favor, insira um email válido",
     "duplicateEmailError": "Este email já está cadastrado na nossa lista de espera",
     "captcha": "Verificação de segurança",
     "captchaError": "Por favor, complete a verificação de segurança.",
     "submit": "Entrar na lista",
+    "submitting": "Entrando...",
     "success": "Obrigado! Você foi adicionado à lista de espera.",
     "error": "Ops! Algo deu errado. Tente novamente.",
     "alreadyJoined": "Você já se inscreveu na lista de espera. Obrigado por se inscrever!",
@@ -19,7 +26,54 @@
     "sending": "Enviando...",
     "waitlistUpdate": "Fique atento ao seu email para atualizações sobre o Calendado!"
   },
+  "features": {
+    "scheduling": {
+      "title": "Agende mais rápido",
+      "description": "Simplifique seu processo de agendamento com horários inteligentes que se adaptam à sua disponibilidade."
+    },
+    "team": {
+      "title": "Organize melhor",
+      "description": "Mantenha sua equipe sincronizada com calendários compartilhados e lembretes automatizados."
+    },
+    "automation": {
+      "title": "Compartilhe facilmente",
+      "description": "Envie links de agendamento via WhatsApp e deixe os clientes se agendarem sem idas e vindas."
+    }
+  },
+  "testimonials": {
+    "title": "O que nossos usuários iniciais dizem",
+    "items": [
+      {
+        "text": "Finalmente, um sistema de agendamento que realmente funciona com WhatsApp!",
+        "author": "Maria Silva",
+        "role": "Designer Freelancer"
+      },
+      {
+        "text": "Isso me economizou horas toda semana. Meus clientes adoram como é fácil.",
+        "author": "João Santos",
+        "role": "Consultor"
+      },
+      {
+        "text": "A melhor parte? Sem mais agendamentos duplos ou compromissos perdidos.",
+        "author": "Ana Costa",
+        "role": "Profissional de Beleza"
+      }
+    ]
+  },
+  "valueProposition": {
+    "title": "Por que escolher o Calendado?",
+    "description": "Tudo que você precisa para simplificar seu processo de agendamento e fazer seu negócio crescer."
+  },
   "footer": {
-    "copyright": "© 2025 Calendado. Todos os direitos reservados."
+    "about": "Sobre",
+    "contact": "Contato",
+    "privacy": "Privacidade",
+    "rights": "Todos os direitos reservados.",
+    "description": "A forma mais inteligente de gerenciar seus agendamentos e fazer seu negócio crescer com integração WhatsApp.",
+    "quickLinks": "Links Rápidos",
+    "stayUpdated": "Fique Atualizado",
+    "stayUpdatedDescription": "Seja notificado quando lançarmos novos recursos.",
+    "joinWaitlist": "Entrar na Lista",
+    "freeToStart": "Grátis para começar"
   }
 }
