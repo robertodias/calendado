@@ -37,7 +37,11 @@ vi.mock('react-router-dom', async () => {
   return {
     ...actual,
     useNavigate: () => mockNavigate,
-    useParams: () => ({ brandSlug: 'glow', storeSlug: 'porto-alegre', proSlug: 'maria-silva' }),
+    useParams: () => ({
+      brandSlug: 'glow',
+      storeSlug: 'porto-alegre',
+      proSlug: 'maria-silva',
+    }),
     useSearchParams: () => [new URLSearchParams()],
   };
 });
@@ -98,7 +102,9 @@ describe('BrandPage', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Glow Beauty Studio')).toBeInTheDocument();
-      expect(screen.getByText('Where beauty meets excellence')).toBeInTheDocument();
+      expect(
+        screen.getByText('Where beauty meets excellence')
+      ).toBeInTheDocument();
     });
   });
 });
@@ -119,7 +125,9 @@ describe('StorePage', () => {
   });
 
   it('renders error state when store not found', async () => {
-    const { getStoreBySlug, getBrandBySlug } = await import('../../lib/bookingMockData');
+    const { getStoreBySlug, getBrandBySlug } = await import(
+      '../../lib/bookingMockData'
+    );
     vi.mocked(getStoreBySlug).mockReturnValue(undefined);
     vi.mocked(getBrandBySlug).mockReturnValue(undefined);
 
@@ -135,7 +143,9 @@ describe('StorePage', () => {
   });
 
   it('filters professionals by search query', async () => {
-    const { getStoreBySlug, getBrandBySlug } = await import('../../lib/bookingMockData');
+    const { getStoreBySlug, getBrandBySlug } = await import(
+      '../../lib/bookingMockData'
+    );
     const mockStore = {
       id: 'store-1',
       slug: 'porto-alegre',
@@ -251,7 +261,11 @@ describe('ProPage', () => {
       return {
         ...actual,
         useNavigate: () => mockNavigate,
-        useParams: () => ({ brandSlug: 'glow', storeSlug: 'porto-alegre', proSlug: 'maria-silva' }),
+        useParams: () => ({
+          brandSlug: 'glow',
+          storeSlug: 'porto-alegre',
+          proSlug: 'maria-silva',
+        }),
         useSearchParams: () => [new URLSearchParams('service=haircut')],
       };
     });

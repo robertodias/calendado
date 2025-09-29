@@ -38,7 +38,7 @@ class TelemetryService {
     };
 
     this.events.push(telemetryEvent);
-    
+
     // In development, log to console
     if (import.meta.env.DEV) {
       console.log('📊 Telemetry Event:', telemetryEvent);

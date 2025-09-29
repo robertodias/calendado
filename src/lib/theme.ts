@@ -17,10 +17,16 @@ export function useTheme(brand?: Brand) {
 
     // Apply brand colors
     if (brand.colors.primary) {
-      document.documentElement.style.setProperty('--brand-primary', brand.colors.primary);
+      document.documentElement.style.setProperty(
+        '--brand-primary',
+        brand.colors.primary
+      );
     }
     if (brand.colors.secondary) {
-      document.documentElement.style.setProperty('--brand-secondary', brand.colors.secondary);
+      document.documentElement.style.setProperty(
+        '--brand-secondary',
+        brand.colors.secondary
+      );
     }
   }, [brand?.colors]);
 

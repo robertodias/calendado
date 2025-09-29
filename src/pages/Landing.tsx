@@ -155,7 +155,7 @@ const Landing: React.FC = () => {
                   <span className='relative z-10'>{t('hero.cta')}</span>
                   <div className='absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300' />
                 </button>
-                <button 
+                <button
                   onClick={() => {
                     // Track secondary CTA click
                     console.log('Secondary CTA clicked: Watch demo');

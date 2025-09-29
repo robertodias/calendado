@@ -51,7 +51,7 @@ const StorePage: React.FC = () => {
 
       const storeData = getStoreBySlug(brandSlug!, storeSlug!);
       const brandData = getBrandBySlug(brandSlug!);
-      
+
       if (!storeData) {
         setError('Store not found');
         return;
@@ -87,28 +87,36 @@ const StorePage: React.FC = () => {
 
   const handleSelectService = (service: Service) => {
     // For now, just log to console. In production, this would navigate to booking flow
-    console.log(`Service "${service.name}" selected. This would start the booking process.`);
+    console.log(
+      `Service "${service.name}" selected. This would start the booking process.`
+    );
   };
 
-  const filteredProfessionals = store?.professionals.filter(pro => {
-    const matchesSearch = pro.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         pro.role?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesService = selectedService === 'all' || 
-                          pro.services.some(service => service.slug === selectedService);
-    return matchesSearch && matchesService;
-  }) || [];
+  const filteredProfessionals =
+    store?.professionals.filter(pro => {
+      const matchesSearch =
+        pro.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        pro.role?.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesService =
+        selectedService === 'all' ||
+        pro.services.some(service => service.slug === selectedService);
+      return matchesSearch && matchesService;
+    }) || [];
 
-  const filteredServices = store?.services?.filter(service => {
-    const matchesSearch = service.name.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesSearch;
-  }) || [];
+  const filteredServices =
+    store?.services?.filter(service => {
+      const matchesSearch = service.name
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      return matchesSearch;
+    }) || [];
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading store...</p>
+      <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+        <div className='text-center'>
+          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4'></div>
+          <p className='text-gray-600'>Loading store...</p>
         </div>
       </div>
     );
@@ -116,10 +124,14 @@ const StorePage: React.FC = () => {
 
   if (error || !store || !brand) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Store Not Found</h1>
-          <p className="text-gray-600 mb-6">The store you're looking for doesn't exist.</p>
+      <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+        <div className='text-center'>
+          <h1 className='text-2xl font-bold text-gray-900 mb-4'>
+            Store Not Found
+          </h1>
+          <p className='text-gray-600 mb-6'>
+            The store you're looking for doesn't exist.
+          </p>
           <Button onClick={() => navigate(`/${brandSlug}`)}>
             Back to Brand
           </Button>
@@ -129,38 +141,43 @@ const StorePage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className='min-h-screen bg-gray-50'>
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className='bg-white shadow-sm border-b'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
           {/* Breadcrumb */}
-          <nav className="flex items-center space-x-2 text-sm text-gray-500 mb-4">
-            <button 
+          <nav className='flex items-center space-x-2 text-sm text-gray-500 mb-4'>
+            <button
               onClick={() => navigate(`/${brandSlug}`)}
-              className="hover:text-gray-700"
+              className='hover:text-gray-700'
             >
               {brand.name}
             </button>
             <span>/</span>
-            <span className="text-gray-900">{store.name}</span>
+            <span className='text-gray-900'>{store.name}</span>
           </nav>
 
           {/* Store Info */}
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{store.name}</h1>
-              
+          <div className='flex items-start justify-between'>
+            <div className='flex-1'>
+              <h1 className='text-3xl font-bold text-gray-900 mb-2'>
+                {store.name}
+              </h1>
+
               {store.address && (
-                <div className="flex items-center space-x-2 text-gray-600 mb-2">
-                  <MapPin className="w-4 h-4" />
+                <div className='flex items-center space-x-2 text-gray-600 mb-2'>
+                  <MapPin className='w-4 h-4' />
                   <span>{store.address}</span>
                 </div>
               )}
 
               {store.phone && (
-                <div className="flex items-center space-x-2 text-gray-600">
-                  <Phone className="w-4 h-4" />
-                  <a href={`tel:${store.phone}`} className="hover:text-gray-900">
+                <div className='flex items-center space-x-2 text-gray-600'>
+                  <Phone className='w-4 h-4' />
+                  <a
+                    href={`tel:${store.phone}`}
+                    className='hover:text-gray-900'
+                  >
                     {store.phone}
                   </a>
                 </div>
@@ -168,9 +185,9 @@ const StorePage: React.FC = () => {
             </div>
 
             {/* Store Stats */}
-            <div className="flex items-center space-x-4 text-sm text-gray-500">
-              <div className="flex items-center space-x-1">
-                <Users className="w-4 h-4" />
+            <div className='flex items-center space-x-4 text-sm text-gray-500'>
+              <div className='flex items-center space-x-1'>
+                <Users className='w-4 h-4' />
                 <span>{store.professionals.length} professionals</span>
               </div>
             </div>
@@ -179,32 +196,32 @@ const StorePage: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
         {/* Filters */}
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row gap-4">
+        <div className='mb-8'>
+          <div className='flex flex-col sm:flex-row gap-4'>
             {/* Search */}
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <div className='flex-1'>
+              <div className='relative'>
+                <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
                 <Input
-                  placeholder="Search professionals..."
+                  placeholder='Search professionals...'
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className='pl-10'
                 />
               </div>
             </div>
 
             {/* Service Filter */}
-            <div className="sm:w-64">
+            <div className='sm:w-64'>
               <select
                 value={selectedService}
-                onChange={(e) => setSelectedService(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                onChange={e => setSelectedService(e.target.value)}
+                className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500'
               >
-                <option value="all">All Services</option>
-                {store.services?.map((service) => (
+                <option value='all'>All Services</option>
+                {store.services?.map(service => (
                   <option key={service.id} value={service.slug}>
                     {service.name}
                   </option>
@@ -216,10 +233,12 @@ const StorePage: React.FC = () => {
 
         {/* Services Section */}
         {store.services && store.services.length > 0 && (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Available Services</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredServices.map((service) => (
+          <div className='mb-12'>
+            <h2 className='text-2xl font-bold text-gray-900 mb-6'>
+              Available Services
+            </h2>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+              {filteredServices.map(service => (
                 <ServiceCard
                   key={service.id}
                   service={service}
@@ -231,25 +250,26 @@ const StorePage: React.FC = () => {
         )}
 
         {/* Professionals Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Our Team</h2>
-            <Badge variant="secondary">
-              {filteredProfessionals.length} professional{filteredProfessionals.length !== 1 ? 's' : ''}
+        <div className='mb-8'>
+          <div className='flex items-center justify-between mb-6'>
+            <h2 className='text-2xl font-bold text-gray-900'>Our Team</h2>
+            <Badge variant='secondary'>
+              {filteredProfessionals.length} professional
+              {filteredProfessionals.length !== 1 ? 's' : ''}
             </Badge>
           </div>
 
           {filteredProfessionals.length === 0 ? (
             <Card>
-              <CardContent className="p-8 text-center">
-                <p className="text-gray-500 mb-4">
-                  {searchQuery || selectedService !== 'all' 
-                    ? 'No professionals found matching your criteria.' 
+              <CardContent className='p-8 text-center'>
+                <p className='text-gray-500 mb-4'>
+                  {searchQuery || selectedService !== 'all'
+                    ? 'No professionals found matching your criteria.'
                     : 'No professionals available at this location.'}
                 </p>
                 {(searchQuery || selectedService !== 'all') && (
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant='outline'
                     onClick={() => {
                       setSearchQuery('');
                       setSelectedService('all');
@@ -261,8 +281,8 @@ const StorePage: React.FC = () => {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProfessionals.map((professional) => (
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+              {filteredProfessionals.map(professional => (
                 <ProfessionalCard
                   key={professional.id}
                   professional={professional}
@@ -274,16 +294,16 @@ const StorePage: React.FC = () => {
         </div>
 
         {/* CTA Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">
+        <div className='bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center'>
+          <h3 className='text-xl font-semibold text-gray-900 mb-4'>
             Ready to Book?
           </h3>
-          <p className="text-gray-600 mb-6">
+          <p className='text-gray-600 mb-6'>
             Choose a professional or service to start your booking process.
           </p>
-          <Button size="lg">
+          <Button size='lg'>
             Start Booking
-            <ArrowRight className="w-5 h-5 ml-2" />
+            <ArrowRight className='w-5 h-5 ml-2' />
           </Button>
         </div>
       </div>

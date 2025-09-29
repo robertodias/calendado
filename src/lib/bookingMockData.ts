@@ -63,7 +63,8 @@ export const mockProfessionals: Professional[] = [
     displayName: 'Maria Silva',
     role: 'Senior Stylist',
     bio: 'Specialized in hair coloring and cutting with 8+ years of experience.',
-    avatarUrl: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+    avatarUrl:
+      'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
     services: [mockServices[0], mockServices[1], mockServices[2]], // haircut, color, highlights
   },
   {
@@ -71,8 +72,9 @@ export const mockProfessionals: Professional[] = [
     slug: 'joao-pereira',
     displayName: 'João Pereira',
     role: 'Master Barber',
-    bio: 'Expert in men\'s grooming and classic cuts with 10+ years experience.',
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+    bio: "Expert in men's grooming and classic cuts with 10+ years experience.",
+    avatarUrl:
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
     services: [mockServices[0]], // haircut
   },
   {
@@ -81,7 +83,8 @@ export const mockProfessionals: Professional[] = [
     displayName: 'Ana Lima',
     role: 'Beauty Specialist',
     bio: 'Specialized in facial treatments and nail care with 6+ years experience.',
-    avatarUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+    avatarUrl:
+      'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
     services: [mockServices[3], mockServices[4], mockServices[5]], // facial, manicure, pedicure
   },
   {
@@ -90,7 +93,8 @@ export const mockProfessionals: Professional[] = [
     displayName: 'Carlos Santos',
     role: 'Color Specialist',
     bio: 'Expert in hair coloring and highlights with 12+ years experience.',
-    avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+    avatarUrl:
+      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
     services: [mockServices[1], mockServices[2]], // color, highlights
   },
 ];
@@ -123,7 +127,11 @@ export const mockStores: Store[] = [
     name: 'Glow Zona Sul',
     address: 'Rua Ipiranga, 789 - Zona Sul, Porto Alegre - RS',
     phone: '+55 51 77777-7777',
-    professionals: [mockProfessionals[0], mockProfessionals[2], mockProfessionals[3]], // Maria, Ana, Carlos
+    professionals: [
+      mockProfessionals[0],
+      mockProfessionals[2],
+      mockProfessionals[3],
+    ], // Maria, Ana, Carlos
     services: mockServices, // all services
   },
 ];
@@ -133,7 +141,8 @@ export const mockBrands: Brand[] = [
     id: 'brand-glow',
     slug: 'glow',
     name: 'Glow Beauty Studio',
-    logoUrl: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=100&h=100&fit=crop',
+    logoUrl:
+      'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=100&h=100&fit=crop',
     colors: {
       primary: '#8B5CF6', // purple
       secondary: '#EC4899', // pink
@@ -145,7 +154,8 @@ export const mockBrands: Brand[] = [
     id: 'brand-chic',
     slug: 'chic',
     name: 'Chic Hair Salon',
-    logoUrl: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=100&h=100&fit=crop',
+    logoUrl:
+      'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=100&h=100&fit=crop',
     colors: {
       primary: '#F59E0B', // amber
       secondary: '#EF4444', // red
@@ -160,16 +170,21 @@ export const getBrandBySlug = (slug: string): Brand | undefined => {
   return mockBrands.find(brand => brand.slug === slug);
 };
 
-export const getStoreBySlug = (brandSlug: string, storeSlug: string): Store | undefined => {
+export const getStoreBySlug = (
+  brandSlug: string,
+  storeSlug: string
+): Store | undefined => {
   const brand = getBrandBySlug(brandSlug);
   if (!brand) return undefined;
-  
-  return mockStores.find(store => 
-    store.brandId === brand.id && store.slug === storeSlug
+
+  return mockStores.find(
+    store => store.brandId === brand.id && store.slug === storeSlug
   );
 };
 
-export const getProfessionalBySlug = (proSlug: string): Professional | undefined => {
+export const getProfessionalBySlug = (
+  proSlug: string
+): Professional | undefined => {
   return mockProfessionals.find(pro => pro.slug === proSlug);
 };
 
