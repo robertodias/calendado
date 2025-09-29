@@ -25,7 +25,7 @@ Calendado uses **GitHub Secrets** for secure environment variable management wit
 | `VITE_FIREBASE_STORAGE_BUCKET` | Firebase storage bucket | `demo.appspot.com` | Yes (production) |
 | `VITE_FIREBASE_MESSAGING_SENDER_ID` | Firebase messaging sender ID | `123456789` | Yes (production) |
 | `VITE_FIREBASE_APP_ID` | Firebase app ID | `1:123456789:web:demo` | Yes (production) |
-| `VITE_RECAPTCHA_SITE_KEY` | Google reCAPTCHA site key | `6Le6nNArAAAAANxArJSBlIZ1kGrtQ03N8Z1BkI2K` | Yes (production) |
+| `VITE_RECAPTCHA_SITE_KEY` | Google reCAPTCHA v3 site key | `6Le6nNArAAAAANxArJSBlIZ1kGrtQ03N8Z1BkI2K` | Yes (production) |
 | `VITE_APP_ENV` | Application environment | `production` | No |
 | `VITE_APP_BASE_URL` | Application base URL | `https://calendado.com` | No |
 | `VITE_DEBUG_MODE` | Debug mode flag | `false` (prod), `true` (dev) | No |

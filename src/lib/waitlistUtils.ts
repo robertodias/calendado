@@ -48,6 +48,7 @@ export interface WaitlistSignupData {
     medium?: string;
     campaign?: string;
   };
+  captchaToken?: string | null;
 }
 
 export interface WaitlistSignupResult {
@@ -107,6 +108,8 @@ export async function signupForWaitlist(
         },
       },
       dedupeKey,
+      captchaToken: data.captchaToken || null,
+      captchaVerified: !!data.captchaToken, // Mark as verified if token is provided
     };
 
     // Add to Firestore
@@ -217,7 +220,8 @@ export function hasJoinedWaitlist(): boolean {
 export async function completeWaitlistSignup(
   email: string,
   name?: string,
-  locale?: Locale
+  locale?: Locale,
+  captchaToken?: string | null
 ): Promise<WaitlistSignupResult> {
   // Check cookie first
   if (hasJoinedWaitlist()) {
@@ -240,6 +244,7 @@ export async function completeWaitlistSignup(
     name,
     locale: finalLocale,
     utm,
+    captchaToken,
   });
 
   // Set cookie on success

@@ -43,10 +43,9 @@ const WaitlistForm: React.FC<WaitlistFormProps> = ({ onSuccess, onError }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [captchaValue, setCaptchaValue] = useState<string | null>(null);
-  const [captchaError, setCaptchaError] = useState(false);
 
-  // Always disable CAPTCHA in production (as per previous decision)
-  const shouldShowCaptcha = false;
+  // Enable reCAPTCHA v3 in production
+  const shouldShowCaptcha = import.meta.env.PROD;
 
   // Debounced email validation
   const debouncedEmailValidator = createDebouncedValidator((email: string) => {
@@ -80,14 +79,25 @@ const WaitlistForm: React.FC<WaitlistFormProps> = ({ onSuccess, onError }) => {
 
   const handleCaptchaChange = (value: string | null) => {
     setCaptchaValue(value);
-    setCaptchaError(false);
+  };
+
+  // Execute reCAPTCHA v3
+  const executeRecaptcha = async (): Promise<string | null> => {
+    if (!recaptchaRef.current) return null;
+    
+    try {
+      const token = await recaptchaRef.current.executeAsync();
+      return token;
+    } catch (error) {
+      console.error('reCAPTCHA execution failed:', error);
+      return null;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setErrors({});
-    setCaptchaError(false);
 
     try {
       // Validate form data
@@ -107,18 +117,23 @@ const WaitlistForm: React.FC<WaitlistFormProps> = ({ onSuccess, onError }) => {
         return;
       }
 
-      // Skip CAPTCHA validation (disabled in production)
-      if (shouldShowCaptcha && !captchaValue) {
-        setCaptchaError(true);
-        return;
+      // Execute reCAPTCHA v3 if enabled
+      let captchaToken: string | null = null;
+      if (shouldShowCaptcha) {
+        captchaToken = await executeRecaptcha();
+        if (!captchaToken) {
+          setErrors({ general: t('form.captchaError') });
+          return;
+        }
       }
 
-      // Submit to waitlist
+      // Submit to waitlist with reCAPTCHA token
       const result = await signupForWaitlist({
         email: formData.email,
         name: formData.name,
         locale: t('locale') as 'en-US' | 'pt-BR' | 'it-IT',
         utm: getUtmParams(),
+        captchaToken,
       });
 
       if (result.success && result.waitlistId) {
@@ -236,34 +251,17 @@ const WaitlistForm: React.FC<WaitlistFormProps> = ({ onSuccess, onError }) => {
 
             {/* CAPTCHA - Disabled in production */}
             {shouldShowCaptcha && (
-              <div className='flex justify-center'>
-                <div className='transform scale-90'>
-                  <ReCAPTCHA
-                    ref={recaptchaRef}
-                    sitekey={
-                      import.meta.env.VITE_RECAPTCHA_SITE_KEY || 'demo-key'
-                    }
-                    onChange={handleCaptchaChange}
-                    onExpired={() => setCaptchaValue(null)}
-                    onError={() => setCaptchaError(true)}
-                  />
-                </div>
-                {captchaError && (
-                  <p className='text-red-400 text-sm mt-2 flex items-center'>
-                    <svg
-                      className='w-4 h-4 mr-1'
-                      fill='currentColor'
-                      viewBox='0 0 20 20'
-                    >
-                      <path
-                        fillRule='evenodd'
-                        d='M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z'
-                        clipRule='evenodd'
-                      />
-                    </svg>
-                    {t('form.captchaError')}
-                  </p>
-                )}
+              <div className='hidden'>
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={
+                    import.meta.env.VITE_RECAPTCHA_SITE_KEY || '6Le6nNArAAAAANxArJSBlIZ1kGrtQ03N8Z1BkI2K'
+                  }
+                  size="invisible"
+                  onChange={handleCaptchaChange}
+                  onExpired={() => setCaptchaValue(null)}
+                  onError={() => setErrors({ general: t('form.captchaError') })}
+                />
               </div>
             )}
 
