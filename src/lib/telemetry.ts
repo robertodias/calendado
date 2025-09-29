@@ -1,341 +1,119 @@
 /**
- * Telemetry system for public routing
- * Tracks resolver hits, mismatches, redirects, and errors
+ * Telemetry system for tracking user interactions
+ * Emits events for analytics and monitoring
  */
 
-import type { TelemetryEvent } from './publicTypes';
-
-// ============================================================================
-// TELEMETRY CONFIGURATION
-// ============================================================================
-
-interface TelemetryConfig {
-  enabled: boolean;
-  endpoint?: string;
-  batchSize: number;
-  flushInterval: number;
-  debug: boolean;
+export interface TelemetryEvent {
+  event: string;
+  properties: Record<string, any>;
+  timestamp: number;
 }
 
-const DEFAULT_CONFIG: TelemetryConfig = {
-  enabled: true,
-  batchSize: 10,
-  flushInterval: 5000, // 5 seconds
-  debug: import.meta.env.DEV,
-};
+export interface PageViewEvent {
+  type: 'brand' | 'store' | 'professional';
+  id: string;
+  slug: string;
+  brandId?: string;
+  storeId?: string;
+  professionalId?: string;
+}
 
-// ============================================================================
-// TELEMETRY STORE
-// ============================================================================
+export interface BookingStartEvent {
+  serviceId: string;
+  serviceSlug: string;
+  professionalId?: string;
+  professionalSlug?: string;
+  selectedDate?: string;
+  selectedTime?: string;
+}
 
-class TelemetryStore {
+class TelemetryService {
   private events: TelemetryEvent[] = [];
-  private config: TelemetryConfig;
-  private flushTimer: NodeJS.Timeout | null = null;
 
-  constructor(config: Partial<TelemetryConfig> = {}) {
-    this.config = { ...DEFAULT_CONFIG, ...config };
-    this.startFlushTimer();
-  }
-
-  /**
-   * Add event to store
-   */
-  addEvent(event: Omit<TelemetryEvent, 'timestamp'>): void {
-    if (!this.config.enabled) return;
-
-    const fullEvent: TelemetryEvent = {
-      ...event,
+  emit(event: string, properties: Record<string, any> = {}) {
+    const telemetryEvent: TelemetryEvent = {
+      event,
+      properties,
       timestamp: Date.now(),
-      userAgent:
-        typeof window !== 'undefined' ? window.navigator.userAgent : undefined,
     };
 
-    this.events.push(fullEvent);
-
-    if (this.config.debug) {
-      console.log('[Telemetry] Event added:', fullEvent);
+    this.events.push(telemetryEvent);
+    
+    // In development, log to console
+    if (import.meta.env.DEV) {
+      console.log('📊 Telemetry Event:', telemetryEvent);
     }
 
-    // Flush if batch size reached
-    if (this.events.length >= this.config.batchSize) {
-      this.flush();
-    }
+    // In production, you would send to your analytics service
+    // Example: analytics.track(event, properties);
   }
 
-  /**
-   * Flush events to endpoint
-   */
-  async flush(): Promise<void> {
-    if (this.events.length === 0) return;
-
-    const eventsToFlush = [...this.events];
-    this.events = [];
-
-    if (this.config.debug) {
-      console.log('[Telemetry] Flushing events:', eventsToFlush);
-    }
-
-    try {
-      if (this.config.endpoint) {
-        await this.sendToEndpoint(eventsToFlush);
-      } else {
-        // In development, just log to console
-        console.log(
-          '[Telemetry] Events (no endpoint configured):',
-          eventsToFlush
-        );
-      }
-    } catch (error) {
-      console.error('[Telemetry] Failed to flush events:', error);
-      // Re-add events to queue for retry
-      this.events.unshift(...eventsToFlush);
-    }
-  }
-
-  /**
-   * Send events to telemetry endpoint
-   */
-  private async sendToEndpoint(events: TelemetryEvent[]): Promise<void> {
-    const response = await fetch(this.config.endpoint!, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ events }),
+  // Page view tracking
+  pageView(data: PageViewEvent) {
+    this.emit('page_view', {
+      type: data.type,
+      id: data.id,
+      slug: data.slug,
+      brandId: data.brandId,
+      storeId: data.storeId,
+      professionalId: data.professionalId,
     });
-
-    if (!response.ok) {
-      throw new Error(`Telemetry endpoint returned ${response.status}`);
-    }
   }
 
-  /**
-   * Start flush timer
-   */
-  private startFlushTimer(): void {
-    if (this.flushTimer) {
-      clearInterval(this.flushTimer);
-    }
-
-    this.flushTimer = setInterval(() => {
-      this.flush();
-    }, this.config.flushInterval);
+  // Booking flow tracking
+  bookingStart(data: BookingStartEvent) {
+    this.emit('booking_start', {
+      serviceId: data.serviceId,
+      serviceSlug: data.serviceSlug,
+      professionalId: data.professionalId,
+      professionalSlug: data.professionalSlug,
+      selectedDate: data.selectedDate,
+      selectedTime: data.selectedTime,
+    });
   }
 
-  /**
-   * Update configuration
-   */
-  updateConfig(config: Partial<TelemetryConfig>): void {
-    this.config = { ...this.config, ...config };
-    this.startFlushTimer();
+  // Service selection tracking
+  serviceSelected(serviceId: string, serviceSlug: string) {
+    this.emit('service_selected', {
+      serviceId,
+      serviceSlug,
+    });
   }
 
-  /**
-   * Get current event count
-   */
-  getEventCount(): number {
-    return this.events.length;
+  // Date/time selection tracking
+  dateTimeSelected(date: string, time: string) {
+    this.emit('datetime_selected', {
+      date,
+      time,
+    });
   }
 
-  /**
-   * Clear all events
-   */
-  clear(): void {
+  // Professional view tracking
+  professionalViewed(professionalId: string, professionalSlug: string) {
+    this.emit('professional_viewed', {
+      professionalId,
+      professionalSlug,
+    });
+  }
+
+  // Store view tracking
+  storeViewed(storeId: string, storeSlug: string) {
+    this.emit('store_viewed', {
+      storeId,
+      storeSlug,
+    });
+  }
+
+  // Get all events (for debugging)
+  getEvents(): TelemetryEvent[] {
+    return [...this.events];
+  }
+
+  // Clear events (for testing)
+  clearEvents() {
     this.events = [];
   }
-
-  /**
-   * Destroy store and cleanup
-   */
-  destroy(): void {
-    if (this.flushTimer) {
-      clearInterval(this.flushTimer);
-      this.flushTimer = null;
-    }
-    this.flush(); // Flush remaining events
-  }
 }
 
-// ============================================================================
-// GLOBAL TELEMETRY STORE
-// ============================================================================
-
-const telemetryStore = new TelemetryStore();
-
-// ============================================================================
-// TELEMETRY HOOKS
-// ============================================================================
-
-/**
- * Track public resolver hit
- */
-export function trackResolverHit(
-  path: string,
-  resolvedType: string,
-  brandId?: string,
-  storeId?: string,
-  proId?: string
-): void {
-  telemetryStore.addEvent({
-    event: 'public_resolver_hit',
-    path,
-    resolvedType,
-    brandId,
-    storeId,
-    proId,
-  });
-}
-
-/**
- * Track mismatch correction
- */
-export function trackMismatchCorrected(
-  path: string,
-  _originalContext: string,
-  _correctedContext: string,
-  brandId?: string,
-  storeId?: string,
-  proId?: string
-): void {
-  telemetryStore.addEvent({
-    event: 'public_resolver_mismatch_corrected',
-    path,
-    resolvedType: 'mismatch_corrected',
-    brandId,
-    storeId,
-    proId,
-  });
-}
-
-/**
- * Track not found error
- */
-export function trackNotFound(path: string, attemptedType: string): void {
-  telemetryStore.addEvent({
-    event: 'public_resolver_not_found',
-    path,
-    resolvedType: attemptedType,
-  });
-}
-
-/**
- * Track redirect applied
- */
-export function trackRedirectApplied(
-  path: string,
-  redirectTo: string,
-  _redirectType: '301' | '302' | '308',
-  _reason?: string
-): void {
-  telemetryStore.addEvent({
-    event: 'public_redirect_applied',
-    path,
-    redirectTo,
-  });
-}
-
-/**
- * Track generic error
- */
-export function trackError(
-  path: string,
-  _error: string,
-  _context?: Record<string, unknown>
-): void {
-  telemetryStore.addEvent({
-    event: 'public_resolver_not_found', // Using not_found as generic error
-    path,
-    resolvedType: 'error',
-  });
-}
-
-// ============================================================================
-// TELEMETRY UTILITIES
-// ============================================================================
-
-/**
- * Initialize telemetry with configuration
- */
-export function initTelemetry(config: Partial<TelemetryConfig> = {}): void {
-  telemetryStore.updateConfig(config);
-}
-
-/**
- * Get telemetry configuration
- */
-export function getTelemetryConfig(): TelemetryConfig {
-  return { ...telemetryStore['config'] };
-}
-
-/**
- * Get current event count
- */
-export function getTelemetryEventCount(): number {
-  return telemetryStore.getEventCount();
-}
-
-/**
- * Force flush events
- */
-export function flushTelemetry(): Promise<void> {
-  return telemetryStore.flush();
-}
-
-/**
- * Clear all telemetry events
- */
-export function clearTelemetry(): void {
-  telemetryStore.clear();
-}
-
-/**
- * Destroy telemetry store
- */
-export function destroyTelemetry(): void {
-  telemetryStore.destroy();
-}
-
-// ============================================================================
-// DEVELOPMENT UTILITIES
-// ============================================================================
-
-/**
- * Get all events (for debugging)
- */
-export function getTelemetryEvents(): TelemetryEvent[] {
-  return [...telemetryStore['events']];
-}
-
-/**
- * Enable/disable telemetry
- */
-export function setTelemetryEnabled(enabled: boolean): void {
-  telemetryStore.updateConfig({ enabled });
-}
-
-/**
- * Set telemetry endpoint
- */
-export function setTelemetryEndpoint(endpoint: string): void {
-  telemetryStore.updateConfig({ endpoint });
-}
-
-// ============================================================================
-// REACT HOOK
-// ============================================================================
-
-/**
- * React hook for telemetry
- */
-export function useTelemetry() {
-  return {
-    trackResolverHit,
-    trackMismatchCorrected,
-    trackNotFound,
-    trackRedirectApplied,
-    trackError,
-    flushTelemetry,
-    clearTelemetry,
-  };
-}
+// Export singleton instance
+export const telemetry = new TelemetryService();
