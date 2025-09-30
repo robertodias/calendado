@@ -10,16 +10,20 @@ import LoadingSpinner from './components/LoadingSpinner';
 const Landing = lazy(() => import('./pages/Landing'));
 const Admin = lazy(() => import('./pages/Admin'));
 const Demo = lazy(() => import('./pages/Demo'));
+const TestRoutes = lazy(() => import('./pages/TestRoutes'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const InviteConsume = lazy(() => import('./pages/InviteConsume'));
+const TestFlow = lazy(() => import('./pages/TestFlow'));
 
 // Lazy load public pages
-const BrandPage = lazy(() => import('./pages/public/BrandPage'));
-const StorePage = lazy(() => import('./pages/public/StorePage'));
-const ProPage = lazy(() => import('./pages/public/ProPage'));
-
-// Lazy load new MVP pages
 const NewBrandPage = lazy(() => import('./pages/brand/BrandPage'));
 const NewStorePage = lazy(() => import('./pages/store/StorePage'));
 const NewProPage = lazy(() => import('./pages/pro/ProPage'));
+
+// Lazy load booking pages
+const BookingRoute = lazy(() => import('./features/booking/components/BookingRoute'));
+const SoloBookingRoute = lazy(() => import('./features/booking/components/SoloBookingRoute'));
+const BookingSuccess = lazy(() => import('./pages/booking/BookingSuccess'));
 
 function App() {
   return (
@@ -41,30 +45,27 @@ function App() {
                   <Route path='/' element={<Landing />} />
                   <Route path='/admin' element={<Admin />} />
                   <Route path='/demo' element={<Demo />} />
+                  <Route path='/test' element={<TestRoutes />} />
+                  <Route path='/test-flow' element={<TestFlow />} />
+                  <Route path='/dashboard' element={<Dashboard />} />
+                  <Route path='/invite/:token' element={<InviteConsume />} />
 
-                  {/* MVP Public Routes */}
-                  <Route path='/mvp/:brandSlug' element={<NewBrandPage />} />
+                  {/* Booking Routes */}
+                  <Route path='/book/:brandSlug/:storeSlug/:proSlug' element={<BookingRoute />} />
+                  <Route path='/book/u/:proSlug' element={<SoloBookingRoute />} />
+                  <Route path='/booking/success' element={<BookingSuccess />} />
+
+                  {/* Public Routes */}
+                  <Route path='/:brandSlug' element={<NewBrandPage />} />
                   <Route
-                    path='/mvp/:brandSlug/:storeSlug'
+                    path='/:brandSlug/:storeSlug'
                     element={<NewStorePage />}
                   />
                   <Route
-                    path='/mvp/:brandSlug/:storeSlug/:proSlug'
+                    path='/:brandSlug/:storeSlug/:proSlug'
                     element={<NewProPage />}
                   />
-                  <Route path='/mvp/u/:proSlug' element={<NewProPage />} />
-
-                  {/* Legacy Public Routes */}
-                  <Route path='/:brandSlug' element={<BrandPage />} />
-                  <Route
-                    path='/:brandSlug/:storeSlug'
-                    element={<StorePage />}
-                  />
-                  <Route
-                    path='/:brandSlug/:storeSlug/:proSlug'
-                    element={<ProPage />}
-                  />
-                  <Route path='/u/:proSlug' element={<ProPage />} />
+                  <Route path='/u/:proSlug' element={<NewProPage />} />
                 </Routes>
               </Suspense>
             </Router>

@@ -63,7 +63,7 @@ export const StoreCard: React.FC<StoreCardProps> = ({
         <Button
           onClick={() => onViewStore(store)}
           className='w-full'
-          variant='outline'
+          variant='secondary'
         >
           View Store
           <ArrowRight className='w-4 h-4 ml-2' />

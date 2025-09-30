@@ -22,7 +22,7 @@ const StorePage: React.FC = () => {
     storeSlug: string;
   }>();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams(); // eslint-disable-line @typescript-eslint/no-unused-vars
+  // const [searchParams] = useSearchParams(); // For future use
 
   const [store, setStore] = useState<Store | null>(null);
   const [brand, setBrand] = useState<Brand | null>(null);
@@ -269,7 +269,7 @@ const StorePage: React.FC = () => {
                 </p>
                 {(searchQuery || selectedService !== 'all') && (
                   <Button
-                    variant='outline'
+                    variant='secondary'
                     onClick={() => {
                       setSearchQuery('');
                       setSelectedService('all');

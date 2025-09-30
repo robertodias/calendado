@@ -136,7 +136,13 @@ const ProPage: React.FC = () => {
         selectedDate,
         selectedTime,
       });
-      setShowBookingModal(true);
+      
+      // Navigate to booking wizard with preselected data
+      const bookingUrl = isSoloPro 
+        ? `/book/u/${professional?.slug}?service=${selectedService.slug}&date=${selectedDate}&time=${selectedTime}`
+        : `/book/${brandSlug}/${storeSlug}/${professional?.slug}?service=${selectedService.slug}&date=${selectedDate}&time=${selectedTime}`;
+      
+      navigate(bookingUrl);
     }
   };
 
@@ -259,7 +265,7 @@ const ProPage: React.FC = () => {
 
             {/* Back Button */}
             <Button
-              variant='outline'
+              variant='secondary'
               onClick={() =>
                 navigate(isSoloPro ? '/' : `/${brandSlug}/${storeSlug}`)
               }

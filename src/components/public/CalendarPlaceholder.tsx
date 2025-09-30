@@ -93,7 +93,7 @@ export const CalendarPlaceholder: React.FC<CalendarPlaceholderProps> = ({
       {/* Month Navigation */}
       <div className='flex items-center justify-between mb-6'>
         <Button
-          variant='outline'
+                variant='secondary'
           size='sm'
           onClick={() => navigateMonth('prev')}
         >
@@ -108,7 +108,7 @@ export const CalendarPlaceholder: React.FC<CalendarPlaceholderProps> = ({
         </h4>
 
         <Button
-          variant='outline'
+                variant='secondary'
           size='sm'
           onClick={() => navigateMonth('next')}
         >
@@ -142,8 +142,8 @@ export const CalendarPlaceholder: React.FC<CalendarPlaceholderProps> = ({
                       key={`${slot.date}-${slot.time}`}
                       variant={
                         selectedDate === slot.date && selectedTime === slot.time
-                          ? 'default'
-                          : 'outline'
+                          ? 'primary'
+                          : 'secondary'
                       }
                       size='sm'
                       onClick={() => onDateSelect(slot.date, slot.time)}

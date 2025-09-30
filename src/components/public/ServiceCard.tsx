@@ -88,7 +88,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
             onSelectService(service);
           }}
           className='w-full'
-          variant={isSelected ? 'default' : 'outline'}
+          variant={isSelected ? 'primary' : 'secondary'}
         >
           {isSelected ? 'Selected' : 'Select'}
           <ArrowRight className='w-4 h-4 ml-2' />

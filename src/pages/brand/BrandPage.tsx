@@ -188,7 +188,7 @@ const BrandPage: React.FC = () => {
                 <p className='text-gray-500 mb-4'>
                   No locations available at the moment.
                 </p>
-                <Button variant='outline'>Contact Us</Button>
+                <Button variant='secondary'>Contact Us</Button>
               </CardContent>
             </Card>
           ) : (

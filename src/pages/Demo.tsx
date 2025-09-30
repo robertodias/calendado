@@ -75,9 +75,9 @@ const Demo: React.FC = () => {
                     <h4 className='font-medium text-gray-900 mb-2'>
                       Brand Page
                     </h4>
-                    <Link to={`/mvp/${site.brandSlug}`}>
+                    <Link to={`/${site.brandSlug}`}>
                       <Button
-                        variant='outline'
+                        variant='secondary'
                         className='w-full justify-start'
                       >
                         <Store className='w-4 h-4 mr-2' />
@@ -95,10 +95,10 @@ const Demo: React.FC = () => {
                       </h4>
                       <div className='space-y-2'>
                         {site.stores.map(store => (
-                          <Link
-                            key={store.slug}
-                            to={`/mvp/${site.brandSlug}/${store.slug}`}
-                          >
+                           <Link
+                             key={store.slug}
+                             to={`/${site.brandSlug}/${store.slug}`}
+                           >
                             <Button
                               variant='ghost'
                               className='w-full justify-start text-left'
@@ -120,7 +120,7 @@ const Demo: React.FC = () => {
                       </h4>
                       <div className='space-y-2'>
                         {site.professionals.slice(0, 2).map(pro => (
-                          <Link key={pro.slug} to={`/mvp/u/${pro.slug}`}>
+                           <Link key={pro.slug} to={`/u/${pro.slug}`}>
                             <Button
                               variant='ghost'
                               className='w-full justify-start text-left'

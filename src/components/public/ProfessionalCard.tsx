@@ -80,7 +80,7 @@ export const ProfessionalCard: React.FC<ProfessionalCardProps> = ({
         <Button
           onClick={() => onViewProfessional(professional)}
           className='w-full'
-          variant='outline'
+          variant='secondary'
         >
           View Profile
           <ArrowRight className='w-4 h-4 ml-2' />
