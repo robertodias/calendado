@@ -2,8 +2,13 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
+  // Vite automatically loads .env.local, .env.development, .env.production files
+  // Variables are available via process.env and import.meta.env
+  // Priority: .env.local > .env.[mode] > .env
   const getEnvValue = (key: string, fallback: string) => {
-    return process.env[key] || fallback;
+    // Check process.env first (from .env files or system environment)
+    // Then fall back to the default
+    return process.env[key] || import.meta.env[key] || fallback;
   };
   
   return {

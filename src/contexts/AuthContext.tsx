@@ -15,6 +15,7 @@ import {
 } from 'firebase/auth';
 import { auth } from '../firebase';
 import type { UserRole, AuthUser } from '../types/auth';
+import { logger } from '../lib/logger';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -75,14 +76,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       return Array.isArray(roles) ? roles : [];
     } catch (error) {
-      console.error('Error extracting roles from token:', error);
+      logger.error('Error extracting roles from token', error as Error, {
+        component: 'AuthContext',
+      });
       return [];
     }
   };
 
   const signInWithGoogle = async () => {
     if (!auth) {
-      throw new Error('Firebase auth not initialized');
+      const isDevelopment = import.meta.env.DEV;
+      const message = isDevelopment
+        ? 'Firebase is not configured. Please set up your Firebase credentials in environment variables. See ENVIRONMENT_VARIABLES.md for instructions.'
+        : 'Authentication service is not available. Please contact support.';
+      throw new Error(message);
     }
 
     const provider = new GoogleAuthProvider();
@@ -94,7 +101,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const roles = await extractRolesFromToken(result.user);
       setUser(createAuthUser(result.user, roles));
     } catch (error) {
-      console.error('Error signing in with Google:', error);
+      logger.error('Error signing in with Google', error as Error, {
+        component: 'AuthContext',
+      });
       throw error;
     }
   };
@@ -108,7 +117,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await firebaseSignOut(auth);
       setUser(null);
     } catch (error) {
-      console.error('Error signing out:', error);
+      logger.error('Error signing out', error as Error, {
+        component: 'AuthContext',
+      });
       throw error;
     }
   };
@@ -124,7 +135,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const roles = await extractRolesFromToken(auth.currentUser);
       setUser(createAuthUser(auth.currentUser, roles));
     } catch (error) {
-      console.error('Error refreshing token:', error);
+      logger.error('Error refreshing token', error as Error, {
+        component: 'AuthContext',
+      });
       throw error;
     }
   };

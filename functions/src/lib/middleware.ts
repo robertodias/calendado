@@ -14,7 +14,7 @@ import { handleError } from './errorHandler';
 export interface AuthenticatedUser {
   uid: string;
   email?: string;
-  customClaims?: Record<string, any>;
+  customClaims?: Record<string, unknown>;
 }
 
 export interface AuthMiddlewareOptions {
@@ -69,8 +69,8 @@ export function withAuth(options: AuthMiddlewareOptions = {}) {
  * Middleware for callable functions that validates authentication
  */
 export function withCallableAuth(options: AuthMiddlewareOptions = {}) {
-  return <T extends CallableRequest>(
-    handler: (request: T, user: AuthenticatedUser) => Promise<any>
+  return <T extends CallableRequest, R = unknown>(
+    handler: (request: T, user: AuthenticatedUser) => Promise<R>
   ) => {
     return async (request: T) => {
       try {
@@ -190,28 +190,32 @@ export function validateBody(requiredFields: string[]) {
 
 /**
  * Rate limiting middleware
+ * Note: Use rateLimit from rateLimiter.ts for distributed rate limiting
+ * This function is kept for backward compatibility but should be migrated
  */
 export function withRateLimit(requestsPerMinute: number = 60) {
+  // This is a simple in-memory implementation
+  // For production, use the distributed rateLimit from rateLimiter.ts
   const requests = new Map<string, { count: number; resetTime: number }>();
-  
+
   return (req: Request, res: Response, next: () => void) => {
     const clientId = req.ip || 'unknown';
     const now = Date.now();
     const windowMs = 60 * 1000; // 1 minute
-    
+
     const clientData = requests.get(clientId);
-    
+
     if (!clientData || now > clientData.resetTime) {
       requests.set(clientId, { count: 1, resetTime: now + windowMs });
       next();
       return;
     }
-    
+
     if (clientData.count >= requestsPerMinute) {
       res.status(429).json({ error: 'Rate limit exceeded' });
       return;
     }
-    
+
     clientData.count++;
     next();
   };

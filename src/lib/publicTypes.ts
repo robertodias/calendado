@@ -4,7 +4,6 @@
  */
 
 import { z } from 'zod';
-// import type { Timestamp } from 'firebase/firestore';
 
 // ============================================================================
 // CORE SCHEMAS
@@ -21,7 +20,7 @@ export const ZPublicLink = z.object({
     proId: z.string().optional(),
     serviceId: z.string().optional(),
   }),
-  updatedAt: z.any(), // Firestore Timestamp
+  updatedAt: z.unknown(), // Firestore Timestamp - validated at runtime
 });
 
 export const ZDisplayModel = z.object({

@@ -25,7 +25,9 @@ export const ServiceSelectionStep: React.FC = () => {
   useEffect(() => {
     const preselectedServiceSlug = searchParams.get('service');
     if (preselectedServiceSlug && services.length > 0) {
-      const preselectedService = services.find(service => service.slug === preselectedServiceSlug);
+      const preselectedService = services.find(
+        service => service.slug === preselectedServiceSlug
+      );
       if (preselectedService) {
         dispatch({ type: 'SET_SERVICE', payload: preselectedService });
       }
@@ -35,13 +37,15 @@ export const ServiceSelectionStep: React.FC = () => {
   const loadServices = async () => {
     try {
       setLoading(true);
-      
+
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 500));
-      
+
       // Get services from professional or store
       if (state.context?.professionalId) {
-        const professional = getProfessionalBySlug(state.context.professionalSlug || '');
+        const professional = getProfessionalBySlug(
+          state.context.professionalSlug || ''
+        );
         if (professional) {
           setServices(professional.services);
         } else {
@@ -135,31 +139,31 @@ export const ServiceSelectionStep: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="text-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">Loading services...</p>
+      <div className='text-center py-8'>
+        <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-4'></div>
+        <p className='text-gray-600'>Loading services...</p>
       </div>
     );
   }
 
   return (
     <div>
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+      <div className='text-center mb-8'>
+        <h2 className='text-2xl font-bold text-gray-900 mb-2'>
           Select a Service
         </h2>
-        <p className="text-gray-600">
-          Choose the service you'd like to book
-        </p>
+        <p className='text-gray-600'>Choose the service you'd like to book</p>
       </div>
 
       {services.length === 0 ? (
-        <div className="text-center py-8">
-          <p className="text-gray-500 mb-4">No services available at this time.</p>
+        <div className='text-center py-8'>
+          <p className='text-gray-500 mb-4'>
+            No services available at this time.
+          </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map((service) => (
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+          {services.map(service => (
             <Card
               key={service.id}
               className={`cursor-pointer transition-all duration-200 ${
@@ -169,33 +173,33 @@ export const ServiceSelectionStep: React.FC = () => {
               }`}
               onClick={() => handleSelectService(service)}
             >
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">
+              <CardContent className='p-6'>
+                <div className='flex items-start justify-between mb-4'>
+                  <h3 className='text-lg font-semibold text-gray-900'>
                     {service.name}
                   </h3>
                   {state.selectedService?.id === service.id && (
-                    <Badge variant="secondary">Selected</Badge>
+                    <Badge variant='secondary'>Selected</Badge>
                   )}
                 </div>
 
                 {service.description && (
-                  <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                  <p className='text-sm text-gray-600 mb-4 line-clamp-2'>
                     {service.description}
                   </p>
                 )}
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-1">
-                      <Clock className="w-4 h-4 text-gray-500" />
-                      <span className="text-sm text-gray-600">
+                <div className='flex items-center justify-between'>
+                  <div className='flex items-center space-x-4'>
+                    <div className='flex items-center space-x-1'>
+                      <Clock className='w-4 h-4 text-gray-500' />
+                      <span className='text-sm text-gray-600'>
                         {formatDuration(service.durationMin)}
                       </span>
                     </div>
-                    <div className="flex items-center space-x-1">
-                      <DollarSign className="w-4 h-4 text-gray-500" />
-                      <span className="text-sm font-medium text-gray-900">
+                    <div className='flex items-center space-x-1'>
+                      <DollarSign className='w-4 h-4 text-gray-500' />
+                      <span className='text-sm font-medium text-gray-900'>
                         {formatPrice(service.price)}
                       </span>
                     </div>
@@ -208,11 +212,13 @@ export const ServiceSelectionStep: React.FC = () => {
       )}
 
       {state.selectedService && (
-        <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <div className="flex items-center space-x-2">
-            <Star className="w-5 h-5 text-green-600" />
-            <p className="text-green-800">
-              <strong>{state.selectedService.name}</strong> selected - {formatDuration(state.selectedService.durationMin)} • {formatPrice(state.selectedService.price)}
+        <div className='mt-6 p-4 bg-green-50 border border-green-200 rounded-lg'>
+          <div className='flex items-center space-x-2'>
+            <Star className='w-5 h-5 text-green-600' />
+            <p className='text-green-800'>
+              <strong>{state.selectedService.name}</strong> selected -{' '}
+              {formatDuration(state.selectedService.durationMin)} •{' '}
+              {formatPrice(state.selectedService.price)}
             </p>
           </div>
         </div>

@@ -3,14 +3,26 @@
  * Manages the booking wizard state and flow
  */
 
-import React, { createContext, useContext, useReducer, type ReactNode } from 'react';
-import type { BookingContext, BookingDraft, BookingStep, AvailabilitySlot, CustomerInfo } from '../types';
+import React, {
+  createContext,
+  useContext,
+  useReducer,
+  type ReactNode,
+} from 'react';
+import type {
+  BookingContext,
+  BookingDraft,
+  BookingStep,
+  AvailabilitySlot,
+  CustomerInfo,
+} from '../types';
+import type { Service } from '../../lib/bookingMockData';
 
 interface BookingState {
   context: BookingContext | null;
   currentStep: number;
   steps: BookingStep[];
-  selectedService: any | null;
+  selectedService: Service | null;
   selectedSlot: AvailabilitySlot | null;
   customerInfo: CustomerInfo | null;
   bookingDraft: BookingDraft | null;
@@ -20,7 +32,7 @@ interface BookingState {
 
 type BookingAction =
   | { type: 'SET_CONTEXT'; payload: BookingContext }
-  | { type: 'SET_SERVICE'; payload: any }
+  | { type: 'SET_SERVICE'; payload: Service }
   | { type: 'SET_SLOT'; payload: AvailabilitySlot }
   | { type: 'SET_CUSTOMER_INFO'; payload: CustomerInfo }
   | { type: 'NEXT_STEP' }
@@ -72,7 +84,10 @@ const initialState: BookingState = {
   error: null,
 };
 
-function bookingReducer(state: BookingState, action: BookingAction): BookingState {
+function bookingReducer(
+  state: BookingState,
+  action: BookingAction
+): BookingState {
   switch (action.type) {
     case 'SET_CONTEXT':
       return {
@@ -194,7 +209,9 @@ interface BookingProviderProps {
   children: ReactNode;
 }
 
-export const BookingProvider: React.FC<BookingProviderProps> = ({ children }) => {
+export const BookingProvider: React.FC<BookingProviderProps> = ({
+  children,
+}) => {
   const [state, dispatch] = useReducer(bookingReducer, initialState);
 
   const canProceed = (() => {
@@ -227,9 +244,7 @@ export const BookingProvider: React.FC<BookingProviderProps> = ({ children }) =>
   };
 
   return (
-    <BookingContext.Provider value={value}>
-      {children}
-    </BookingContext.Provider>
+    <BookingContext.Provider value={value}>{children}</BookingContext.Provider>
   );
 };
 

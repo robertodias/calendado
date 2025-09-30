@@ -19,8 +19,11 @@ dist-ssr/
 functions/lib/
 *.local
 
-# Environment variables (using hosting platform environment variables instead)
-# .env files are not used - environment variables are set in deployment platform
+# Environment variables
+# .env.local is for local development only (not committed to git)
+.env.local
+.env.*.local
+# Production uses GitHub Secrets and hosting platform environment variables
 
 # Editor directories and files
 .vscode/*

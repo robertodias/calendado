@@ -27,4 +27,3 @@ export const BookingRoute: React.FC = () => {
 };
 
 export default BookingRoute;
-

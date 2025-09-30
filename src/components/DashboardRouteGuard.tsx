@@ -12,19 +12,21 @@ interface DashboardRouteGuardProps {
   children: React.ReactNode;
 }
 
-const DashboardRouteGuard: React.FC<DashboardRouteGuardProps> = ({ children }) => {
+const DashboardRouteGuard: React.FC<DashboardRouteGuardProps> = ({
+  children,
+}) => {
   const { user, loading } = useAuth();
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className='min-h-screen flex items-center justify-center bg-gray-50'>
         <LoadingSpinner />
       </div>
     );
   }
 
   if (!user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to='/' replace />;
   }
 
   return <>{children}</>;

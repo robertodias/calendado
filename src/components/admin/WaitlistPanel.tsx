@@ -35,6 +35,7 @@ import {
 } from '../../lib/waitlistTransformers';
 import { checkPlatformAdmin } from '../../lib/permissions';
 import type { WaitlistEntry } from '../../types/shared';
+import { logger } from '../../lib/logger';
 
 type WaitlistStatus =
   | 'all'
@@ -86,7 +87,9 @@ const WaitlistPanel: React.FC = () => {
           setEntries(validEntries);
           setError(null);
         } catch (err) {
-          console.error('Error processing waitlist entries:', err);
+          logger.error('Error processing waitlist entries', err as Error, {
+            component: 'WaitlistPanel',
+          });
           setError('Failed to process waitlist data');
           setEntries([]);
         } finally {
@@ -94,7 +97,9 @@ const WaitlistPanel: React.FC = () => {
         }
       },
       error => {
-        console.error('Error fetching waitlist entries:', error);
+        logger.error('Error fetching waitlist entries', error as Error, {
+          component: 'WaitlistPanel',
+        });
         setError('Failed to load waitlist entries');
         setEntries([]);
         setLoading(false);
@@ -152,7 +157,9 @@ const WaitlistPanel: React.FC = () => {
         variant: 'success',
       });
     } catch (error) {
-      console.error('Error sending invite:', error);
+      logger.error('Error sending invite', error as Error, {
+        component: 'WaitlistPanel',
+      });
       toast({
         title: 'Error',
         description: 'Failed to send invitation',
@@ -170,7 +177,9 @@ const WaitlistPanel: React.FC = () => {
         variant: 'success',
       });
     } catch (error) {
-      console.error('Error rejecting entry:', error);
+      logger.error('Error rejecting entry', error as Error, {
+        component: 'WaitlistPanel',
+      });
       toast({
         title: 'Error',
         description: 'Failed to reject entry',
@@ -201,29 +210,33 @@ const WaitlistPanel: React.FC = () => {
           return;
         }
 
-        // Debug: Log user's custom claims and roles
-        console.log('🔍 Delete attempt for entry:', entryId);
-        console.log('👤 User object:', user);
-        console.log('🎭 User roles from context:', user.roles);
-        console.log('🧪 has getIdTokenResult:', typeof user.getIdTokenResult);
-        console.log('🧪 has getIdToken:', typeof (user as any).getIdToken);
+        // Debug: Log user's custom claims and roles (development only)
+        logger.debug('Delete attempt for entry', {
+          component: 'WaitlistPanel',
+          entryId,
+          userId: user.uid,
+          userRoles: user.roles,
+        });
 
         // Get fresh token to check custom claims
         const tokenResult: IdTokenResult = await user.getIdTokenResult();
-        console.log('🔑 Custom claims from token:', tokenResult.claims);
-        console.log(
-          '🏷️ Platform admin flag:',
-          tokenResult.claims.platformAdmin
-        );
-        console.log('📋 Roles in claims:', tokenResult.claims.roles);
-        console.log('🔍 Admin flag:', tokenResult.claims.admin);
-        console.log('🔍 IsAdmin flag:', tokenResult.claims.isAdmin);
+        logger.debug('Token claims retrieved', {
+          component: 'WaitlistPanel',
+          platformAdmin: tokenResult.claims.platformAdmin,
+          roles: tokenResult.claims.roles,
+          admin: tokenResult.claims.admin,
+          isAdmin: tokenResult.claims.isAdmin,
+        });
 
         // Check if user has platform admin role using the new utility
         const hasPlatformAdmin = await checkPlatformAdmin(user, tokenResult);
 
         if (!hasPlatformAdmin) {
-          console.log('❌ User does not have platform admin privileges');
+          logger.warn('User does not have platform admin privileges', {
+            component: 'WaitlistPanel',
+            userId: user.uid,
+            entryId,
+          });
           toast({
             title: 'Permission Denied',
             description:
@@ -234,9 +247,11 @@ const WaitlistPanel: React.FC = () => {
           return;
         }
 
-        console.log(
-          '✅ User has platform admin privileges, proceeding with deletion'
-        );
+        logger.debug('User has platform admin privileges, proceeding with deletion', {
+          component: 'WaitlistPanel',
+          userId: user.uid,
+          entryId,
+        });
         await deleteDoc(doc(db, 'waitlist', entryId));
         toast({
           title: 'Success',
@@ -244,12 +259,16 @@ const WaitlistPanel: React.FC = () => {
         });
         setDeleteConfirmOpen(null);
       } catch (error) {
-        console.error('🚨 Delete error:', error);
-        console.error('📊 Error details:', {
-          code: (error as any).code,
-          message: (error as any).message,
-          details: (error as any).details,
-          stack: (error as any).stack,
+        logger.error('Delete error', error as Error, {
+          component: 'WaitlistPanel',
+          entryId,
+          errorDetails: error instanceof Error
+            ? {
+                code: (error as Error & { code?: string }).code,
+                message: error.message,
+                stack: error.stack,
+              }
+            : { error: String(error) },
         });
         toast({
           title: 'Error',
@@ -271,7 +290,9 @@ const WaitlistPanel: React.FC = () => {
       });
       setSelectedEntries([]);
     } catch (error) {
-      console.error('Error sending bulk invites:', error);
+      logger.error('Error sending bulk invites', error as Error, {
+        component: 'WaitlistPanel',
+      });
       toast({
         title: 'Error',
         description: 'Failed to send bulk invitations',
@@ -290,7 +311,9 @@ const WaitlistPanel: React.FC = () => {
       });
       setSelectedEntries([]);
     } catch (error) {
-      console.error('Error rejecting bulk entries:', error);
+      logger.error('Error rejecting bulk entries', error as Error, {
+        component: 'WaitlistPanel',
+      });
       toast({
         title: 'Error',
         description: 'Failed to reject entries',
@@ -323,7 +346,9 @@ const WaitlistPanel: React.FC = () => {
       link.click();
       URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error exporting CSV:', error);
+      logger.error('Error exporting CSV', error as Error, {
+        component: 'WaitlistPanel',
+      });
       toast({
         title: 'Error',
         description: 'Failed to export CSV',

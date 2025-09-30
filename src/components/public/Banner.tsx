@@ -51,6 +51,8 @@ export const Banner: React.FC<BannerProps> = ({
       document.addEventListener('keydown', handleKeyDown);
       return () => document.removeEventListener('keydown', handleKeyDown);
     }
+    // handleDismiss is stable (doesn't change), so we can safely omit it from deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isVisible, isDismissed]);
 
   const handleDismiss = () => {

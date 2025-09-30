@@ -224,16 +224,31 @@ export function validateOrThrow<T extends Record<string, unknown>>(
 export function createDebouncedValidator<T>(
   validator: (value: T) => ValidationResult,
   delay = 300
-): (value: T, callback: (result: ValidationResult) => void) => void {
-  let timeoutId: NodeJS.Timeout;
+): {
+  validate: (value: T, callback: (result: ValidationResult) => void) => void;
+  cancel: () => void;
+} {
+  let timeoutId: NodeJS.Timeout | undefined;
 
-  return (value: T, callback: (result: ValidationResult) => void) => {
-    clearTimeout(timeoutId);
+  const validate = (value: T, callback: (result: ValidationResult) => void) => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
     timeoutId = setTimeout(() => {
       const result = validator(value);
       callback(result);
+      timeoutId = undefined;
     }, delay);
   };
+
+  const cancel = () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      timeoutId = undefined;
+    }
+  };
+
+  return { validate, cancel };
 }
 
 // Form validation hook helper

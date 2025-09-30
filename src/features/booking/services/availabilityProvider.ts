@@ -29,18 +29,33 @@ export class MockAvailabilityProvider implements AvailabilityProvider {
       if (d.getDay() === 0 || d.getDay() === 6) continue;
 
       const dateStr = d.toISOString().split('T')[0];
-      
+
       // Generate time slots (9 AM to 6 PM, every 30 minutes)
       const timeSlots = [
-        '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-        '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
-        '15:00', '15:30', '16:00', '16:30', '17:00', '17:30'
+        '09:00',
+        '09:30',
+        '10:00',
+        '10:30',
+        '11:00',
+        '11:30',
+        '12:00',
+        '12:30',
+        '13:00',
+        '13:30',
+        '14:00',
+        '14:30',
+        '15:00',
+        '15:30',
+        '16:00',
+        '16:30',
+        '17:00',
+        '17:30',
       ];
 
       timeSlots.forEach(time => {
         // Randomly make some slots unavailable (70% availability)
         const isAvailable = Math.random() > 0.3;
-        
+
         slots.push({
           id: `${professionalId}-${dateStr}-${time}`,
           date: dateStr,

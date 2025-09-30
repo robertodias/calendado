@@ -25,4 +25,3 @@ export const SoloBookingRoute: React.FC = () => {
 };
 
 export default SoloBookingRoute;
-

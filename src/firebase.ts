@@ -1,6 +1,7 @@
 import { initializeApp, type FirebaseApp } from 'firebase/app';
 import { getAuth, type Auth } from 'firebase/auth';
 import { getFirestore, type Firestore } from 'firebase/firestore';
+import { logger } from './lib/logger';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'demo-key',
@@ -31,20 +32,26 @@ if (hasValidConfig) {
     app = initializeApp(firebaseConfig);
     auth = getAuth(app);
     db = getFirestore(app);
-    console.log('Firebase initialized successfully');
+    logger.info('Firebase initialized successfully', {
+      component: 'firebase',
+    });
   } catch (error) {
-    console.error('Failed to initialize Firebase:', error);
+    logger.error('Failed to initialize Firebase', error as Error, {
+      component: 'firebase',
+    });
     app = null;
     auth = null;
     db = null;
   }
 } else {
-  console.warn('Firebase not configured. Using demo values for development.');
-  console.warn('Current config:', {
-    apiKey: firebaseConfig.apiKey,
-    projectId: firebaseConfig.projectId,
-    isDemoKey: firebaseConfig.apiKey === 'demo-key',
-    isLocalDev: import.meta.env.MODE === 'development',
+  logger.warn('Firebase not configured. Using demo values for development.', {
+    component: 'firebase',
+    config: {
+      apiKey: firebaseConfig.apiKey,
+      projectId: firebaseConfig.projectId,
+      isDemoKey: firebaseConfig.apiKey === 'demo-key',
+      isLocalDev: import.meta.env.MODE === 'development',
+    },
   });
   app = null;
   auth = null;

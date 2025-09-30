@@ -4,7 +4,7 @@
  * Handles form submission, validation, and user feedback
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { useLanguage } from '../../contexts/LanguageContext';
 import {
@@ -56,6 +56,13 @@ const WaitlistForm: React.FC<WaitlistFormProps> = ({ onSuccess, onError }) => {
     };
   });
 
+  // Cleanup debounced validator on unmount
+  useEffect(() => {
+    return () => {
+      debouncedEmailValidator.cancel();
+    };
+  }, [debouncedEmailValidator]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -67,7 +74,7 @@ const WaitlistForm: React.FC<WaitlistFormProps> = ({ onSuccess, onError }) => {
 
     // Real-time email validation
     if (name === 'email') {
-      debouncedEmailValidator(value, result => {
+      debouncedEmailValidator.validate(value, result => {
         if (!result.isValid) {
           setErrors(prev => ({ ...prev, email: result.errors[0] }));
         } else {

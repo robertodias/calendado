@@ -34,14 +34,16 @@ export default tseslint.config(
     rules: {
       // TypeScript rules
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-explicit-any': 'error', // Changed from warn to error
       '@typescript-eslint/no-non-null-assertion': 'warn',
       '@typescript-eslint/consistent-type-imports': 'error',
+      // Note: no-floating-promises requires type information (parserOptions.project)
+      // Skipping for now to avoid configuration complexity
       
       // General rules
-      'no-console': 'off', // We handle this with our logger
-      'no-debugger': 'warn',
-      'no-alert': 'warn',
+      'no-console': ['warn', { allow: ['warn', 'error'] }], // Allow console.warn/error but prefer logger
+      'no-debugger': 'error', // Changed from warn to error
+      'no-alert': 'error', // Changed from warn to error
       'prefer-const': 'error',
       'no-var': 'error',
       'object-shorthand': 'error',
@@ -49,7 +51,7 @@ export default tseslint.config(
       
       // React rules
       'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'warn',
+      'react-hooks/exhaustive-deps': 'error', // Changed from warn to error
       'react-refresh/only-export-components': 'warn',
       
       // Import rules

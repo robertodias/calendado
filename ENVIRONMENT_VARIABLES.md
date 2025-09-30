@@ -111,11 +111,61 @@ The script checks for:
 
 ## 🚀 **Setup Instructions**
 
-### 1. **Development Setup**
-```bash
-# Start development server (uses demo fallback values for local development)
+### 1. **Local Development Setup**
+
+#### Option A: Using `.env.local` file (Recommended for Local Development)
+
+1. **Copy the example file:**
+   ```bash
+   cp .env.local.example .env.local
+   ```
+
+2. **Fill in your Firebase credentials:**
+   
+   You can get these values from:
+   - **Firebase Console**: https://console.firebase.google.com/ → Your Project → Project Settings → General → Your apps
+   - **GitHub Secrets** (if you have access): https://github.com/robertodias/calendado/settings/secrets/actions
+   
+   Edit `.env.local` and add your actual values:
+   ```bash
+   VITE_FIREBASE_API_KEY=your-actual-api-key
+   VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+   VITE_FIREBASE_PROJECT_ID=your-project-id
+   # ... etc
+   ```
+
+3. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
+   
+   Vite will automatically load variables from `.env.local` file.
+
+#### Option B: Using System Environment Variables
+
+Set environment variables in your system (Windows PowerShell example):
+```powershell
+$env:VITE_FIREBASE_API_KEY="your-api-key"
+$env:VITE_FIREBASE_AUTH_DOMAIN="your-project.firebaseapp.com"
+# ... set other variables
 npm run dev
 ```
+
+Or on Linux/Mac:
+```bash
+export VITE_FIREBASE_API_KEY="your-api-key"
+export VITE_FIREBASE_AUTH_DOMAIN="your-project.firebaseapp.com"
+# ... set other variables
+npm run dev
+```
+
+#### Option C: Demo Mode (Default)
+
+If no environment variables are set, the app will use demo values:
+```bash
+npm run dev
+```
+Note: Authentication and Firebase features will not work with demo values.
 
 ### 2. **Production Deployment**
 Production deployment is **automatic** via GitHub Actions:

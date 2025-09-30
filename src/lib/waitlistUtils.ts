@@ -38,6 +38,7 @@ const normalizeEmail = (email: string): string => {
 };
 import { generateDedupeKeySync } from './crypto';
 import type { Locale } from '../types/models';
+import { logger } from './logger';
 
 export interface WaitlistSignupData {
   email: string;
@@ -121,7 +122,8 @@ export async function signupForWaitlist(
       waitlistData as DocumentData
     );
 
-    console.log('Waitlist signup successful:', {
+    logger.info('Waitlist signup successful', {
+      component: 'waitlistUtils',
       waitlistId: docRef.id,
       email: normalizedEmail,
       locale: data.locale,
@@ -132,7 +134,9 @@ export async function signupForWaitlist(
       waitlistId: docRef.id,
     };
   } catch (error) {
-    console.error('Waitlist signup error:', error);
+    logger.error('Waitlist signup error', error as Error, {
+      component: 'waitlistUtils',
+    });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error occurred',

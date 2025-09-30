@@ -3,12 +3,24 @@
  * Handles booking creation, confirmation, and email sending
  */
 
-import { collection, addDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import {
+  collection,
+  addDoc,
+  doc,
+  updateDoc,
+  serverTimestamp,
+} from 'firebase/firestore';
 import { db } from '../../../firebase';
-import type { BookingDraft, BookingConfirmation, BookingService } from '../types';
+import type {
+  BookingDraft,
+  BookingConfirmation,
+  BookingService,
+} from '../types';
 
 export class FirebaseBookingService implements BookingService {
-  async createBookingDraft(draft: Omit<BookingDraft, 'id' | 'createdAt' | 'updatedAt'>): Promise<BookingDraft> {
+  async createBookingDraft(
+    draft: Omit<BookingDraft, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<BookingDraft> {
     try {
       const bookingData = {
         ...draft,
@@ -19,7 +31,7 @@ export class FirebaseBookingService implements BookingService {
 
       if (!db) throw new Error('Firebase not initialized');
       const docRef = await addDoc(collection(db, 'bookings'), bookingData);
-      
+
       const bookingDraft: BookingDraft = {
         ...draft,
         id: docRef.id,
@@ -67,14 +79,16 @@ export class FirebaseBookingService implements BookingService {
     }
   }
 
-  async sendConfirmationEmail(confirmation: BookingConfirmation): Promise<void> {
+  async sendConfirmationEmail(
+    confirmation: BookingConfirmation
+  ): Promise<void> {
     try {
       // In a real implementation, this would call your email service
       console.log('Sending confirmation email:', confirmation);
-      
+
       // Simulate email sending
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       console.log('Confirmation email sent successfully');
     } catch (error) {
       console.error('Error sending confirmation email:', error);
