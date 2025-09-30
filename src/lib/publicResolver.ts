@@ -13,12 +13,12 @@ import {
   type ResolverSlugs,
   type ResolverResult,
 } from './publicTypes';
-import {
-  trackResolverHit,
-  trackMismatchCorrected,
-  trackNotFound,
-  trackError,
-} from './telemetry';
+// import {
+//   // trackResolverHit,
+//   // trackMismatchCorrected,
+//   // trackNotFound,
+//   // trackError,
+// } from './telemetry';
 import { findRedirectRule } from './redirects';
 
 // ============================================================================
@@ -90,10 +90,10 @@ export async function resolvePublicContext(
     };
   } catch (error) {
     console.error('Public resolver error:', error);
-    trackError(
-      buildPathFromSlugs(slugs),
-      error instanceof Error ? error.message : 'Unknown error'
-    );
+    // trackError(
+    //   buildPathFromSlugs(slugs),
+    //   error instanceof Error ? error.message : 'Unknown error'
+    // );
 
     return {
       success: false,
@@ -127,7 +127,7 @@ async function resolveProfessional(
   }
 
   if (!proLink || proLink.status !== 'active') {
-    trackNotFound(buildPathFromSlugs(slugs), 'professional');
+    // trackNotFound(buildPathFromSlugs(slugs), 'professional');
     return {
       success: false,
       error: proLink?.status === 'disabled' ? 'disabled' : 'not_found',
@@ -137,7 +137,7 @@ async function resolveProfessional(
   // Verify professional belongs to the specified store and brand
   const storeLink = await resolveStoreLink(slugs.brand, slugs.store);
   if (!storeLink) {
-    trackNotFound(buildPathFromSlugs(slugs), 'store');
+    // trackNotFound(buildPathFromSlugs(slugs), 'store');
     return {
       success: false,
       error: 'not_found',
@@ -153,14 +153,14 @@ async function resolveProfessional(
     // Find correct store for this professional
     const correctStore = await findCorrectStoreForProfessional(proLink);
     if (correctStore) {
-      trackMismatchCorrected(
-        buildPathFromSlugs(slugs),
-        `${slugs.brand}/${slugs.store}`,
-        `${correctStore.slug}/${correctStore.slug}`,
-        proLink.target.orgId,
-        correctStore.target.storeId,
-        proLink.target.proId
-      );
+      // trackMismatchCorrected(
+      //   buildPathFromSlugs(slugs),
+      //   `${slugs.brand}/${slugs.store}`,
+      //   `${correctStore.slug}/${correctStore.slug}`,
+      //   proLink.target.orgId,
+      //   correctStore.target.storeId,
+      //   proLink.target.proId
+      // );
 
       return {
         success: true,
@@ -183,13 +183,13 @@ async function resolveProfessional(
   const brandLink = await resolveBrandLink(slugs.brand);
   const storeLinkResolved = await resolveStoreLink(slugs.brand, slugs.store);
 
-  trackResolverHit(
-    buildPathFromSlugs(slugs),
-    'professional',
-    proLink.target.orgId,
-    proLink.target.storeId,
-    proLink.target.proId
-  );
+  // trackResolverHit(
+  //   buildPathFromSlugs(slugs),
+  //   'professional',
+  //   proLink.target.orgId,
+  //   proLink.target.storeId,
+  //   proLink.target.proId
+  // );
 
   return {
     success: true,
@@ -223,7 +223,7 @@ async function resolveSoloProfessional(
   }
 
   if (!proLink || proLink.status !== 'active') {
-    trackNotFound(`/u/${proSlug}`, 'professional');
+    // trackNotFound(`/u/${proSlug}`, 'professional');
     return {
       success: false,
       error: proLink?.status === 'disabled' ? 'disabled' : 'not_found',
@@ -233,13 +233,13 @@ async function resolveSoloProfessional(
   // Get display model
   const display = await getDisplayModel(proLink);
 
-  trackResolverHit(
-    `/u/${proSlug}`,
-    'professional',
-    proLink.target.orgId,
-    proLink.target.storeId,
-    proLink.target.proId
-  );
+  // trackResolverHit(
+  //   `/u/${proSlug}`,
+  //   'professional',
+  //   proLink.target.orgId,
+  //   proLink.target.storeId,
+  //   proLink.target.proId
+  // );
 
   return {
     success: true,
@@ -264,7 +264,7 @@ async function resolveStore(slugs: ResolverSlugs): Promise<ResolverResult> {
 
   const storeLink = await resolveStoreLink(slugs.brand, slugs.store);
   if (!storeLink || storeLink.status !== 'active') {
-    trackNotFound(buildPathFromSlugs(slugs), 'store');
+    // trackNotFound(buildPathFromSlugs(slugs), 'store');
     return {
       success: false,
       error: storeLink?.status === 'disabled' ? 'disabled' : 'not_found',
@@ -275,12 +275,12 @@ async function resolveStore(slugs: ResolverSlugs): Promise<ResolverResult> {
   const display = await getDisplayModel(storeLink);
   const brandLink = await resolveBrandLink(slugs.brand);
 
-  trackResolverHit(
-    buildPathFromSlugs(slugs),
-    'store',
-    storeLink.target.orgId,
-    storeLink.target.storeId
-  );
+  // trackResolverHit(
+  //   buildPathFromSlugs(slugs),
+  //   'store',
+  //   storeLink.target.orgId,
+  //   storeLink.target.storeId
+  // );
 
   return {
     success: true,
@@ -301,7 +301,7 @@ async function resolveStore(slugs: ResolverSlugs): Promise<ResolverResult> {
 async function resolveBrand(brandSlug: string): Promise<ResolverResult> {
   const brandLink = await resolveBrandLink(brandSlug);
   if (!brandLink || brandLink.status !== 'active') {
-    trackNotFound(`/${brandSlug}`, 'brand');
+    // trackNotFound(`/${brandSlug}`, 'brand');
     return {
       success: false,
       error: brandLink?.status === 'disabled' ? 'disabled' : 'not_found',
@@ -311,7 +311,7 @@ async function resolveBrand(brandSlug: string): Promise<ResolverResult> {
   // Get display model
   const display = await getDisplayModel(brandLink);
 
-  trackResolverHit(`/${brandSlug}`, 'brand', brandLink.target.orgId);
+  // trackResolverHit(`/${brandSlug}`, 'brand', brandLink.target.orgId);
 
   return {
     success: true,

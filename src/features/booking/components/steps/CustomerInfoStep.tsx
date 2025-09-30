@@ -5,9 +5,9 @@
 
 import React, { useState } from 'react';
 import { useBooking } from '../../context/BookingContext';
-import { Input } from '../../../components/ui/Input';
-import { Button } from '../../../components/ui/Button';
-import { Card, CardContent } from '../../../components/ui/Card';
+import { Input } from '../../../../components/ui/Input';
+import { Button } from '../../../../components/ui/Button';
+import { Card, CardContent } from '../../../../components/ui/Card';
 import { User, Mail, Phone, MessageSquare } from 'lucide-react';
 import type { CustomerInfo } from '../../types';
 
@@ -50,7 +50,7 @@ export const CustomerInfoStep: React.FC = () => {
 
     if (!formData.phone.trim()) {
       newErrors.phone = 'Phone number is required';
-    } else if (!/^[\+]?[1-9][\d]{0,15}$/.test(formData.phone.replace(/[\s\-\(\)]/g, ''))) {
+    } else if (!/^[+]?[1-9][\d]{0,15}$/.test(formData.phone.replace(/[\s\-()]/g, ''))) {
       newErrors.phone = 'Please enter a valid phone number';
     }
 

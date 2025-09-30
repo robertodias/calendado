@@ -7,8 +7,8 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useBooking } from '../../context/BookingContext';
 import { availabilityProvider } from '../../services/availabilityProvider';
-import { Card, CardContent } from '../../../components/ui/Card';
-import { Button } from '../../../components/ui/Button';
+// import { Card, CardContent } from '../../../components/ui/Card';
+import { Button } from '../../../../components/ui/Button';
 import { Calendar, Clock, Check } from 'lucide-react';
 import type { AvailabilitySlot } from '../../types';
 
@@ -150,7 +150,7 @@ export const AvailabilityStep: React.FC = () => {
               {availableDates.slice(0, 14).map((date) => (
                 <Button
                   key={date}
-                  variant={selectedDate === date ? 'default' : 'outline'}
+                  variant={selectedDate === date ? 'primary' : 'outline'}
                   onClick={() => setSelectedDate(date)}
                   className="h-auto p-3 text-left"
                 >
@@ -177,7 +177,7 @@ export const AvailabilityStep: React.FC = () => {
                 {getTimeSlotsForDate(selectedDate).map((slot) => (
                   <Button
                     key={slot.id}
-                    variant={state.selectedSlot?.id === slot.id ? 'default' : 'outline'}
+                    variant={state.selectedSlot?.id === slot.id ? 'primary' : 'outline'}
                     onClick={() => handleSelectSlot(slot)}
                     className="h-auto p-3"
                   >

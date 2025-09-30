@@ -6,24 +6,24 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
+import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { CheckCircle, XCircle } from 'lucide-react';
 
-interface ConsumeInviteResponse {
-  success: boolean;
-  message: string;
-  user?: {
-    uid: string;
-    email: string;
-    displayName?: string;
-    roles: string[];
-    orgId?: string;
-  };
-  redirectUrl?: string;
-  error?: string;
-}
+// interface ConsumeInviteResponse {
+//   success: boolean;
+//   message: string;
+//   user?: {
+//     uid: string;
+//     email: string;
+//     displayName?: string;
+//     roles: string[];
+//     orgId?: string;
+//   };
+//   redirectUrl?: string;
+//   error?: string;
+// }
 
 const InviteConsume: React.FC = () => {
   const { token } = useParams<{ token: string }>();

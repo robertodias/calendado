@@ -117,7 +117,7 @@ function bookingReducer(state: BookingState, action: BookingAction): BookingStat
         error: null,
       };
 
-    case 'NEXT_STEP':
+    case 'NEXT_STEP': {
       const nextStep = Math.min(state.currentStep + 1, state.steps.length - 1);
       return {
         ...state,
@@ -127,8 +127,9 @@ function bookingReducer(state: BookingState, action: BookingAction): BookingStat
           isActive: index === nextStep,
         })),
       };
+    }
 
-    case 'PREV_STEP':
+    case 'PREV_STEP': {
       const prevStep = Math.max(state.currentStep - 1, 0);
       return {
         ...state,
@@ -138,6 +139,7 @@ function bookingReducer(state: BookingState, action: BookingAction): BookingStat
           isActive: index === prevStep,
         })),
       };
+    }
 
     case 'GO_TO_STEP':
       return {

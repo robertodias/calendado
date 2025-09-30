@@ -7,9 +7,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBooking } from '../../context/BookingContext';
 import { bookingService } from '../../services/bookingService';
-import { Card, CardContent } from '../../../components/ui/Card';
-import { Button } from '../../../components/ui/Button';
-import { Badge } from '../../../components/ui/Badge';
+import { Card, CardContent } from '../../../../components/ui/Card';
+import { Button } from '../../../../components/ui/Button';
+import { Badge } from '../../../../components/ui/Badge';
 import { Calendar, Clock, User, Mail, Phone, MapPin, CheckCircle, Download } from 'lucide-react';
 
 export const ConfirmationStep: React.FC = () => {
@@ -126,7 +126,7 @@ export const ConfirmationStep: React.FC = () => {
   };
 
   // Removed isConfirmed check since we now navigate to success page
-  if (false) {
+  if (false) { // eslint-disable-line no-constant-condition
     return (
       <div className="text-center">
         <div className="mb-8">

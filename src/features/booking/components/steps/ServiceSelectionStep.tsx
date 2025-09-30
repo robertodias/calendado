@@ -6,10 +6,10 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useBooking } from '../../context/BookingContext';
-import { Card, CardContent } from '../../../components/ui/Card';
-import { Badge } from '../../../components/ui/Badge';
+import { Card, CardContent } from '../../../../components/ui/Card';
+import { Badge } from '../../../../components/ui/Badge';
 import { Clock, DollarSign, Star } from 'lucide-react';
-import { getProfessionalBySlug } from '../../../lib/bookingMockData';
+import { getProfessionalBySlug } from '../../../../lib/bookingMockData';
 
 export const ServiceSelectionStep: React.FC = () => {
   const { state, dispatch } = useBooking();

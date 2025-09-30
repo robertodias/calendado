@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { ProfessionalCard } from '../../components/public/ProfessionalCard';
 import { ServiceCard } from '../../components/public/ServiceCard';
 import { Card, CardContent } from '../../components/ui/Card';

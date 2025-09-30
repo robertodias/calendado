@@ -11,14 +11,14 @@ import { Copy, Check, ExternalLink, Users, Calendar, Link } from 'lucide-react';
 import { useToast } from '../hooks/useToast';
 
 const TestFlow: React.FC = () => {
-  const { showToast } = useToast();
+  const { toast } = useToast();
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
-  const [testEmail, setTestEmail] = useState('test@example.com');
+  // const [testEmail, setTestEmail] = useState('test@example.com');
 
   const handleCopyLink = (link: string) => {
     navigator.clipboard.writeText(link);
     setCopiedLink(link);
-    showToast('Link copied to clipboard!', 'success');
+    toast({ title: 'Link copied to clipboard!', description: 'The link has been copied to your clipboard.' });
     setTimeout(() => setCopiedLink(null), 2000);
   };
 

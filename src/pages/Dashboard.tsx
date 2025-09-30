@@ -36,7 +36,7 @@ interface Booking {
 
 const DashboardContent: React.FC = () => {
   const { user } = useAuth();
-  const { showToast } = useToast();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'schedule' | 'profile' | 'links'>('schedule');
   const [profile, setProfile] = useState<ProfessionalProfile | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -96,7 +96,7 @@ const DashboardContent: React.FC = () => {
   const handleCopyLink = (link: string) => {
     navigator.clipboard.writeText(link);
     setCopiedLink(link);
-    showToast('Link copied to clipboard!', 'success');
+    toast({ title: 'Link copied to clipboard!', description: 'The booking link has been copied to your clipboard.' });
     setTimeout(() => setCopiedLink(null), 2000);
   };
 
