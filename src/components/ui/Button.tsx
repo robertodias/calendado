@@ -20,7 +20,8 @@ const buttonVariants = cva(
         ghost: 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900',
 
         // Outline - Border style
-        outline: 'border-2 border-neutral-300 bg-white text-neutral-900 shadow-sm hover:bg-neutral-50 hover:border-neutral-400 hover:shadow-md',
+        outline:
+          'border-2 border-neutral-300 bg-white text-neutral-900 shadow-sm hover:bg-neutral-50 hover:border-neutral-400 hover:shadow-md',
 
         // Destructive - Error actions
         destructive:

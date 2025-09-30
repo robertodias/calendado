@@ -143,7 +143,7 @@ export const BookingSummaryModal: React.FC<BookingSummaryModalProps> = ({
 
           {/* Action Buttons */}
           <div className='flex space-x-3'>
-                   <Button variant='secondary' onClick={onClose} className='flex-1'>
+            <Button variant='secondary' onClick={onClose} className='flex-1'>
               Cancel
             </Button>
             <Button onClick={onConfirm} className='flex-1'>

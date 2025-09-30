@@ -86,11 +86,16 @@ export function getProfessionalBySlug(slug: string): Professional | null {
   return mockProfessionals.find(prof => prof.slug === slug) || null;
 }
 
-export function getServiceBySlug(professionalSlug: string, serviceSlug: string): Service | null {
+export function getServiceBySlug(
+  professionalSlug: string,
+  serviceSlug: string
+): Service | null {
   const professional = getProfessionalBySlug(professionalSlug);
   if (!professional) return null;
-  
-  return professional.services.find(service => service.slug === serviceSlug) || null;
+
+  return (
+    professional.services.find(service => service.slug === serviceSlug) || null
+  );
 }
 
 export function getBrandBySlug(slug: string): any {
@@ -98,7 +103,7 @@ export function getBrandBySlug(slug: string): any {
   return {
     id: 'brand-1',
     name: 'Glow Beauty Studio',
-    slug: slug,
+    slug,
     description: 'Professional beauty services',
   };
 }

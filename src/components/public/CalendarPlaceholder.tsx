@@ -93,7 +93,7 @@ export const CalendarPlaceholder: React.FC<CalendarPlaceholderProps> = ({
       {/* Month Navigation */}
       <div className='flex items-center justify-between mb-6'>
         <Button
-                variant='secondary'
+          variant='secondary'
           size='sm'
           onClick={() => navigateMonth('prev')}
         >
@@ -108,7 +108,7 @@ export const CalendarPlaceholder: React.FC<CalendarPlaceholderProps> = ({
         </h4>
 
         <Button
-                variant='secondary'
+          variant='secondary'
           size='sm'
           onClick={() => navigateMonth('next')}
         >

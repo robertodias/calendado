@@ -136,12 +136,12 @@ const ProPage: React.FC = () => {
         selectedDate,
         selectedTime,
       });
-      
+
       // Navigate to booking wizard with preselected data
-      const bookingUrl = isSoloPro 
+      const bookingUrl = isSoloPro
         ? `/book/u/${professional?.slug}?service=${selectedService.slug}&date=${selectedDate}&time=${selectedTime}`
         : `/book/${brandSlug}/${storeSlug}/${professional?.slug}?service=${selectedService.slug}&date=${selectedDate}&time=${selectedTime}`;
-      
+
       navigate(bookingUrl);
     }
   };

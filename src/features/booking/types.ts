@@ -74,9 +74,10 @@ export interface AvailabilityProvider {
 }
 
 export interface BookingService {
-  createBookingDraft(draft: Omit<BookingDraft, 'id' | 'createdAt' | 'updatedAt'>): Promise<BookingDraft>;
+  createBookingDraft(
+    draft: Omit<BookingDraft, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<BookingDraft>;
   confirmBooking(bookingId: string): Promise<BookingConfirmation>;
   sendConfirmationEmail(confirmation: BookingConfirmation): Promise<void>;
   generateICSFile(booking: BookingDraft): Promise<string>;
 }
-

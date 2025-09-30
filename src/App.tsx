@@ -21,8 +21,12 @@ const NewStorePage = lazy(() => import('./pages/store/StorePage'));
 const NewProPage = lazy(() => import('./pages/pro/ProPage'));
 
 // Lazy load booking pages
-const BookingRoute = lazy(() => import('./features/booking/components/BookingRoute'));
-const SoloBookingRoute = lazy(() => import('./features/booking/components/SoloBookingRoute'));
+const BookingRoute = lazy(
+  () => import('./features/booking/components/BookingRoute')
+);
+const SoloBookingRoute = lazy(
+  () => import('./features/booking/components/SoloBookingRoute')
+);
 const BookingSuccess = lazy(() => import('./pages/booking/BookingSuccess'));
 
 function App() {
@@ -51,8 +55,14 @@ function App() {
                   <Route path='/invite/:token' element={<InviteConsume />} />
 
                   {/* Booking Routes */}
-                  <Route path='/book/:brandSlug/:storeSlug/:proSlug' element={<BookingRoute />} />
-                  <Route path='/book/u/:proSlug' element={<SoloBookingRoute />} />
+                  <Route
+                    path='/book/:brandSlug/:storeSlug/:proSlug'
+                    element={<BookingRoute />}
+                  />
+                  <Route
+                    path='/book/u/:proSlug'
+                    element={<SoloBookingRoute />}
+                  />
                   <Route path='/booking/success' element={<BookingSuccess />} />
 
                   {/* Public Routes */}

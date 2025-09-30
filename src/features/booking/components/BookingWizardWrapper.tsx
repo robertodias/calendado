@@ -18,7 +18,9 @@ interface BookingWizardWrapperProps {
   };
 }
 
-export const BookingWizardWrapper: React.FC<BookingWizardWrapperProps> = ({ context }) => {
+export const BookingWizardWrapper: React.FC<BookingWizardWrapperProps> = ({
+  context,
+}) => {
   return (
     <BookingProvider>
       <BookingWizard context={context} />
@@ -27,4 +29,3 @@ export const BookingWizardWrapper: React.FC<BookingWizardWrapperProps> = ({ cont
 };
 
 export default BookingWizardWrapper;
-

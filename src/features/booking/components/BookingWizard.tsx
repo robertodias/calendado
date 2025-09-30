@@ -63,14 +63,14 @@ const BookingWizardContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className='min-h-screen bg-gray-50'>
+      <div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <div className='text-center mb-8'>
+          <h1 className='text-3xl font-bold text-gray-900 mb-2'>
             Book Your Appointment
           </h1>
-          <p className="text-gray-600">
+          <p className='text-gray-600'>
             Complete the steps below to schedule your appointment
           </p>
         </div>
@@ -79,40 +79,35 @@ const BookingWizardContent: React.FC = () => {
         <BookingProgress />
 
         {/* Main Content */}
-        <Card className="mt-8">
-          <CardContent className="p-8">
-            {renderCurrentStep()}
-          </CardContent>
+        <Card className='mt-8'>
+          <CardContent className='p-8'>{renderCurrentStep()}</CardContent>
         </Card>
 
         {/* Navigation */}
-        <div className="flex items-center justify-between mt-8">
+        <div className='flex items-center justify-between mt-8'>
           <Button
-            variant="secondary"
+            variant='secondary'
             onClick={handleBack}
             disabled={!canGoBack}
-            className="flex items-center space-x-2"
+            className='flex items-center space-x-2'
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className='w-4 h-4' />
             <span>Back</span>
           </Button>
 
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="secondary"
-              onClick={handleCancel}
-            >
+          <div className='flex items-center space-x-4'>
+            <Button variant='secondary' onClick={handleCancel}>
               Cancel
             </Button>
-            
+
             {state.currentStep < 3 && (
               <Button
                 onClick={handleNext}
                 disabled={!canProceed}
-                className="flex items-center space-x-2"
+                className='flex items-center space-x-2'
               >
                 <span>Next</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className='w-4 h-4' />
               </Button>
             )}
           </div>
@@ -120,8 +115,8 @@ const BookingWizardContent: React.FC = () => {
 
         {/* Error Display */}
         {state.error && (
-          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-800">{state.error}</p>
+          <div className='mt-4 p-4 bg-red-50 border border-red-200 rounded-lg'>
+            <p className='text-red-800'>{state.error}</p>
           </div>
         )}
       </div>
@@ -146,7 +141,7 @@ const BookingWizard: React.FC<BookingWizardProps> = ({ context }) => {
     };
 
     dispatch({ type: 'SET_CONTEXT', payload: bookingContext });
-    
+
     // Handle URL parameters for preselection
     const serviceSlug = searchParams.get('service');
     const date = searchParams.get('date');

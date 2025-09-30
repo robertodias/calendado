@@ -3,8 +3,19 @@
  * Manages the booking wizard state and flow
  */
 
-import React, { createContext, useContext, useReducer, type ReactNode } from 'react';
-import type { BookingContext, BookingDraft, BookingStep, AvailabilitySlot, CustomerInfo } from '../types';
+import React, {
+  createContext,
+  useContext,
+  useReducer,
+  type ReactNode,
+} from 'react';
+import type {
+  BookingContext,
+  BookingDraft,
+  BookingStep,
+  AvailabilitySlot,
+  CustomerInfo,
+} from '../types';
 
 interface BookingState {
   context: BookingContext | null;
@@ -72,7 +83,10 @@ const initialState: BookingState = {
   error: null,
 };
 
-function bookingReducer(state: BookingState, action: BookingAction): BookingState {
+function bookingReducer(
+  state: BookingState,
+  action: BookingAction
+): BookingState {
   switch (action.type) {
     case 'SET_CONTEXT':
       return {
@@ -194,7 +208,9 @@ interface BookingProviderProps {
   children: ReactNode;
 }
 
-export const BookingProvider: React.FC<BookingProviderProps> = ({ children }) => {
+export const BookingProvider: React.FC<BookingProviderProps> = ({
+  children,
+}) => {
   const [state, dispatch] = useReducer(bookingReducer, initialState);
 
   const canProceed = (() => {
@@ -227,9 +243,7 @@ export const BookingProvider: React.FC<BookingProviderProps> = ({ children }) =>
   };
 
   return (
-    <BookingContext.Provider value={value}>
-      {children}
-    </BookingContext.Provider>
+    <BookingContext.Provider value={value}>{children}</BookingContext.Provider>
   );
 };
 

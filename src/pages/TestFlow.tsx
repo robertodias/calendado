@@ -4,7 +4,12 @@
  */
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Copy, Check, ExternalLink, Users, Calendar, Link } from 'lucide-react';
@@ -18,7 +23,10 @@ const TestFlow: React.FC = () => {
   const handleCopyLink = (link: string) => {
     navigator.clipboard.writeText(link);
     setCopiedLink(link);
-    toast({ title: 'Link copied to clipboard!', description: 'The link has been copied to your clipboard.' });
+    toast({
+      title: 'Link copied to clipboard!',
+      description: 'The link has been copied to your clipboard.',
+    });
     setTimeout(() => setCopiedLink(null), 2000);
   };
 
@@ -37,29 +45,31 @@ const TestFlow: React.FC = () => {
       id: 1,
       title: 'Admin invites user from waitlist',
       description: 'Admin sends invitation to user from the waitlist',
-      icon: <Users className="w-5 h-5" />,
+      icon: <Users className='w-5 h-5' />,
       action: (
-        <div className="space-y-3">
-          <p className="text-sm text-gray-600">
+        <div className='space-y-3'>
+          <p className='text-sm text-gray-600'>
             Admin goes to /admin → Waitlist → Selects user → Sends invitation
           </p>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <p className="text-sm font-medium text-blue-900">Invitation Link:</p>
-            <div className="flex items-center space-x-2 mt-1">
+          <div className='bg-blue-50 border border-blue-200 rounded-lg p-3'>
+            <p className='text-sm font-medium text-blue-900'>
+              Invitation Link:
+            </p>
+            <div className='flex items-center space-x-2 mt-1'>
               <Input
                 value={generateInviteLink()}
                 readOnly
-                className="text-xs"
+                className='text-xs'
               />
               <Button
-                size="sm"
-                variant="outline"
+                size='sm'
+                variant='outline'
                 onClick={() => handleCopyLink(generateInviteLink())}
               >
                 {copiedLink === generateInviteLink() ? (
-                  <Check className="w-4 h-4" />
+                  <Check className='w-4 h-4' />
                 ) : (
-                  <Copy className="w-4 h-4" />
+                  <Copy className='w-4 h-4' />
                 )}
               </Button>
             </div>
@@ -71,25 +81,26 @@ const TestFlow: React.FC = () => {
       id: 2,
       title: 'User receives and accepts invitation',
       description: 'User clicks the invitation link and signs in',
-      icon: <Calendar className="w-5 h-5" />,
+      icon: <Calendar className='w-5 h-5' />,
       action: (
-        <div className="space-y-3">
-          <p className="text-sm text-gray-600">
-            User clicks invitation link → Signs in with Google → Redirected to dashboard
+        <div className='space-y-3'>
+          <p className='text-sm text-gray-600'>
+            User clicks invitation link → Signs in with Google → Redirected to
+            dashboard
           </p>
-          <div className="flex space-x-2">
+          <div className='flex space-x-2'>
             <Button
-              variant="outline"
+              variant='outline'
               onClick={() => window.open('/invite/sample-token-123', '_blank')}
             >
-              <ExternalLink className="w-4 h-4 mr-2" />
+              <ExternalLink className='w-4 h-4 mr-2' />
               Test Invitation Flow
             </Button>
             <Button
-              variant="outline"
+              variant='outline'
               onClick={() => window.open('/dashboard', '_blank')}
             >
-              <ExternalLink className="w-4 h-4 mr-2" />
+              <ExternalLink className='w-4 h-4 mr-2' />
               View Dashboard
             </Button>
           </div>
@@ -99,30 +110,33 @@ const TestFlow: React.FC = () => {
     {
       id: 3,
       title: 'User views schedule and copies booking link',
-      description: 'User accesses their dashboard and shares their booking link',
-      icon: <Link className="w-5 h-5" />,
+      description:
+        'User accesses their dashboard and shares their booking link',
+      icon: <Link className='w-5 h-5' />,
       action: (
-        <div className="space-y-3">
-          <p className="text-sm text-gray-600">
+        <div className='space-y-3'>
+          <p className='text-sm text-gray-600'>
             User goes to dashboard → Links tab → Copies their booking link
           </p>
-          <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-            <p className="text-sm font-medium text-green-900">User's Booking Link:</p>
-            <div className="flex items-center space-x-2 mt-1">
+          <div className='bg-green-50 border border-green-200 rounded-lg p-3'>
+            <p className='text-sm font-medium text-green-900'>
+              User's Booking Link:
+            </p>
+            <div className='flex items-center space-x-2 mt-1'>
               <Input
                 value={generateBookingLink()}
                 readOnly
-                className="text-xs"
+                className='text-xs'
               />
               <Button
-                size="sm"
-                variant="outline"
+                size='sm'
+                variant='outline'
                 onClick={() => handleCopyLink(generateBookingLink())}
               >
                 {copiedLink === generateBookingLink() ? (
-                  <Check className="w-4 h-4" />
+                  <Check className='w-4 h-4' />
                 ) : (
-                  <Copy className="w-4 h-4" />
+                  <Copy className='w-4 h-4' />
                 )}
               </Button>
             </div>
@@ -134,25 +148,26 @@ const TestFlow: React.FC = () => {
       id: 4,
       title: 'Non-user books appointment',
       description: 'Non-user clicks the shared link and books an appointment',
-      icon: <Calendar className="w-5 h-5" />,
+      icon: <Calendar className='w-5 h-5' />,
       action: (
-        <div className="space-y-3">
-          <p className="text-sm text-gray-600">
-            Non-user clicks shared link → Views professional page → Books appointment
+        <div className='space-y-3'>
+          <p className='text-sm text-gray-600'>
+            Non-user clicks shared link → Views professional page → Books
+            appointment
           </p>
-          <div className="flex space-x-2">
+          <div className='flex space-x-2'>
             <Button
-              variant="outline"
+              variant='outline'
               onClick={() => window.open('/u/john-doe-hair', '_blank')}
             >
-              <ExternalLink className="w-4 h-4 mr-2" />
+              <ExternalLink className='w-4 h-4 mr-2' />
               Test Public Booking
             </Button>
             <Button
-              variant="outline"
+              variant='outline'
               onClick={() => window.open('/book/u/john-doe-hair', '_blank')}
             >
-              <ExternalLink className="w-4 h-4 mr-2" />
+              <ExternalLink className='w-4 h-4 mr-2' />
               Test Booking Wizard
             </Button>
           </div>
@@ -162,66 +177,70 @@ const TestFlow: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+    <div className='min-h-screen bg-gray-50'>
+      <div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12'>
+        <div className='text-center mb-12'>
+          <h1 className='text-4xl font-bold text-gray-900 mb-4'>
             Test Case Flow
           </h1>
-          <p className="text-xl text-gray-600">
+          <p className='text-xl text-gray-600'>
             Complete user journey from invitation to booking
           </p>
         </div>
 
-        <div className="space-y-8">
+        <div className='space-y-8'>
           {steps.map((step, index) => (
-            <Card key={step.id} className="relative">
-              <div className="flex items-start space-x-4 p-6">
-                <div className="flex-shrink-0">
-                  <div className="flex items-center justify-center w-10 h-10 bg-primary-100 rounded-full">
+            <Card key={step.id} className='relative'>
+              <div className='flex items-start space-x-4 p-6'>
+                <div className='flex-shrink-0'>
+                  <div className='flex items-center justify-center w-10 h-10 bg-primary-100 rounded-full'>
                     {step.icon}
                   </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-3 mb-2">
-                    <h3 className="text-lg font-semibold text-gray-900">
+                <div className='flex-1 min-w-0'>
+                  <div className='flex items-center space-x-3 mb-2'>
+                    <h3 className='text-lg font-semibold text-gray-900'>
                       {step.title}
                     </h3>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
+                    <span className='inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800'>
                       Step {step.id}
                     </span>
                   </div>
-                  <p className="text-gray-600 mb-4">{step.description}</p>
+                  <p className='text-gray-600 mb-4'>{step.description}</p>
                   {step.action}
                 </div>
               </div>
-              
+
               {/* Connection line to next step */}
               {index < steps.length - 1 && (
-                <div className="absolute left-8 top-full w-0.5 h-8 bg-gray-200"></div>
+                <div className='absolute left-8 top-full w-0.5 h-8 bg-gray-200'></div>
               )}
             </Card>
           ))}
         </div>
 
-        <div className="mt-12">
-          <Card className="bg-blue-50 border-blue-200">
+        <div className='mt-12'>
+          <Card className='bg-blue-50 border-blue-200'>
             <CardHeader>
-              <CardTitle className="text-blue-900">Test Instructions</CardTitle>
+              <CardTitle className='text-blue-900'>Test Instructions</CardTitle>
             </CardHeader>
             <CardContent>
-              <ol className="space-y-2 text-blue-800">
+              <ol className='space-y-2 text-blue-800'>
                 <li>
-                  <strong>1. Admin Flow:</strong> Go to /admin → Waitlist panel → Select a user → Send invitation
+                  <strong>1. Admin Flow:</strong> Go to /admin → Waitlist panel
+                  → Select a user → Send invitation
                 </li>
                 <li>
-                  <strong>2. User Flow:</strong> Click the invitation link → Sign in with Google → Access dashboard
+                  <strong>2. User Flow:</strong> Click the invitation link →
+                  Sign in with Google → Access dashboard
                 </li>
                 <li>
-                  <strong>3. Link Sharing:</strong> In dashboard → Links tab → Copy booking link → Share with someone
+                  <strong>3. Link Sharing:</strong> In dashboard → Links tab →
+                  Copy booking link → Share with someone
                 </li>
                 <li>
-                  <strong>4. Public Booking:</strong> Non-user clicks shared link → Books appointment → Confirmation
+                  <strong>4. Public Booking:</strong> Non-user clicks shared
+                  link → Books appointment → Confirmation
                 </li>
               </ol>
             </CardContent>
