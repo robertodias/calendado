@@ -9,23 +9,19 @@ import { useBooking } from '../../context/BookingContext';
 import { bookingService } from '../../services/bookingService';
 import { Card, CardContent } from '../../../../components/ui/Card';
 import { Button } from '../../../../components/ui/Button';
-import { Badge } from '../../../../components/ui/Badge';
+import { logger } from '../../../../lib/logger';
 import {
   Calendar,
-  Clock,
   User,
   Mail,
   Phone,
   MapPin,
-  CheckCircle,
-  Download,
 } from 'lucide-react';
 
 export const ConfirmationStep: React.FC = () => {
   const { state, dispatch } = useBooking();
   const navigate = useNavigate();
   const [isConfirming, setIsConfirming] = useState(false);
-  const [confirmationCode, setConfirmationCode] = useState<string | null>(null);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -88,7 +84,6 @@ export const ConfirmationStep: React.FC = () => {
 
       // Confirm booking
       const confirmation = await bookingService.confirmBooking(bookingDraft.id);
-      setConfirmationCode(confirmation.confirmationCode);
 
       // Send confirmation email
       await bookingService.sendConfirmationEmail(confirmation);
@@ -112,7 +107,9 @@ export const ConfirmationStep: React.FC = () => {
         },
       });
     } catch (error) {
-      console.error('Error confirming booking:', error);
+      logger.error('Error confirming booking', error as Error, {
+        component: 'ConfirmationStep',
+      });
       dispatch({
         type: 'SET_ERROR',
         payload: 'Failed to confirm booking. Please try again.',
@@ -123,106 +120,10 @@ export const ConfirmationStep: React.FC = () => {
     }
   };
 
-  const handleDownloadICS = async () => {
-    if (!state.bookingDraft) return;
+  // ICS download handled on success page
 
-    try {
-      const icsUrl = await bookingService.generateICSFile(state.bookingDraft);
-      // In a real implementation, this would trigger a download
-      console.log('Downloading ICS file:', icsUrl);
-      // For now, just show an alert
-      alert('ICS file download would start here');
-    } catch (error) {
-      console.error('Error downloading ICS file:', error);
-    }
-  };
-
-  // Removed isConfirmed check since we now navigate to success page
-  // if (false) {
-  //   return (
-  //     <div className='text-center'>
-  //       ...
-  //     </div>
-  //   );
-  // }
-
-  return (
-    <div className='mb-8'>
-          <CheckCircle className='w-16 h-16 text-green-500 mx-auto mb-4' />
-          <h2 className='text-3xl font-bold text-gray-900 mb-2'>
-            Booking Confirmed!
-          </h2>
-          <p className='text-gray-600 mb-4'>
-            Your appointment has been successfully booked
-          </p>
-          {confirmationCode && (
-            <Badge variant='secondary' className='text-lg px-4 py-2'>
-              Confirmation Code: {confirmationCode}
-            </Badge>
-          )}
-        </div>
-
-        <Card className='max-w-2xl mx-auto mb-8'>
-          <CardContent className='p-6'>
-            <h3 className='text-lg font-semibold text-gray-900 mb-4'>
-              Appointment Details
-            </h3>
-            <div className='space-y-4'>
-              <div className='flex items-center space-x-3'>
-                <Calendar className='w-5 h-5 text-gray-500' />
-                <span className='text-gray-900'>
-                  {formatDate(state.selectedSlot!.date)} at{' '}
-                  {formatTime(state.selectedSlot!.time)}
-                </span>
-              </div>
-              <div className='flex items-center space-x-3'>
-                <Clock className='w-5 h-5 text-gray-500' />
-                <span className='text-gray-900'>
-                  {state.selectedService!.name} •{' '}
-                  {formatDuration(state.selectedService!.durationMin)}
-                </span>
-              </div>
-              <div className='flex items-center space-x-3'>
-                <User className='w-5 h-5 text-gray-500' />
-                <span className='text-gray-900'>
-                  {state.customerInfo!.firstName} {state.customerInfo!.lastName}
-                </span>
-              </div>
-              <div className='flex items-center space-x-3'>
-                <Mail className='w-5 h-5 text-gray-500' />
-                <span className='text-gray-900'>
-                  {state.customerInfo!.email}
-                </span>
-              </div>
-              <div className='flex items-center space-x-3'>
-                <Phone className='w-5 h-5 text-gray-500' />
-                <span className='text-gray-900'>
-                  {state.customerInfo!.phone}
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className='flex flex-col sm:flex-row gap-4 justify-center'>
-          <Button
-            onClick={handleDownloadICS}
-            variant='outline'
-            className='flex items-center space-x-2'
-          >
-            <Download className='w-4 h-4' />
-            <span>Add to Calendar</span>
-          </Button>
-          <Button
-            onClick={() => (window.location.href = '/')}
-            className='flex items-center space-x-2'
-          >
-            <span>Book Another Appointment</span>
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  // The confirmation logic now redirects to /booking/success page
+  // This step shows the booking summary for review before confirming
 
   return (
     <div>
