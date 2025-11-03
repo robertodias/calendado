@@ -94,8 +94,8 @@ const AdminSignIn: React.FC = () => {
                 </h3>
                 <div className='mt-2 text-sm text-yellow-700'>
                   <p>
-                    Firebase authentication is not set up. Please configure
-                    your Firebase credentials to enable sign-in.
+                    Firebase authentication is not set up. Please configure your
+                    Firebase credentials to enable sign-in.
                   </p>
                   <p className='mt-2 font-mono text-xs'>
                     See ENVIRONMENT_VARIABLES.md for setup instructions.

@@ -12,6 +12,7 @@ import WaitlistForm from '../components/forms/WaitlistForm';
 import WaitlistSuccess from '../components/WaitlistSuccess';
 import { Card, CardContent } from '../components/ui/Card';
 import { logError } from '../lib/errorHandler';
+import { logger } from '../lib/logger';
 
 const Landing: React.FC = () => {
   const { language, setLanguage, t, translations } = useLanguage();
@@ -158,7 +159,10 @@ const Landing: React.FC = () => {
                 <button
                   onClick={() => {
                     // Track secondary CTA click
-                    console.log('Secondary CTA clicked: Watch demo');
+                    logger.debug('Secondary CTA clicked', {
+                      component: 'Landing',
+                      action: 'watch_demo',
+                    });
                     // Navigate to demo page
                     window.location.href = '/demo';
                   }}
@@ -210,7 +214,10 @@ const Landing: React.FC = () => {
           {/* Demo Steps */}
           <div className='grid grid-cols-1 md:grid-cols-3 gap-8 mb-16'>
             {(translations.demo?.steps || []).map(
-              (step: any, index: number) => (
+              (
+                step: { title?: string; description?: string },
+                index: number
+              ) => (
                 <Card
                   key={index}
                   variant='elevated'
@@ -352,7 +359,7 @@ const Landing: React.FC = () => {
           {/* Stats Grid */}
           <div className='grid grid-cols-1 md:grid-cols-3 gap-8 mb-16'>
             {(translations.trust?.stats || []).map(
-              (stat: any, index: number) => (
+              (stat: { number?: string; label?: string }, index: number) => (
                 <div key={index} className='text-center'>
                   <div className='text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary-400 to-secondary-400 bg-clip-text text-transparent mb-2'>
                     {stat.number}
@@ -561,7 +568,15 @@ const Landing: React.FC = () => {
           {/* Pricing Cards */}
           <div className='grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto'>
             {(translations.pricing?.plans || []).map(
-              (plan: any, index: number) => (
+              (
+                plan: {
+                  name?: string;
+                  price?: string;
+                  features?: string[];
+                  popular?: boolean;
+                },
+                index: number
+              ) => (
                 <Card
                   key={index}
                   variant='elevated'

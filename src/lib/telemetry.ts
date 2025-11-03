@@ -3,9 +3,11 @@
  * Emits events for analytics and monitoring
  */
 
+import { logger } from './logger';
+
 export interface TelemetryEvent {
   event: string;
-  properties: Record<string, any>;
+  properties: Record<string, unknown>;
   timestamp: number;
 }
 
@@ -30,7 +32,7 @@ export interface BookingStartEvent {
 class TelemetryService {
   private events: TelemetryEvent[] = [];
 
-  emit(event: string, properties: Record<string, any> = {}) {
+  emit(event: string, properties: Record<string, unknown> = {}) {
     const telemetryEvent: TelemetryEvent = {
       event,
       properties,
@@ -39,9 +41,13 @@ class TelemetryService {
 
     this.events.push(telemetryEvent);
 
-    // In development, log to console
+    // In development, log via logger
     if (import.meta.env.DEV) {
-      console.log('📊 Telemetry Event:', telemetryEvent);
+      logger.debug('Telemetry Event', {
+        component: 'telemetry',
+        event: telemetryEvent.event,
+        properties: telemetryEvent.properties,
+      });
     }
 
     // In production, you would send to your analytics service

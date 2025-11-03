@@ -3,7 +3,7 @@
  * Displays brand information and available stores
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { BrandHeader } from '../../components/public/BrandHeader';
 import { StoreCard } from '../../components/public/StoreCard';
@@ -13,6 +13,7 @@ import { Button } from '../../components/ui/Button';
 import { MapPin, ArrowRight } from 'lucide-react';
 import { getBrandBySlug } from '../../lib/bookingMockData';
 import { telemetry } from '../../lib/telemetry';
+import { logger } from '../../lib/logger';
 import type { Brand, Store, Service } from '../../types/booking';
 
 const BrandPage: React.FC = () => {
@@ -23,17 +24,7 @@ const BrandPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!brandSlug) {
-      setError('Brand slug is required');
-      setLoading(false);
-      return;
-    }
-
-    loadBrand();
-  }, [brandSlug]);
-
-  const loadBrand = async () => {
+  const loadBrand = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -58,19 +49,37 @@ const BrandPage: React.FC = () => {
         brandId: brandData.id,
       });
     } catch (err) {
-      console.error('Error loading brand:', err);
+      logger.error('Error loading brand', err as Error, {
+        component: 'BrandPage',
+      });
       setError('Failed to load brand');
     } finally {
       setLoading(false);
     }
-  };
+  }, [brandSlug]);
+
+  useEffect(() => {
+    if (!brandSlug) {
+      setError('Brand slug is required');
+      setLoading(false);
+      return;
+    }
+
+    loadBrand();
+  }, [brandSlug, loadBrand]);
 
   const handleViewStore = (store: Store) => {
     navigate(`/${brandSlug}/${store.slug}`);
   };
 
   const handleSelectService = (service: Service) => {
-    // For now, just log to console. In production, this would navigate to booking flow
+    // For now, just log. In production, this would navigate to booking flow
+    logger.debug('Service selected', {
+      component: 'BrandPage',
+      serviceId: service.id,
+      serviceName: service.name,
+    });
+    // eslint-disable-next-line no-console
     console.log(
       `Service "${service.name}" selected. This would start the booking process.`
     );

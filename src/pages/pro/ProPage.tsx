@@ -3,7 +3,7 @@
  * Displays professional information and booking interface
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { ServiceCard } from '../../components/public/ServiceCard';
 import { CalendarPlaceholder } from '../../components/public/CalendarPlaceholder';
@@ -18,6 +18,7 @@ import {
   getStoreBySlug,
 } from '../../lib/bookingMockData';
 import { telemetry } from '../../lib/telemetry';
+import { logger } from '../../lib/logger';
 import type { Professional, Service, Brand, Store } from '../../types/booking';
 
 const ProPage: React.FC = () => {
@@ -41,6 +42,54 @@ const ProPage: React.FC = () => {
 
   const isSoloPro = !brandSlug || !storeSlug;
 
+  const loadProfessional = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      const proData = getProfessionalBySlug(proSlug!);
+
+      if (!proData) {
+        setError('Professional not found');
+        return;
+      }
+
+      setProfessional(proData);
+
+      // Load brand and store if not solo professional
+      if (!isSoloPro && brandSlug && storeSlug) {
+        const brandData = getBrandBySlug(brandSlug);
+        const storeData = getStoreBySlug(brandSlug, storeSlug);
+
+        if (brandData) setBrand(brandData);
+        if (storeData) setStore(storeData);
+      }
+
+      // Track page view
+      telemetry.pageView({
+        type: 'professional',
+        id: proData.id,
+        slug: proData.slug,
+        brandId: proData.brandId,
+        storeId: proData.storeId,
+        professionalId: proData.id,
+      });
+
+      // Track professional view
+      telemetry.professionalViewed(proData.id, proData.slug);
+    } catch (err) {
+      logger.error('Error loading professional', err as Error, {
+        component: 'ProPage',
+      });
+      setError('Failed to load professional');
+    } finally {
+      setLoading(false);
+    }
+  }, [proSlug, brandSlug, storeSlug, isSoloPro]);
+
   useEffect(() => {
     if (!proSlug) {
       setError('Professional slug is required');
@@ -49,7 +98,7 @@ const ProPage: React.FC = () => {
     }
 
     loadProfessional();
-  }, [proSlug, brandSlug, storeSlug]);
+  }, [proSlug, brandSlug, storeSlug, loadProfessional]);
 
   // Handle URL parameters for preselection
   useEffect(() => {
@@ -148,9 +197,9 @@ const ProPage: React.FC = () => {
 
   const handleBookingConfirm = () => {
     // In production, this would integrate with your booking system
-    console.log(
-      'Booking confirmed! This is a demo - in production, this would complete the booking.'
-    );
+    logger.debug('Booking confirmed (demo)', {
+      component: 'ProPage',
+    });
     setShowBookingModal(false);
   };
 

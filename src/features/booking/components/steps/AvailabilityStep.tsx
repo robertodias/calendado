@@ -3,7 +3,7 @@
  * Shows available time slots for booking
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useBooking } from '../../context/BookingContext';
 import { availabilityProvider } from '../../services/availabilityProvider';
@@ -11,6 +11,7 @@ import { availabilityProvider } from '../../services/availabilityProvider';
 import { Button } from '../../../../components/ui/Button';
 import { Calendar, Clock, Check } from 'lucide-react';
 import type { AvailabilitySlot } from '../../types';
+import { logger } from '../../../../lib/logger';
 
 export const AvailabilityStep: React.FC = () => {
   const { state, dispatch } = useBooking();
@@ -20,13 +21,7 @@ export const AvailabilityStep: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [availableDates, setAvailableDates] = useState<string[]>([]);
 
-  useEffect(() => {
-    if (state.selectedService && state.context?.professionalId) {
-      loadAvailability();
-    }
-  }, [state.selectedService, state.context?.professionalId]);
-
-  const loadAvailability = async () => {
+  const loadAvailability = useCallback(async () => {
     try {
       setLoading(true);
       dispatch({ type: 'SET_LOADING', payload: true });
@@ -86,13 +81,21 @@ export const AvailabilityStep: React.FC = () => {
         }
       }
     } catch (error) {
-      console.error('Error loading availability:', error);
+      logger.error('Error loading availability', error as Error, {
+        component: 'AvailabilityStep',
+      });
       dispatch({ type: 'SET_ERROR', payload: 'Failed to load availability' });
     } finally {
       setLoading(false);
       dispatch({ type: 'SET_LOADING', payload: false });
     }
-  };
+  }, [state.selectedService, state.context, dispatch, searchParams]);
+
+  useEffect(() => {
+    if (state.selectedService && state.context?.professionalId) {
+      loadAvailability();
+    }
+  }, [state.selectedService, state.context?.professionalId, loadAvailability]);
 
   const handleSelectSlot = (slot: AvailabilitySlot) => {
     dispatch({ type: 'SET_SLOT', payload: slot });

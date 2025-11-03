@@ -60,7 +60,7 @@ function createMockQueryDocumentSnapshot<T = DocumentData>(
     },
     get: vi.fn(),
     toJSON: vi.fn(),
-    ref: {} as any,
+    ref: {} as unknown,
   } as unknown as QueryDocumentSnapshot<T>;
 }
 
@@ -77,7 +77,7 @@ function createMockQuerySnapshot<T = DocumentData>(
     }),
     docChanges: vi.fn(),
     isEqual: vi.fn(),
-    query: {} as any,
+    query: {} as unknown,
     toJSON: vi.fn(),
     metadata: {
       fromCache: false,

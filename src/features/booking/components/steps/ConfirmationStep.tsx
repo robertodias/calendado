@@ -10,13 +10,7 @@ import { bookingService } from '../../services/bookingService';
 import { Card, CardContent } from '../../../../components/ui/Card';
 import { Button } from '../../../../components/ui/Button';
 import { logger } from '../../../../lib/logger';
-import {
-  Calendar,
-  User,
-  Mail,
-  Phone,
-  MapPin,
-} from 'lucide-react';
+import { Calendar, User, Mail, Phone, MapPin } from 'lucide-react';
 
 export const ConfirmationStep: React.FC = () => {
   const { state, dispatch } = useBooking();

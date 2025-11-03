@@ -3,7 +3,7 @@
  * Displays store information and available professionals
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ProfessionalCard } from '../../components/public/ProfessionalCard';
 import { ServiceCard } from '../../components/public/ServiceCard';
@@ -14,6 +14,7 @@ import { Badge } from '../../components/ui/Badge';
 import { MapPin, Phone, Search, ArrowRight, Users } from 'lucide-react';
 import { getStoreBySlug, getBrandBySlug } from '../../lib/bookingMockData';
 import { telemetry } from '../../lib/telemetry';
+import { logger } from '../../lib/logger';
 import type { Store, Professional, Service, Brand } from '../../types/booking';
 
 const StorePage: React.FC = () => {
@@ -31,17 +32,7 @@ const StorePage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedService, setSelectedService] = useState<string>('all');
 
-  useEffect(() => {
-    if (!brandSlug || !storeSlug) {
-      setError('Brand and store slugs are required');
-      setLoading(false);
-      return;
-    }
-
-    loadStore();
-  }, [brandSlug, storeSlug]);
-
-  const loadStore = async () => {
+  const loadStore = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -74,22 +65,36 @@ const StorePage: React.FC = () => {
         storeId: storeData.id,
       });
     } catch (err) {
-      console.error('Error loading store:', err);
+      logger.error('Error loading store', err as Error, {
+        component: 'StorePage',
+      });
       setError('Failed to load store');
     } finally {
       setLoading(false);
     }
-  };
+  }, [brandSlug, storeSlug]);
+
+  useEffect(() => {
+    if (!brandSlug || !storeSlug) {
+      setError('Brand and store slugs are required');
+      setLoading(false);
+      return;
+    }
+
+    loadStore();
+  }, [brandSlug, storeSlug, loadStore]);
 
   const handleViewProfessional = (professional: Professional) => {
     navigate(`/${brandSlug}/${storeSlug}/${professional.slug}`);
   };
 
   const handleSelectService = (service: Service) => {
-    // For now, just log to console. In production, this would navigate to booking flow
-    console.log(
-      `Service "${service.name}" selected. This would start the booking process.`
-    );
+    // For now, just log. In production, this would navigate to booking flow
+    logger.debug('Service selected', {
+      component: 'StorePage',
+      serviceId: service.id,
+      serviceName: service.name,
+    });
   };
 
   const filteredProfessionals =

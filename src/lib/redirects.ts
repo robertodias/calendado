@@ -124,7 +124,7 @@ function matchesRedirectPattern(path: string, pattern: string): boolean {
 export function applySPARedirect(
   path: string,
   navigate: (to: string, options?: { replace?: boolean }) => void,
-  telemetry?: (event: any) => void
+  telemetry?: (event: Record<string, unknown>) => void
 ): boolean {
   const rule = findRedirectRule(path);
   if (!rule) {
@@ -159,7 +159,7 @@ export function applySPARedirect(
 export function applySSRRedirect(
   path: string,
   res: { redirect: (status: number, url: string) => void },
-  telemetry?: (event: any) => void
+  telemetry?: (event: Record<string, unknown>) => void
 ): boolean {
   const rule = findRedirectRule(path);
   if (!rule) {

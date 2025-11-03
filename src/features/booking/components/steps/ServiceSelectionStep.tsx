@@ -3,38 +3,25 @@
  * Allows users to select a service for booking
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useBooking } from '../../context/BookingContext';
 import { Card, CardContent } from '../../../../components/ui/Card';
 import { Badge } from '../../../../components/ui/Badge';
 import { Clock, DollarSign, Star } from 'lucide-react';
-import { getProfessionalBySlug } from '../../../../lib/bookingMockData';
+import {
+  getProfessionalBySlug,
+  type Service,
+} from '../../../../lib/bookingMockData';
+import { logger } from '../../../../lib/logger';
 
 export const ServiceSelectionStep: React.FC = () => {
   const { state, dispatch } = useBooking();
   const [searchParams] = useSearchParams();
-  const [services, setServices] = useState<any[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadServices();
-  }, []);
-
-  // Handle preselected service from URL
-  useEffect(() => {
-    const preselectedServiceSlug = searchParams.get('service');
-    if (preselectedServiceSlug && services.length > 0) {
-      const preselectedService = services.find(
-        service => service.slug === preselectedServiceSlug
-      );
-      if (preselectedService) {
-        dispatch({ type: 'SET_SERVICE', payload: preselectedService });
-      }
-    }
-  }, [services, searchParams, dispatch]);
-
-  const loadServices = async () => {
+  const loadServices = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -108,14 +95,37 @@ export const ServiceSelectionStep: React.FC = () => {
         ]);
       }
     } catch (error) {
-      console.error('Error loading services:', error);
+      logger.error('Error loading services', error as Error, {
+        component: 'ServiceSelectionStep',
+      });
       dispatch({ type: 'SET_ERROR', payload: 'Failed to load services' });
     } finally {
       setLoading(false);
     }
-  };
+  }, [
+    state.context?.professionalId,
+    state.context?.professionalSlug,
+    dispatch,
+  ]);
 
-  const handleSelectService = (service: any) => {
+  useEffect(() => {
+    loadServices();
+  }, [loadServices]);
+
+  // Handle preselected service from URL
+  useEffect(() => {
+    const preselectedServiceSlug = searchParams.get('service');
+    if (preselectedServiceSlug && services.length > 0) {
+      const preselectedService = services.find(
+        service => service.slug === preselectedServiceSlug
+      );
+      if (preselectedService) {
+        dispatch({ type: 'SET_SERVICE', payload: preselectedService });
+      }
+    }
+  }, [services, searchParams, dispatch]);
+
+  const handleSelectService = (service: Service) => {
     dispatch({ type: 'SET_SERVICE', payload: service });
   };
 

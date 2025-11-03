@@ -247,11 +247,14 @@ const WaitlistPanel: React.FC = () => {
           return;
         }
 
-        logger.debug('User has platform admin privileges, proceeding with deletion', {
-          component: 'WaitlistPanel',
-          userId: user.uid,
-          entryId,
-        });
+        logger.debug(
+          'User has platform admin privileges, proceeding with deletion',
+          {
+            component: 'WaitlistPanel',
+            userId: user.uid,
+            entryId,
+          }
+        );
         await deleteDoc(doc(db, 'waitlist', entryId));
         toast({
           title: 'Success',
@@ -262,13 +265,14 @@ const WaitlistPanel: React.FC = () => {
         logger.error('Delete error', error as Error, {
           component: 'WaitlistPanel',
           entryId,
-          errorDetails: error instanceof Error
-            ? {
-                code: (error as Error & { code?: string }).code,
-                message: error.message,
-                stack: error.stack,
-              }
-            : { error: String(error) },
+          errorDetails:
+            error instanceof Error
+              ? {
+                  code: (error as Error & { code?: string }).code,
+                  message: error.message,
+                  stack: error.stack,
+                }
+              : { error: String(error) },
         });
         toast({
           title: 'Error',

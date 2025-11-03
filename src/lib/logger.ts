@@ -41,9 +41,7 @@ class Logger {
     context?: LogContext
   ): string {
     const timestamp = new Date().toISOString();
-    const contextStr = context
-      ? ` [${JSON.stringify(context)}]`
-      : '';
+    const contextStr = context ? ` [${JSON.stringify(context)}]` : '';
     return `[${timestamp}] [${level.toUpperCase()}]${contextStr} ${message}`;
   }
 
@@ -80,6 +78,7 @@ class Logger {
     }
 
     const formatted = this.formatMessage('debug', message, context);
+    // eslint-disable-next-line no-console
     console.debug(formatted);
   }
 
@@ -92,6 +91,7 @@ class Logger {
     }
 
     const formatted = this.formatMessage('info', message, context);
+    // eslint-disable-next-line no-console
     console.info(formatted);
   }
 
@@ -104,17 +104,14 @@ class Logger {
     }
 
     const formatted = this.formatMessage('warn', message, context);
+    // eslint-disable-next-line no-console
     console.warn(formatted);
   }
 
   /**
    * Error level logging
    */
-  error(
-    message: string,
-    error?: Error | unknown,
-    context?: LogContext
-  ): void {
+  error(message: string, error?: Error | unknown, context?: LogContext): void {
     if (!this.shouldLog('error')) {
       return;
     }
@@ -122,9 +119,11 @@ class Logger {
     const formatted = this.formatMessage('error', message, context);
 
     if (error instanceof Error) {
+      // eslint-disable-next-line no-console
       console.error(formatted, error);
       this.sendToMonitoring('error', message, error, context);
     } else if (error) {
+      // eslint-disable-next-line no-console
       console.error(formatted, error);
       this.sendToMonitoring(
         'error',
@@ -133,6 +132,7 @@ class Logger {
         context
       );
     } else {
+      // eslint-disable-next-line no-console
       console.error(formatted);
       this.sendToMonitoring('error', message, undefined, context);
     }
@@ -146,6 +146,7 @@ class Logger {
       return; // Only log telemetry in dev/debug mode
     }
 
+    // eslint-disable-next-line no-console
     console.debug(`[TELEMETRY] ${event}`, properties);
     // In production, send to analytics service instead
     // Example: analytics.track(event, properties);
@@ -156,10 +157,7 @@ class Logger {
 export const logger = new Logger();
 
 // Export convenience functions for common use cases
-export const logError = (
-  error: Error | string,
-  component?: string
-): void => {
+export const logError = (error: Error | string, component?: string): void => {
   if (typeof error === 'string') {
     logger.error(error, undefined, { component });
   } else {
@@ -178,4 +176,3 @@ export const logWarn = (message: string, component?: string): void => {
 export const logDebug = (message: string, component?: string): void => {
   logger.debug(message, { component });
 };
-
